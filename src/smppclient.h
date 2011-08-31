@@ -220,8 +220,9 @@ private:
 	 * @param priority_flag
 	 * @param schedule_delivery_time
 	 * @param validity_period
+	 * @return SMSC sms id.
 	 */
-	void submitSm(const SmppAddress &sender, const SmppAddress &receiver,
+	string submitSm(const SmppAddress &sender, const SmppAddress &receiver,
 			const string &shortMessage, list<TLV> tags, const uint8_t priority_flag,
 			const string &schedule_delivery_time, const string& validity_period)
 					throw (smpp::SmppException, smpp::TransportException);
