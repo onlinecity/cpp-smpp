@@ -235,7 +235,7 @@ vector<string> smpp::SmppClient::split(const string& shortMessage,
 	return parts;
 }
 
-void smpp::SmppClient::submitSm(const SmppAddress& sender,
+string smpp::SmppClient::submitSm(const SmppAddress& sender,
 		const SmppAddress& receiver, const string& shortMessage, list<TLV> tags,
 		const uint8_t priority_flag, const string& schedule_delivery_time,
 		const string& validity_period) throw (smpp::SmppException,
@@ -275,7 +275,8 @@ void smpp::SmppClient::submitSm(const SmppAddress& sender,
 	for (list<TLV>::iterator itr = tags.begin(); itr != tags.end(); itr++)
 		pdu += *itr;
 
-	sendCommand(pdu);
+	PDU resp = sendCommand(pdu);
+	return resp.readStr();
 }
 
 uint32_t smpp::SmppClient::nextSequenceNumber() throw (smpp::SmppException) {
