@@ -6,6 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -182,6 +183,8 @@ public:
 					 * @return Next octets until a 0x00 is read as a c-style string.
 					 */
 					uint8_t* readStr();
+
+					string readString();
 
 					/**
 					 * Copy n octets into a string. Adds an 0x00 at the end.

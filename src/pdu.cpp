@@ -197,6 +197,15 @@ uint8_t* smpp::PDU::readStr()
 	return s;
 }
 
+string smpp::PDU::readString()
+{
+	stringstream ss;
+	string s;
+	ss << readStr();
+	ss >> s;
+	return s;
+}
+
 void smpp::PDU::readStr(uint8_t *arr, const uint32_t &len)
 {
 	std::copy(buffer + marker, buffer + (marker + len), arr);
