@@ -76,20 +76,20 @@ void hexDump(const string &s) {
 /**
  * Send an sms to the smsc.
  */
-void smpp::SmppClient::sendSms(const SmppAddress& sender,
+string smpp::SmppClient::sendSms(const SmppAddress& sender,
 		const SmppAddress& receiver, const string& shortMessage,
 		const uint8_t priority_flag, const string& schedule_delivery_time,
 		const string& validity_period, const int dataCoding)
 				throw (smpp::SmppException, smpp::TransportException) {
 
-	sendSms(sender, receiver, shortMessage, list<TLV>(), priority_flag,
+	return sendSms(sender, receiver, shortMessage, list<TLV>(), priority_flag,
 			schedule_delivery_time, validity_period, dataCoding);
 }
 
 /**
  * Send an sms to the smsc.
  */
-void smpp::SmppClient::sendSms(const SmppAddress& sender,
+string smpp::SmppClient::sendSms(const SmppAddress& sender,
 		const SmppAddress& receiver, const string& shortMessage, list<TLV> tags,
 		const uint8_t priority_flag, const string& schedule_delivery_time,
 		const string& validity_period, const int dataCoding)
@@ -111,11 +111,9 @@ void smpp::SmppClient::sendSms(const SmppAddress& sender,
 	}
 
 	// submit_sm if the short message could fit into one pdu.
-	if (messageLen <= singleSmsOctetLimit) {
-		submitSm(sender, receiver, shortMessage, tags, priority_flag,
+	if (messageLen <= singleSmsOctetLimit)
+		return submitSm(sender, receiver, shortMessage, tags, priority_flag,
 				schedule_delivery_time, validity_period);
-		return;
-	}
 
 	// split message
 	vector<string> parts = split(shortMessage, csmsSplit, dataCoding);
@@ -125,9 +123,11 @@ void smpp::SmppClient::sendSms(const SmppAddress& sender,
 	tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, (uint8_t) parts.size()));
 	int segment = 0;
 
+	string smsId;
+
 	for (; itr < parts.end(); itr++) {
 		tags.push_back(TLV(smpp::tags::SAR_SEGMENT_SEQNUM, ++segment));
-		submitSm(sender, receiver, (*itr), tags, priority_flag,
+		smsId = submitSm(sender, receiver, (*itr), tags, priority_flag,
 				schedule_delivery_time, validity_period);
 		// pop SAR_SEGMENT_SEQNUM tag
 		tags.pop_back();
@@ -137,6 +137,8 @@ void smpp::SmppClient::sendSms(const SmppAddress& sender,
 	tags.pop_back();
 	// pop SAR_MSG_REF_NUM tag
 	tags.pop_back();
+
+	return smsId;
 }
 
 smpp::SMS smpp::SmppClient::readSms() throw (smpp::SmppException,

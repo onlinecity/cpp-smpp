@@ -115,8 +115,9 @@ public:
 	 * @param schedule_delivery_time
 	 * @param validity_period
 	 * @param dataCoding
+	 * @return SMSC sms id.
 	 */
-	void
+	string
 	sendSms(const SmppAddress &sender, const SmppAddress &receiver,
 			const string &shortMessage, const uint8_t priority_flag = 0,
 			const string &schedule_delivery_time = "", const string &validity_period =
@@ -135,8 +136,9 @@ public:
 	 * @param schedule_delivery_time
 	 * @param validity_period
 	 * @param dataCoding
+	 * @return SMSC sms id.
 	 */
-	void sendSms(const SmppAddress &sender, const SmppAddress &receiver,
+	string sendSms(const SmppAddress &sender, const SmppAddress &receiver,
 			const string &shortMessage, list<TLV> tags, const uint8_t priority_flag =
 					0, const string &schedule_delivery_time = "",
 			const string &validity_period = "", const int dataCoding =
