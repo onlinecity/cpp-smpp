@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #include "smpp.h"
 #include "smppclient.h"
@@ -237,8 +238,6 @@ vector<string> smpp::SmppClient::split(const string& shortMessage,
 	return parts;
 }
 
-#include <sstream>
-
 string smpp::SmppClient::submitSm(const SmppAddress& sender,
 		const SmppAddress& receiver, const string& shortMessage, list<TLV> tags,
 		const uint8_t priority_flag, const string& schedule_delivery_time,
@@ -418,14 +417,6 @@ smpp::PDU smpp::SmppClient::readPduResponse(const uint32_t &sequence,
 		}
 		it++;
 	}
-
-//	PDU pdu;
-//	do {
-//		pdu = readPdu(true);
-//	} while (!pdu.null
-//			&& (pdu.getSequenceNo() != sequence && pdu.getCommandId() != response));
-//
-//	return pdu;
 
 	while (true) {
 		PDU pdu = readPdu(true);
