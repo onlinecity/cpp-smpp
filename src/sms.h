@@ -6,7 +6,6 @@
 #include <sstream>
 #include <locale>
 #include <boost/regex.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "smpp.h"
 #include "pdu.h"
@@ -111,8 +110,7 @@ pdu		.readStr(short_message, sm_length);
 					sms.replace_if_present_flag), data_coding(sms.data_coding), sm_default_msg_id(
 					sms.sm_default_msg_id), sm_length(sms.sm_length), null(sms.null) {
 		if (!null) {
-			short_message = new uint8_t[sm_length + 1];
-			std::copy(sms.short_message, sms.short_message + sm_length + 1, short_message);
+			short_message = new uint8_t[sm_length + 1];std::copy(sms.short_message, sms.short_message + sm_length + 1, short_message);
 			std::copy(sms.tlvs.begin(), sms.tlvs.end(), tlvs.begin());
 		}
 		}
@@ -172,8 +170,8 @@ public:
 	string id;
 	uint8_t sub;
 	uint8_t dlvrd;
-	boost::posix_time::ptime submitDate;
-	boost::posix_time::ptime doneDate;
+	string submitDate;
+	string doneDate;
 	string stat;
 	string err;
 	string text;
@@ -187,28 +185,20 @@ public:
 
 	{
 		using namespace boost;
-		using namespace boost::posix_time;
+//		using namespace boost::posix_time;
 
 		char* msg = reinterpret_cast<char*>(short_message);
 		regex expression(
 				"^id:([^ ]+) sub:(\\d{1,3}) dlvrd:(\\d{3}) submit date:(\\d{10}) done date:(\\d{10}) stat:([A-Z]{7}) err:(\\d{3}) text:(.*)$",
 				regex_constants::perl);
 		cmatch what;
-		stringstream ss;
-
-		time_input_facet *fac = new time_input_facet("%y%m%d%H%M");
-		ss.imbue(std::locale(std::locale::classic(), fac));
 
 		if (regex_match(msg, what, expression)) {
 			id = what[1];
 			sub = atoi(((string) what[2]).c_str());
 			dlvrd = atoi(((string) what[3]).c_str());
-
-			ss << what[4];
-			ss >> submitDate;
-
-			ss << what[5];
-			ss >> doneDate;
+			submitDate = what[4];
+			doneDate = what[5];
 
 			stat = what[6];
 			err = what[7];
