@@ -176,6 +176,10 @@ public:
 	string err;
 	string text;
 
+	DeliveryReport() :
+			SMS() {
+	}
+
 	/**
 	 * Constructs a delivery report from an SMS.
 	 * @param sms SMS to construct delivery report from.
@@ -185,8 +189,6 @@ public:
 
 	{
 		using namespace boost;
-//		using namespace boost::posix_time;
-
 		char* msg = reinterpret_cast<char*>(short_message);
 		regex expression(
 				"^id:([^ ]+) sub:(\\d{1,3}) dlvrd:(\\d{3}) submit date:(\\d{10}) done date:(\\d{10}) stat:([A-Z]{7}) err:(\\d{3}) text:(.*)$",
@@ -211,8 +213,7 @@ public:
 					rhs.doneDate), stat(rhs.stat), err(rhs.err), text(rhs.text) {
 	}
 
-	const DeliveryReport & operator=(const DeliveryReport &rhs)
-	{
+	const DeliveryReport & operator=(const DeliveryReport &rhs) {
 		if (this != &rhs) {
 			id = rhs.id;
 			sub = rhs.sub;
