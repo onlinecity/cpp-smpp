@@ -205,6 +205,26 @@ public:
 			text = what[8];
 		}
 	}
+
+	DeliveryReport(const DeliveryReport &rhs) :
+			id(rhs.id), sub(rhs.sub), dlvrd(rhs.dlvrd), submitDate(rhs.submitDate), doneDate(
+					rhs.doneDate), stat(rhs.stat), err(rhs.err), text(rhs.text) {
+	}
+
+	const DeliveryReport & operator=(const DeliveryReport &rhs)
+	{
+		if (this != &rhs) {
+			id = rhs.id;
+			sub = rhs.sub;
+			dlvrd = rhs.dlvrd;
+			submitDate = rhs.submitDate;
+			doneDate = rhs.doneDate;
+			stat = rhs.stat;
+			err = rhs.err;
+			text = rhs.text;
+		}
+		return *this;
+	}
 };
 
 } // namespace smpp
