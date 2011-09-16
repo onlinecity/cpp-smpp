@@ -256,6 +256,11 @@ private:
 	 */
 	PDU readPdu(const bool&) throw (smpp::SmppException, smpp::TransportException);
 
+	void readPduBlocking();
+
+	void handleTimeout(boost::optional<boost::system::error_code>* opt,
+			const boost::system::error_code &error);
+
 	/**
 	 * Peeks at the socket and returns true if there is data to be read.
 	 * @return True if there is data to be read.
@@ -284,6 +289,11 @@ private:
 	 * @param read Bytes read
 	 */
 	void readPduBodyHandler(const boost::system::error_code &error, size_t read);
+
+	void readPduHeaderHandlerBlocking(
+			boost::optional<boost::system::error_code>* opt,
+			const boost::system::error_code &error, size_t read)
+					throw (smpp::TransportException);
 
 	/**
 	 * Returns a response for a PDU we have sent,
