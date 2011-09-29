@@ -88,6 +88,20 @@ public:
 				regex_constants::perl);
 		return regex_replace(str, pattern, "?");
 	}
+
+	/**
+	 * Converts an GSM 0338 encoded string into UTF8.
+	 * @param str String to be encoded.
+	 * @return UTF8-encoded string.
+	 */
+	string getUtf8(string &str) {
+		map<string, string>::iterator it = dict.begin();
+		for (; it != dict.end(); it++) {
+			replace_all(str, it->second, it->first);
+		}
+
+		return str;
+	}
 };
 }
 
