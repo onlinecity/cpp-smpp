@@ -34,4 +34,3 @@ std::ostream& smpp::operator<<(std::ostream& out, smpp::SMS& sms)
 	return out;
 }
 
-

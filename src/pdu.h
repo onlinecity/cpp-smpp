@@ -7,8 +7,10 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <boost/shared_array.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace smpp {
 
@@ -18,195 +20,144 @@ const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
 /**
  * Class for representing a PDU.
  */
-class PDU {
-private:
-	int capacity;
-	int size;
-public:
-	int marker;
+class PDU
+{
 private:
 	uint32_t cmdId;
 	uint32_t cmdStatus;
 	uint32_t seqNo;
-	uint8_t *buffer;
-
+	iostream buf;
 	bool nullTerminateOctetStrings;
-
-	void pack();
-	void packHeaderField(uint32_t val, int pos);
-	void extractHeaderField(uint32_t &val, int pos);
-	bool checkBounds(int i);
 public:
 	bool null;
 
 public:
 
 	PDU() :
-			capacity(0), size(0), marker(0), cmdId(0), cmdStatus(0), seqNo(0), buffer(
-					new uint8_t[size]), nullTerminateOctetStrings(true), null(true) {
+			cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(true)
+	{
 	}
 
-	PDU(uint32_t _cmdId, uint32_t _cmdStatus, uint32_t _seqNo, int _initCapacity =
-			512) :
-			capacity(_initCapacity), size(HEADER_SIZE), marker(HEADER_SIZE), cmdId(
-					_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), buffer(
-					new uint8_t[HEADER_SIZE + capacity]), nullTerminateOctetStrings(true), null(false)
-					{
-						packHeaderField(cmdId, HEADERFIELD_SIZE);
-						packHeaderField(cmdStatus, HEADERFIELD_SIZE * 2);
-						packHeaderField(seqNo, HEADERFIELD_SIZE * 3);
-					}
+	PDU(uint32_t _cmdId, uint32_t _cmdStatus, uint32_t _seqNo) :
+			buf(streambuf()), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo)
+	{
+		buf.seekp(HEADERFIELD_SIZE);
+		buf << cmdId;
+		buf << cmdStatus;
+		buf << seqNo;
+	}
 
-					PDU(uint8_t* _buffer, int _size) : capacity(_size),
-					size(_size), marker(HEADER_SIZE), buffer(_buffer), null(false)
-					{
-						extractHeaderField(cmdId, HEADERFIELD_SIZE);
-						extractHeaderField(cmdStatus, HEADERFIELD_SIZE * 2);
-						extractHeaderField(seqNo, HEADERFIELD_SIZE * 3);
-					}
+	PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer)
+	{
+		unsigned int bufSize = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8
+				| (int) pduLength[3];
 
-					PDU(const PDU &rhs) :
-					capacity (rhs.capacity),
-					size(rhs.size),
-					marker (rhs.marker),
+		streambuf tmpBuf;
 
-					cmdId(rhs.cmdId),
-					cmdStatus(rhs.cmdStatus),
-					seqNo (rhs.seqNo),
-					nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
+		tmpBuf.sputn((char*) pduLength.get(), HEADERFIELD_SIZE);
+		tmpBuf.sputn((char*) pduBuffer.get(), bufSize);
 
-					null(rhs.null) {
+		buf = iostream(tmpBuf);
 
-						if (!null) {
+		buf.seekg(HEADERFIELD_SIZE);
 
-							buffer = new uint8_t[capacity];
-							std::copy(rhs.buffer, rhs.buffer + capacity, buffer);
-						}
-					}
+		buf >> cmdId;
+		buf >> cmdStatus;
+		buf >> seqNo;
+	}
 
-					const PDU& operator= (const PDU &rhs) {
-						if (this != &rhs) {
-							capacity = rhs.capacity;
-							size = rhs.size;
-							marker = rhs.marker;
-							cmdId = rhs.cmdId;
-							cmdStatus = rhs.cmdStatus;
-							seqNo = rhs.seqNo;
-							nullTerminateOctetStrings = rhs.nullTerminateOctetStrings;
-							null = rhs.null;
-							if (!null) {
+	/**
+	 * @return All data in this PDU as array of unsigned char array.
+	 */
+	const shared_array<uint8_t> getOctets();
 
-								buffer = new uint8_t[capacity];
-								std::copy(rhs.buffer, rhs.buffer + capacity, buffer);
-							}
-						}
+	/**
+	 * @return PDU size in octets.
+	 */
+	const int getSize();
 
-						return *this;
-					}
+	/**
+	 * @return PDU command id.
+	 */
+	const uint32_t getCommandId();
 
-					~PDU() {
-						delete[] buffer;
-					}
+	/**
+	 * @return PDU command status.
+	 */
+	const uint32_t getCommandStatus();
 
-					/**
-					 * @return All data in this PDU as array of unsigned char array.
-					 */
-					uint8_t* getOctets();
+	/**
+	 * @return PDU sequence number.
+	 */
+	const uint32_t getSequenceNo();
 
-					/**
-					 * @return PDU size in octets.
-					 */
-					const int getSize();
+	/**
+	 * @return True if null termination is on.
+	 */
+	const bool isNullTerminating();
 
-					/**
-					 * @return PDU command id.
-					 */
-					const uint32_t getCommandId();
+	/**
+	 * Turns null termination on or off.
+	 * @param True if null termination is on.
+	 */
+	void setNullTerminateOctetStrings(const bool&);
 
-					/**
-					 * @return PDU command status.
-					 */
-					const uint32_t getCommandStatus();
+	/** Adds an integer as an unsigned 8 bit. */
+	inline PDU& operator+=(const int &);
 
-					/**
-					 * @return PDU sequence number.
-					 */
-					const uint32_t getSequenceNo();
+	inline PDU& operator+=(const uint8_t &i);
+	inline PDU& operator+=(const uint16_t &i);
+	inline PDU& operator+=(const uint32_t &i);
+	PDU& operator+=(std::basic_string<char> s);
+	PDU& operator+=(const smpp::SmppAddress);
+	PDU& operator+=(const smpp::TLV);
+	PDU& addOctets(const shared_array<uint8_t> &octets, const streamsize &len);
 
-					/**
-					 * @return True if null termination is on.
-					 */
-					const bool isNullTerminating();
+	/**
+	 * Skips n octets.
+	 * @param n Octets to skip.
+	 */
+	void skip(int n);
 
-					/**
-					 * Turns null termination on or off.
-					 * @param True if null termination is on.
-					 */
-					void setNullTerminateOctetStrings(const bool&);
+	/**
+	 * Resets the read marker to the beginning of the PDU.
+	 */
+	void resetMarker();
 
-					PDU& operator+=(const int &);
-					PDU& operator+=(const uint8_t &i);
-					PDU& operator+=(const uint16_t &i);
-					PDU& operator+=(const uint32_t &i);
-					PDU& operator+=(std::basic_string<char> s);
-					PDU& operator+=(const smpp::SmppAddress);
-					PDU& operator+=(const smpp::TLV);
-					PDU& addOctets(const uint8_t*, const uint32_t &);
+	/**
+	 * Returns the next octet.
+	 * @return
+	 */
+	int readInt();
 
-					/**
-					 * Skips n octets.
-					 * @param n Octets to skip.
-					 */
-					void skip(int n);
+	/**
+	 * @return Next two octets as an uint16_t.
+	 */
+	uint16_t read2Int();
+	/**
+	 * @return Next four octets as an uint32_t.
+	 */
+	uint32_t read4Int();
 
-					/**
-					 * Resets the read marker to the beginning of the PDU.
-					 */
-					void resetMarker();
+	/**
+	 * @return Next null terminated string.
+	 */
+	string readString();
 
-					/**
-					 * Returns the next octet.
-					 * @return
-					 */
-					int readInt();
+	/**
+	 * Copy n octet into an array.
+	 * @param array Target array.
+	 * @param n Octets to copy.
+	 */
+	void readOctets(shared_array<uint8_t> &octets, const streamsize &n);
 
-					/**
-					 * @return Next two octets as an uint16_t.
-					 */
-					uint16_t read2Int();
-					/**
-					 * @return Next four octets as an uint32_t.
-					 */
-					uint32_t read4Int();
+	/**
+	 * @return True if the read marker is not at the end of the PDU.
+	 */
+	bool hasMoreData();
 
-					/**
-					 * @return Next octets until a 0x00 is read as a c-style string.
-					 */
-					uint8_t* readStr();
-
-					string readString();
-
-					/**
-					 * Copy n octets into a string. Adds an 0x00 at the end.
-					 * @param s target string
-					 * @param n Octets to copy
-					 */
-					void readStr(uint8_t *s, const uint32_t &n );
-
-					/**
-					 * Copy n octet into an array.
-					 * @param array Target array.
-					 * @param n Octets to copy.
-					 */
-					void readOctets(uint8_t *s, const uint32_t &n);
-
-					/**
-					 * @return True if the read marker is not at the end of the PDU.
-					 */
-					bool hasMoreData();
-
-					friend std::ostream& smpp::operator<<(std::ostream&, smpp::PDU&);
-				};
+	friend std::ostream& smpp::operator<<(std::ostream&, smpp::PDU&);
+};
 
 std::ostream& operator<<(std::ostream&, smpp::PDU&);
 }

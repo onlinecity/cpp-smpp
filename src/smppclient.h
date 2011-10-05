@@ -1,6 +1,7 @@
 #ifndef SMPPCLIENT_H_
 #define SMPPCLIENT_H_
 
+#include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -10,6 +11,7 @@
 #include <stdint.h>
 #include <vector>
 #include <list>
+#include <iostream>
 
 #include "smpp.h"
 #include "tlv.h"
@@ -18,6 +20,7 @@
 #include "exceptions.h"
 
 using namespace std;
+using namespace boost;
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
@@ -28,9 +31,11 @@ namespace smpp {
  * delivery reports and therefore not all features of the SMPP protocol is
  * implemented.
  */
-class SmppClient {
+class SmppClient
+{
 public:
-	enum {
+	enum
+	{
 		OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
 	};
 
@@ -56,12 +61,15 @@ public:
 
 private:
 	int state;
-	tcp::socket* socket;
+	shared_ptr<tcp::socket> socket;
 
 	uint32_t seqNo;
 
-	uint8_t pduHeader[4];
-	uint8_t* pduBuffer;
+
+//	uint8_t pduHeader[4];
+
+
+//	boost::asio::buffer pduBuffer;
 
 	list<PDU> pdu_queue;
 
@@ -72,13 +80,26 @@ public:
 	/**
 	 * Constructs a new SmppClient object.
 	 */
-	SmppClient(tcp::socket* _socket) :
-			system_type("WWW"), interfaceVersion(0x34), addr_ton(0), addr_npi(0), addr_range(
-					""), service_type(""), esmClass(0), protocol_id(0), registered_delivery(
-					0), replace_if_present_flag(0), data_coding(0), sm_default_msg_id(0), nullTerminateOctetStrings(
-					false), useMsgPayload(false), state(OPEN), socket(_socket), seqNo(0), verbose(
-					false) {
-
+	SmppClient(shared_ptr<tcp::socket> _socket) :
+					system_type("WWW"),
+					interfaceVersion(0x34),
+					addr_ton(0),
+					addr_npi(0),
+					addr_range(""),
+					service_type(""),
+					esmClass(0),
+					protocol_id(0),
+					registered_delivery(0),
+					replace_if_present_flag(0),
+					data_coding(0),
+					sm_default_msg_id(0),
+					nullTerminateOctetStrings(false),
+					useMsgPayload(false),
+					state(OPEN),
+					socket(_socket),
+					seqNo(0),
+					verbose(false)
+	{
 	}
 
 	~SmppClient();
@@ -88,16 +109,15 @@ public:
 	 * @param login SMSC login.
 	 * @param password SMS password.
 	 */
-	void bindTransmitter(const string &login, const string &password)
-			throw (smpp::SmppException, smpp::TransportException);
+	void bindTransmitter(const string &login, const string &password) throw (smpp::SmppException,
+			smpp::TransportException);
 
 	/**
 	 * Binds the client in receiver mode.
 	 * @param login SMSC login
 	 * @param password SMSC password.
 	 */
-	void bindReceiver(const string &login, const string &password)
-			throw (smpp::SmppException, smpp::TransportException);
+	void bindReceiver(const string &login, const string &password) throw (smpp::SmppException, smpp::TransportException);
 
 	/**
 	 * Unbinds the client.
@@ -118,11 +138,9 @@ public:
 	 * @return SMSC sms id.
 	 */
 	string
-	sendSms(const SmppAddress &sender, const SmppAddress &receiver,
-			const string &shortMessage, const uint8_t priority_flag = 0,
-			const string &schedule_delivery_time = "", const string &validity_period =
-					"", const int dataCoding = smpp::DATA_CODING_DEFAULT)
-					throw (smpp::SmppException, smpp::TransportException);
+	sendSms(const SmppAddress &sender, const SmppAddress &receiver, const string &shortMessage,
+			const uint8_t priority_flag = 0, const string &schedule_delivery_time = "", const string &validity_period = "",
+			const int dataCoding = smpp::DATA_CODING_DEFAULT) throw (smpp::SmppException, smpp::TransportException);
 
 	/**
 	 * Sends an SMS to the SMSC.
@@ -138,12 +156,9 @@ public:
 	 * @param dataCoding
 	 * @return SMSC sms id.
 	 */
-	string sendSms(const SmppAddress &sender, const SmppAddress &receiver,
-			const string &shortMessage, list<TLV> tags, const uint8_t priority_flag =
-					0, const string &schedule_delivery_time = "",
-			const string &validity_period = "", const int dataCoding =
-					smpp::DATA_CODING_DEFAULT) throw (smpp::SmppException,
-					smpp::TransportException);
+	string sendSms(const SmppAddress &sender, const SmppAddress &receiver, const string &shortMessage, list<TLV> tags,
+			const uint8_t priority_flag = 0, const string &schedule_delivery_time = "", const string &validity_period = "",
+			const int dataCoding = smpp::DATA_CODING_DEFAULT) throw (smpp::SmppException, smpp::TransportException);
 
 	/**
 	 * Returns the first SMS in the PDU queue,
@@ -160,15 +175,20 @@ public:
 	 * Checks if the SMSC has sent us a enquire link command.
 	 * If they have, a response is sent.
 	 */
-	void enquireLinkRespond() throw (smpp::SmppException,
-			smpp::TransportException);
+	void enquireLinkRespond() throw (smpp::SmppException, smpp::TransportException);
 
 	/**
 	 * Sleeps the given number of milliseconds.
 	 * @param milliseconds Milliseconds to sleep.
 	 */
-	inline void sleep(const int &milliseconds) {
+	inline void sleep(const int &milliseconds)
+	{
 		boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
+	}
+
+	inline bool isBound()
+	{
+		return state != OPEN;
 	}
 
 private:
@@ -179,8 +199,8 @@ private:
 	 * @param login SMSC login.
 	 * @param password SMSC password.
 	 */
-	void bind(uint32_t mode, const string &login, const string &password)
-			throw (smpp::SmppException, smpp::TransportException);
+	void bind(uint32_t mode, const string &login, const string &password) throw (smpp::SmppException,
+			smpp::TransportException);
 
 	/**
 	 * Constructs a PDU for binding the client.
@@ -189,8 +209,7 @@ private:
 	 * @param password SMSC password.
 	 * @return PDU for binding the client.
 	 */
-	smpp::PDU setupBindPdu(uint32_t mode, const string &login,
-			const string &password);
+	smpp::PDU setupBindPdu(uint32_t mode, const string &login, const string &password);
 
 	/**
 	 * Runs through the PDU queue and returns the first sms it finds, and sends a reponse to the SMSC.
@@ -208,8 +227,7 @@ private:
 	 * @param dataCoding
 	 * @return Vector of substrings.
 	 */
-	vector<string> split(const string &shortMessage, const int split,
-			const int dataCoding = smpp::DATA_CODING_DEFAULT);
+	vector<string> split(const string &shortMessage, const int split, const int dataCoding = smpp::DATA_CODING_DEFAULT);
 
 	/**
 	 * Sends a SUBMIT_SM pdu with the required details for sending an SMS to the SMSC.
@@ -224,9 +242,8 @@ private:
 	 * @param validity_period
 	 * @return SMSC sms id.
 	 */
-	string submitSm(const SmppAddress &sender, const SmppAddress &receiver,
-			const string &shortMessage, list<TLV> tags, const uint8_t priority_flag,
-			const string &schedule_delivery_time, const string& validity_period)
+	string submitSm(const SmppAddress &sender, const SmppAddress &receiver, const string &shortMessage, list<TLV> tags,
+			const uint8_t priority_flag, const string &schedule_delivery_time, const string& validity_period)
 					throw (smpp::SmppException, smpp::TransportException);
 
 	/**
@@ -245,8 +262,7 @@ private:
 	 * @param pdu PDU to send.
 	 * @return PDU PDU response to the one we sent.
 	 */
-	smpp::PDU sendCommand(PDU &pdu) throw (smpp::SmppException,
-			smpp::TransportException);
+	smpp::PDU sendCommand(PDU &pdu) throw (smpp::SmppException, smpp::TransportException);
 
 	/** Async write callback */
 	void writeHandler(const boost::system::error_code&);
@@ -258,8 +274,7 @@ private:
 
 	void readPduBlocking();
 
-	void handleTimeout(boost::optional<boost::system::error_code>* opt,
-			const boost::system::error_code &error);
+	void handleTimeout(boost::optional<boost::system::error_code>* opt, const boost::system::error_code &error);
 
 	/**
 	 * Peeks at the socket and returns true if there is data to be read.
@@ -278,8 +293,7 @@ private:
 	 * @param error Boost error code
 	 * @param read Bytes read
 	 */
-	void readPduHeaderHandler(const boost::system::error_code &error, size_t read)
-			throw (smpp::TransportException);
+	void readPduHeaderHandler(const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength) throw (smpp::TransportException);
 
 	/**
 	 * Handler for reading a PDU body.
@@ -288,12 +302,10 @@ private:
 	 * @param error Boost error code
 	 * @param read Bytes read
 	 */
-	void readPduBodyHandler(const boost::system::error_code &error, size_t read);
+	void readPduBodyHandler(const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength, shared_array<uint8_t> pduBuffer);
 
-	void readPduHeaderHandlerBlocking(
-			boost::optional<boost::system::error_code>* opt,
-			const boost::system::error_code &error, size_t read)
-					throw (smpp::TransportException);
+	void readPduHeaderHandlerBlocking(boost::optional<boost::system::error_code>* opt,
+			const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduHeader) throw (smpp::TransportException);
 
 	/**
 	 * Returns a response for a PDU we have sent,
@@ -306,8 +318,8 @@ private:
 	 * @param commandId Command id to look for.
 	 * @return PDU response to PDU with the given sequence number and command id.
 	 */
-	PDU readPduResponse(const uint32_t &sequence, const uint32_t &commandId)
-			throw (smpp::SmppException, smpp::TransportException);
+	PDU readPduResponse(const uint32_t &sequence, const uint32_t &commandId) throw (smpp::SmppException,
+			smpp::TransportException);
 
 	/**
 	 * Returns an array of four bytes as one uint32_t.
@@ -329,6 +341,7 @@ private:
 	 * @param state Desired state.
 	 * @throw SmppException if the client is not in the desired state.
 	 */
+
 	void checkState(int state) throw (smpp::SmppException);
 
 };

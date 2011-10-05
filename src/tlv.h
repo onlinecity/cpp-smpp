@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <boost/shared_array.hpp>
 
 namespace smpp {
 namespace tags {
@@ -52,21 +53,26 @@ const uint16_t ITS_REPLY_TYPE = 0x1380;
 const uint16_t ITS_SESSION_INFO = 0x1383;
 } // tlv tags
 
+using namespace boost;
+
 /**
  * TLV container class.
  */
-class TLV {
+class TLV
+{
 private:
 	uint16_t tag;
 	uint16_t len;
-	uint8_t* octets;
+	shared_array<uint8_t> octets;
+
 public:
 	/**
 	 * Constructs a TLV with only the tag.
 	 * @param _tag TLV tag.
 	 */
 	TLV(const uint16_t &_tag) :
-			tag(_tag), len(0) {
+			tag(_tag), len(0)
+	{
 	}
 
 	/**
@@ -75,7 +81,8 @@ public:
 	 * @param value TLV value.
 	 */
 	TLV(const uint16_t &_tag, int value) :
-			tag(_tag), len(1), octets(new uint8_t[len]) {
+			tag(_tag), len(1), octets(new uint8_t[len])
+	{
 		octets[0] = value & 0xff;
 	}
 
@@ -85,7 +92,8 @@ public:
 	 * @param value TLV value.
 	 */
 	TLV(const uint16_t &_tag, uint8_t value) :
-			tag(_tag), len(1), octets(new uint8_t[len]) {
+			tag(_tag), len(1), octets(new uint8_t[len])
+	{
 		octets[0] = value & 0xff;
 	}
 
@@ -95,7 +103,8 @@ public:
 	 * @param value TLV value.
 	 */
 	TLV(const uint16_t &_tag, uint16_t value) :
-			tag(_tag), len(2), octets(new uint8_t[len]) {
+			tag(_tag), len(2), octets(new uint8_t[len])
+	{
 		octets[0] = (value >> 8) & 0xff;
 		octets[1] = value & 0xff;
 	}
@@ -106,7 +115,8 @@ public:
 	 * @param value TLV value.
 	 */
 	TLV(const uint16_t &_tag, uint32_t value) :
-			tag(_tag), len(4), octets(new uint8_t[len]) {
+			tag(_tag), len(4), octets(new uint8_t[len])
+	{
 		octets[0] = (value >> 24) & 0xff;
 		octets[1] = (value >> 16) & 0xff;
 		octets[2] = (value >> 8) & 0xff;
@@ -119,8 +129,9 @@ public:
 	 * @param value TLV value.
 	 */
 	TLV(const uint16_t &_tag, std::basic_string<char> s) :
-			tag(_tag), len(s.length()), octets(new uint8_t[len]) {
-		std::copy(s.begin(), s.end(), octets);
+			tag(_tag), len(s.length()), octets(new uint8_t[len])
+	{
+		std::copy(s.begin(), s.end(), octets.get());
 	}
 
 	/**
@@ -129,45 +140,23 @@ public:
 	 * @param _len Length of octet array.
 	 * @param _octets Array of octets.
 	 */
-	TLV(const uint16_t &_tag, const uint16_t &_len, const uint8_t *_octets) :
-			tag(_tag), len(_len), octets(new uint8_t[len]) {
-		std::copy(_octets, _octets + len, octets);
+	TLV(const uint16_t &_tag, const uint16_t &_len, const shared_array<uint8_t> &_octets) :
+			tag(_tag), len(_len), octets(_octets)
+	{
 	}
 
-//	TLV(const TLV &rhs) :
-//			tag(rhs.tag), len(rhs.len) {
-//		if (len != 0) {
-//			octets = new uint8_t[len];
-//			std::copy(rhs.octets, rhs.octets + len, octets);
-//		}
-//	}
-//
-//	const TLV& operator=(const TLV &rhs) {
-//		if (this != &rhs) {
-//			tag = rhs.tag;
-//			len = rhs.len;
-//			if (len != 0) {
-//				octets = new uint8_t[len];
-//				std::copy(rhs.octets, rhs.octets + len, octets);
-//			}
-//		}
-//		return *this;
-//	}
-//
-	~TLV() {
-		if (len != 0)
-			delete[] octets;
-	}
-
-	inline const uint16_t getTag() {
+	inline const uint16_t getTag()
+	{
 		return tag;
 	}
 
-	inline const uint16_t getLen() {
+	inline const uint16_t getLen()
+	{
 		return len;
 	}
 
-	inline uint8_t* getOctets() {
+	inline shared_array<uint8_t> getOctets()
+	{
 		return octets;
 	}
 };

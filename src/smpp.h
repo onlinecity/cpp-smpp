@@ -4,8 +4,7 @@
 #include <string>
 #include <stdint.h>
 
-namespace smpp
-{
+namespace smpp {
 /*
  * SMPP Command ID values (table 5-1, 5.1.2.1)
  */
@@ -177,7 +176,7 @@ public:
 	uint8_t npi; // numbering-plan-indicator
 
 	SmppAddress(std::string _value, uint8_t _ton = smpp::TON_UNKNOWN, uint8_t _npi = smpp::NPI_UNKNOWN) :
-		value(_value), ton(_ton), npi(_npi)
+			value(_value), ton(_ton), npi(_npi)
 	{
 	}
 };

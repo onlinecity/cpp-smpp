@@ -13,12 +13,14 @@ namespace smpp {
 /**
  * Class for encoding strings in GSM 0338.
  */
-class GsmEncoder {
+class GsmEncoder
+{
 private:
 	map<string, string> dict;
 
 public:
-	GsmEncoder() {
+	GsmEncoder()
+	{
 		dict.insert(pair<string, string>("@", "\x00"));
 		dict.insert(pair<string, string>("£", "\x01"));
 		dict.insert(pair<string, string>("$", "\x02"));
@@ -78,14 +80,14 @@ public:
 	 * @param str String to be encoded.
 	 * @return Encoded string.
 	 */
-	string getGsm0338(string &str) {
+	string getGsm0338(string &str)
+	{
 		map<string, string>::iterator it = dict.begin();
-		for (; it != dict.end(); it++) {
+		for (; it != dict.end() ; it++) {
 			replace_all(str, it->first, it->second);
 		}
 
-		const regex pattern("([\\xC0-\\xDF].)|([\\xE0-\\xEF]..)|([\\xF0-\\xFF]...)",
-				regex_constants::perl);
+		const regex pattern("([\\xC0-\\xDF].)|([\\xE0-\\xEF]..)|([\\xF0-\\xFF]...)", regex_constants::perl);
 		return regex_replace(str, pattern, "?");
 	}
 
@@ -94,9 +96,10 @@ public:
 	 * @param str String to be encoded.
 	 * @return UTF8-encoded string.
 	 */
-	string getUtf8(string &str) {
+	string getUtf8(string &str)
+	{
 		map<string, string>::iterator it = dict.begin();
-		for (; it != dict.end(); it++) {
+		for (; it != dict.end() ; it++) {
 			replace_all(str, it->second, it->first);
 		}
 
