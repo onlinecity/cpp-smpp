@@ -5,22 +5,27 @@
 /**
  * Extension of the standard exception that can hold a status message.
  */
-class OcException: public std::exception {
+class OcException: public std::exception
+{
 protected:
 	std::string message;
 
 public:
 	OcException() :
-			message() {
+			message()
+	{
 	}
 	OcException(const std::string &_message) :
-			message(_message) {
+			message(_message)
+	{
 	}
 
-	virtual ~OcException() throw () {
+	virtual ~OcException() throw ()
+	{
 	}
 
-	virtual const char* what() const throw () {
+	virtual const char* what() const throw ()
+	{
 		if (message.empty()) {
 			return "Default OcException.";
 		} else {
@@ -33,26 +38,32 @@ namespace smpp {
 /**
  * Exception thrown when there is SMPP protocol related issues.
  */
-class SmppException: public OcException {
+class SmppException: public OcException
+{
 public:
 	SmppException() :
-			OcException("Default SmppException.") {
+			OcException("Default SmppException.")
+	{
 	}
 	SmppException(const std::string &message) :
-			OcException(message) {
+			OcException(message)
+	{
 	}
 };
 
 /**
  * Exception thrown when there is transport/connection related issues.
  */
-class TransportException: public OcException {
+class TransportException: public OcException
+{
 public:
 	TransportException() :
-			OcException("Default TransportException.") {
+			OcException("Default TransportException.")
+	{
 	}
 	TransportException(const std::string &message) :
-			OcException(message) {
+			OcException(message)
+	{
 	}
 };
 }

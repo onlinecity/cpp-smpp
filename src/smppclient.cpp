@@ -7,24 +7,27 @@
 
 using namespace smpp;
 
-smpp::SmppClient::~SmppClient() {
+smpp::SmppClient::~SmppClient()
+{
 	unbind();
 }
 
-void SmppClient::bindTransmitter(const string &login, const string &pass)
-		throw (smpp::SmppException, smpp::TransportException) {
+void SmppClient::bindTransmitter(const string &login, const string &pass) throw (smpp::SmppException,
+		smpp::TransportException)
+{
 
 	bind(smpp::BIND_TRANSMITTER, login, pass);
 }
 
-void SmppClient::bindReceiver(const string &login, const string &pass)
-		throw (smpp::SmppException, smpp::TransportException) {
+void SmppClient::bindReceiver(const string &login, const string &pass) throw (smpp::SmppException,
+		smpp::TransportException)
+{
 	bind(smpp::BIND_RECEIVER, login, pass);
 }
 
-void SmppClient::bind(uint32_t mode, const string &login,
-		const string &password) throw (smpp::SmppException,
-				smpp::TransportException) {
+void SmppClient::bind(uint32_t mode, const string &login, const string &password) throw (smpp::SmppException,
+		smpp::TransportException)
+{
 	checkConnection();
 	checkState(OPEN);
 
@@ -33,17 +36,17 @@ void SmppClient::bind(uint32_t mode, const string &login,
 	sendCommand(pdu);
 
 	switch (mode) {
-	case smpp::BIND_RECEIVER:
-		state = BOUND_RX;
-		break;
-	case smpp::BIND_TRANSMITTER:
-		state = BOUND_TX;
-		break;
+		case smpp::BIND_RECEIVER:
+			state = BOUND_RX;
+			break;
+		case smpp::BIND_TRANSMITTER:
+			state = BOUND_TX;
+			break;
 	}
 }
 
-smpp::PDU SmppClient::setupBindPdu(uint32_t mode, const string &login,
-		const string &password) {
+smpp::PDU SmppClient::setupBindPdu(uint32_t mode, const string &login, const string &password)
+{
 	PDU pdu(mode, 0, nextSequenceNumber());
 	pdu += login;
 	pdu += password;
@@ -55,21 +58,22 @@ smpp::PDU SmppClient::setupBindPdu(uint32_t mode, const string &login,
 	return pdu;
 }
 
-void SmppClient::unbind() throw (smpp::SmppException, smpp::TransportException) {
+void SmppClient::unbind() throw (smpp::SmppException, smpp::TransportException)
+{
 	checkConnection();
 	PDU pdu(smpp::UNBIND, 0, nextSequenceNumber());
 	PDU resp = sendCommand(pdu);
 
 	uint32_t pduStatus = resp.getCommandStatus();
 
-	if (pduStatus != smpp::ESME_ROK)
-		throw smpp::SmppException(smpp::getEsmeStatus(pduStatus));
+	if (pduStatus != smpp::ESME_ROK) throw smpp::SmppException(smpp::getEsmeStatus(pduStatus));
 
 	state = OPEN;
 }
 
-void hexDump(const string &s) {
-	for (unsigned int i = 0; i < s.size(); i++) {
+void hexDump(const string &s)
+{
+	for (unsigned int i = 0 ; i < s.size() ; i++) {
 		cout << setw(2) << setfill('0') << hex << (int) s[i] << " ";
 	}
 	cout << endl << dec;
@@ -78,44 +82,41 @@ void hexDump(const string &s) {
 /**
  * Send an sms to the smsc.
  */
-string SmppClient::sendSms(const SmppAddress& sender,
-		const SmppAddress& receiver, const string& shortMessage,
-		const uint8_t priority_flag, const string& schedule_delivery_time,
-		const string& validity_period, const int dataCoding)
-				throw (smpp::SmppException, smpp::TransportException) {
+string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
+		const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
+		const int dataCoding) throw (smpp::SmppException, smpp::TransportException)
+{
 
-	return sendSms(sender, receiver, shortMessage, list<TLV>(), priority_flag,
-			schedule_delivery_time, validity_period, dataCoding);
+	return sendSms(sender, receiver, shortMessage, list<TLV>(), priority_flag, schedule_delivery_time, validity_period,
+			dataCoding);
 }
 
 /**
  * Send an sms to the smsc.
  */
-string SmppClient::sendSms(const SmppAddress& sender,
-		const SmppAddress& receiver, const string& shortMessage, list<TLV> tags,
-		const uint8_t priority_flag, const string& schedule_delivery_time,
-		const string& validity_period, const int dataCoding)
-				throw (smpp::SmppException, smpp::TransportException) {
+string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
+		const int dataCoding) throw (smpp::SmppException, smpp::TransportException)
+{
 
 	int messageLen = shortMessage.length();
 	int singleSmsOctetLimit = 254; // Default SMPP standard
 	int csmsSplit = -1; // where to split
 
 	switch (dataCoding) {
-	case smpp::DATA_CODING_UCS2:
-		singleSmsOctetLimit = 140;
-		csmsSplit = 132;
-		break;
-	case smpp::DATA_CODING_DEFAULT:
-		singleSmsOctetLimit = 160;
-		csmsSplit = 152;
-		break;
+		case smpp::DATA_CODING_UCS2:
+			singleSmsOctetLimit = 140;
+			csmsSplit = 132;
+			break;
+		case smpp::DATA_CODING_DEFAULT:
+			singleSmsOctetLimit = 160;
+			csmsSplit = 152;
+			break;
 	}
 
 	// submit_sm if the short message could fit into one pdu.
-	if (messageLen <= singleSmsOctetLimit)
-		return submitSm(sender, receiver, shortMessage, tags, priority_flag,
-				schedule_delivery_time, validity_period);
+	if (messageLen <= singleSmsOctetLimit) return submitSm(sender, receiver, shortMessage, tags, priority_flag,
+			schedule_delivery_time, validity_period);
 
 	// split message
 	vector<string> parts = split(shortMessage, csmsSplit, dataCoding);
@@ -127,10 +128,9 @@ string SmppClient::sendSms(const SmppAddress& sender,
 
 	string smsId;
 
-	for (; itr < parts.end(); itr++) {
+	for (; itr < parts.end() ; itr++) {
 		tags.push_back(TLV(smpp::tags::SAR_SEGMENT_SEQNUM, ++segment));
-		smsId = submitSm(sender, receiver, (*itr), tags, priority_flag,
-				schedule_delivery_time, validity_period);
+		smsId = submitSm(sender, receiver, (*itr), tags, priority_flag, schedule_delivery_time, validity_period);
 		// pop SAR_SEGMENT_SEQNUM tag
 		tags.pop_back();
 	}
@@ -143,14 +143,13 @@ string SmppClient::sendSms(const SmppAddress& sender,
 	return smsId;
 }
 
-smpp::SMS SmppClient::readSms() throw (smpp::SmppException,
-		smpp::TransportException) {
+smpp::SMS SmppClient::readSms() throw (smpp::SmppException, smpp::TransportException)
+{
 	// see if we're bound correct.
 	checkState(BOUND_RX);
 
 	// if  there are any messages in the queue pop the first usable one off and return it
-	if (!pdu_queue.empty())
-		return parseSms();
+	if (!pdu_queue.empty()) return parseSms();
 
 	// fill queue until we get a DELIVER_SM command
 	try {
@@ -165,12 +164,10 @@ smpp::SMS SmppClient::readSms() throw (smpp::SmppException,
 			}
 
 			if (pdu.null) {
-				cout << "null pdu => timeout" << endl;
 				break;
 			}
 
-			if (!pdu.null)
-				pdu_queue.push_back(pdu); // save pdu for reading later
+			if (!pdu.null) pdu_queue.push_back(pdu); // save pdu for reading later
 			b = pdu.getCommandId() == DELIVER_SM;
 		}
 	} catch (std::exception &e) {
@@ -182,15 +179,15 @@ smpp::SMS SmppClient::readSms() throw (smpp::SmppException,
 	return parseSms();
 }
 
-void SmppClient::enquireLink() throw (smpp::SmppException,
-		smpp::TransportException) {
+void SmppClient::enquireLink() throw (smpp::SmppException, smpp::TransportException)
+{
 	PDU pdu = PDU(ENQUIRE_LINK, 0, nextSequenceNumber());
 	sendCommand(pdu);
 }
 
-smpp::SMS SmppClient::parseSms() {
-	if (pdu_queue.empty())
-		return SMS();
+smpp::SMS SmppClient::parseSms()
+{
+	if (pdu_queue.empty()) return SMS();
 
 	list<PDU>::iterator it = pdu_queue.begin();
 	while (it != pdu_queue.end()) {
@@ -224,8 +221,8 @@ smpp::SMS SmppClient::parseSms() {
 	return SMS();
 }
 
-vector<string> SmppClient::split(const string& shortMessage, const int split,
-		const int dataCoding) {
+vector<string> SmppClient::split(const string& shortMessage, const int split, const int dataCoding)
+{
 	vector<string> parts;
 	int len = shortMessage.length();
 	int pos = 0;
@@ -233,24 +230,22 @@ vector<string> SmppClient::split(const string& shortMessage, const int split,
 
 	while (pos < len) {
 		if ((int) shortMessage[pos + n - 1] == 0x1b) // do not split at escape char
-			n--;
+		n--;
 
 		parts.push_back(shortMessage.substr(pos, n));
 
 		pos += n;
 		n = split;
 
-		if (pos + n > len)
-			n = len - pos;
+		if (pos + n > len) n = len - pos;
 	}
 	return parts;
 }
 
-string SmppClient::submitSm(const SmppAddress& sender,
-		const SmppAddress& receiver, const string& shortMessage, list<TLV> tags,
-		const uint8_t priority_flag, const string& schedule_delivery_time,
-		const string& validity_period) throw (smpp::SmppException,
-				smpp::TransportException) {
+string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period)
+				throw (smpp::SmppException, smpp::TransportException)
+{
 
 	checkState(BOUND_TX);
 
@@ -283,65 +278,76 @@ string SmppClient::submitSm(const SmppAddress& sender,
 	}
 
 	// add  optional tags.
-	for (list<TLV>::iterator itr = tags.begin(); itr != tags.end(); itr++)
+	for (list<TLV>::iterator itr = tags.begin() ; itr != tags.end() ; itr++)
 		pdu += *itr;
 
 	PDU resp = sendCommand(pdu);
 	return resp.readString();
 }
 
-uint32_t SmppClient::nextSequenceNumber() throw (smpp::SmppException) {
-	if (++seqNo > 0x7FFFFFFF)
-		throw SmppException("Ran out of sequence numbers");
+uint32_t SmppClient::nextSequenceNumber() throw (smpp::SmppException)
+{
+	if (++seqNo > 0x7FFFFFFF) throw SmppException("Ran out of sequence numbers");
 
 	return seqNo;
 }
 
-void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException,
-		smpp::TransportException) {
+void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportException)
+{
 	checkConnection();
+
+	boost::optional<boost::system::error_code> ioResult;
+	boost::optional<boost::system::error_code> timerResult;
 
 	if (verbose) {
 		cout << "===>" << endl;
 		std::cout << pdu << endl;
 	}
 
-	async_write(
-			*socket,
-			buffer(pdu.getOctets(), pdu.getSize()),
-			boost::bind(&smpp::SmppClient::writeHandler, this,
-					boost::asio::placeholders::error()));
+	deadline_timer timer(socket->io_service());
+	timer.expires_from_now(boost::posix_time::seconds(5));
+	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
+
+	async_write(*socket, buffer(pdu.getOctets(), pdu.getSize()),
+			boost::bind(&SmppClient::handleTimeout, this, &ioResult, _1));
+
+	socketExecute();
+
+	if (ioResult) {
+		timer.cancel();
+	} else if (timerResult) {
+		socket->cancel();
+	}
 
 	socketExecute();
 }
 
-smpp::PDU SmppClient::sendCommand(PDU &pdu) throw (smpp::SmppException,
-		smpp::TransportException) {
+smpp::PDU SmppClient::sendCommand(PDU &pdu) throw (smpp::SmppException, smpp::TransportException)
+{
 
 	sendPdu(pdu);
 	PDU resp = readPduResponse(pdu.getSequenceNo(), pdu.getCommandId());
 
-	if (resp.getCommandStatus() != smpp::ESME_ROK)
-		throw smpp::SmppException(smpp::getEsmeStatus(resp.getCommandStatus()));
+	if (resp.getCommandStatus() != smpp::ESME_ROK) throw smpp::SmppException(
+			smpp::getEsmeStatus(resp.getCommandStatus()));
 
 	return resp;
 }
 
-void SmppClient::writeHandler(const boost::system::error_code &error) {
+void SmppClient::writeHandler(const boost::system::error_code &error)
+{
 }
 
-smpp::PDU SmppClient::readPdu(const bool &isBlocking)
-		throw (smpp::SmppException, smpp::TransportException) {
+smpp::PDU SmppClient::readPdu(const bool &isBlocking) throw (smpp::SmppException, smpp::TransportException)
+{
 
 	// return NULL pdu if there is nothing on the wire for us.
-	if (!isBlocking && !socketPeek())
-		return PDU();
+	if (!isBlocking && !socketPeek()) return PDU();
 
 	readPduBlocking();
 
 	// There are no pdus to be read return a null pdu.
-	if (pdu_queue.empty())
-		return PDU();
+	if (pdu_queue.empty()) return PDU();
 
 	// Return last the pdu inserted into the queue.
 	PDU pdu = pdu_queue.back();
@@ -355,11 +361,12 @@ smpp::PDU SmppClient::readPdu(const bool &isBlocking)
 	return pdu;
 }
 
-bool SmppClient::socketPeek() {
+bool SmppClient::socketPeek()
+{
 	// prepare our read
-
-	async_read(*socket, buffer(pduHeader, 4),
-			boost::bind(&smpp::SmppClient::readPduHeaderHandler, this, _1, _2));
+	shared_array<uint8_t> pduHeader(new uint8_t[4]);
+	async_read(*socket, buffer(pduHeader.get(), 4),
+			boost::bind(&smpp::SmppClient::readPduHeaderHandler, this, _1, _2, pduHeader));
 
 	size_t handlersCalled = socket->get_io_service().poll_one();
 
@@ -371,81 +378,73 @@ bool SmppClient::socketPeek() {
 	return handlersCalled != 0;
 }
 
-void SmppClient::readPduBlocking() {
+void SmppClient::readPduBlocking()
+{
 
 	using namespace boost;
+	boost::optional<boost::system::error_code> ioResult;
+	boost::optional<boost::system::error_code> timerResult;
 
-	boost::optional<system::error_code> readerResult;
-	boost::optional<system::error_code> timerResult;
+	shared_array<uint8_t> pduHeader(new uint8_t[4]);
 
-	async_read(
-			*socket,
-			buffer(pduHeader, 4),
-			boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this,
-					&readerResult, _1, _2));
+	async_read(*socket, boost::asio::buffer(pduHeader.get(), 4),
+			boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1, _2, pduHeader));
 
 	deadline_timer timer(socket->io_service());
 	timer.expires_from_now(boost::posix_time::seconds(5));
-	timer.async_wait(
-			boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
+	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
 	socketExecute();
 
-	if (readerResult) {
-		cout << "cancel timer" << endl;
+	if (ioResult) {
 		timer.cancel();
 	} else if (timerResult) {
-		cout << "cancel: timeout" << endl;
 		socket->cancel();
 	}
 
 	socketExecute();
 }
 
-void SmppClient::handleTimeout(boost::optional<boost::system::error_code>* opt,
-		const boost::system::error_code &error) {
+void SmppClient::handleTimeout(boost::optional<boost::system::error_code>* opt, const boost::system::error_code &error)
+{
 	opt->reset(error);
-
-	cout << "handleTimeout" << endl;
 }
 
-void SmppClient::socketExecute() {
+void SmppClient::socketExecute()
+{
 	socket->get_io_service().run_one();
 	socket->get_io_service().reset();
 }
 
-void SmppClient::readPduHeaderHandler(const boost::system::error_code &error,
-		size_t len) throw (smpp::TransportException) {
+void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, size_t len,
+		shared_array<uint8_t> pduLength) throw (smpp::TransportException)
+{
 	if (error) {
 
 		if (error == boost::asio::error::operation_aborted) {
-			cout << "CANCEL" << endl;
 			// Not treated as an error
 			return;
 		}
 		throw TransportException(boost::system::system_error(error).what());
 	}
 
-	unsigned int i = (int) pduHeader[0] << 24 | (int) pduHeader[1] << 16
-			| (int) pduHeader[2] << 8 | (int) pduHeader[3];
-	pduBuffer = new uint8_t[i];
+	unsigned int i = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8 | (int) pduLength[3];
+	shared_array<uint8_t> pduBuffer(new uint8_t[i]);
 
 	// start reading after the size mark of the pdu
-	async_read(*socket, buffer(pduBuffer + (4 * sizeof(uint8_t)), i - 4),
-			boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2));
+	async_read(*socket, buffer(pduBuffer.get(), i - 4), boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2));
 
 	socketExecute();
 }
 
-void SmppClient::readPduHeaderHandlerBlocking(
-		boost::optional<boost::system::error_code>* opt,
-		const boost::system::error_code &error, size_t read)
-				throw (smpp::TransportException) {
+void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::error_code>* opt,
+		const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength)
+				throw (smpp::TransportException)
+{
 
 	if (error) {
 
 		if (error == boost::asio::error::operation_aborted) {
-			cout << "read pdu header: cancel" << endl;
 			// Not treated as an error
 			return;
 		}
@@ -453,33 +452,33 @@ void SmppClient::readPduHeaderHandlerBlocking(
 	}
 
 	opt->reset(error);
-	cout << "read pdu header: ahead" << endl;
 
-	unsigned int i = (int) pduHeader[0] << 24 | (int) pduHeader[1] << 16
-			| (int) pduHeader[2] << 8 | (int) pduHeader[3];
-	pduBuffer = new uint8_t[i];
+	unsigned int i = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8 | (int) pduLength[3];
+
+	shared_array<uint8_t> pduBuffer(new uint8_t[i - 4]);
 
 	// start reading after the size mark of the pdu
-	async_read(*socket, buffer(pduBuffer + (4 * sizeof(uint8_t)), i - 4),
-			boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2));
+async_read	(*socket, buffer(pduBuffer.get(), i - 4),
+			boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2, pduLength, pduBuffer));
 
 	socketExecute();
 }
 
-void SmppClient::readPduBodyHandler(const boost::system::error_code &error,
-		size_t len) {
+void SmppClient::readPduBodyHandler(const boost::system::error_code &error, size_t len, shared_array<uint8_t> pduLength,
+		shared_array<uint8_t> pduBuffer)
+{
 	if (error) {
 		throw TransportException(boost::system::system_error(error).what());
 	}
 
-	PDU pdu(pduBuffer, len + 4);
+	PDU pdu(pduLength, pduBuffer);
 	pdu_queue.push_back(pdu);
 }
 
 // blocks until response is read
-smpp::PDU smpp::SmppClient::readPduResponse(const uint32_t &sequence,
-		const uint32_t &commandId) throw (smpp::SmppException,
-				smpp::TransportException) {
+smpp::PDU smpp::SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &commandId)
+		throw (smpp::SmppException, smpp::TransportException)
+{
 	uint32_t response = GENERIC_NACK | commandId;
 	list<PDU>::iterator it = pdu_queue.begin();
 
@@ -496,8 +495,7 @@ smpp::PDU smpp::SmppClient::readPduResponse(const uint32_t &sequence,
 	while (true) {
 		PDU pdu = readPdu(true);
 		if (!pdu.null) {
-			if (pdu.getSequenceNo() == sequence && pdu.getCommandId() == response)
-				return pdu;
+			if (pdu.getSequenceNo() == sequence && pdu.getCommandId() == response) return pdu;
 		}
 	}
 
@@ -505,8 +503,8 @@ smpp::PDU smpp::SmppClient::readPduResponse(const uint32_t &sequence,
 	return pdu;
 }
 
-void smpp::SmppClient::enquireLinkRespond() throw (smpp::SmppException,
-		smpp::TransportException) {
+void smpp::SmppClient::enquireLinkRespond() throw (smpp::SmppException, smpp::TransportException)
+{
 	list<PDU>::iterator it = pdu_queue.begin();
 
 	while (it != pdu_queue.end()) {
@@ -526,10 +524,11 @@ void smpp::SmppClient::enquireLinkRespond() throw (smpp::SmppException,
 	}
 }
 
-uint32_t smpp::SmppClient::byteRead(uint8_t* bytes) {
+uint32_t smpp::SmppClient::byteRead(uint8_t* bytes)
+{
 	uint32_t r = 0;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0 ; i < 4 ; i++) {
 		r <<= 8;
 		r |= (uint32_t) bytes[i];
 	}
@@ -537,12 +536,12 @@ uint32_t smpp::SmppClient::byteRead(uint8_t* bytes) {
 	return r;
 }
 
-void smpp::SmppClient::checkConnection() throw (smpp::TransportException) {
-	if (!socket->is_open())
-		throw smpp::TransportException("Socket is closed");
+void smpp::SmppClient::checkConnection() throw (smpp::TransportException)
+{
+	if (!socket->is_open()) throw smpp::TransportException("Socket is closed");
 }
 
-void smpp::SmppClient::checkState(int state) throw (smpp::SmppException) {
-	if (this->state != state)
-		throw smpp::SmppException("Client in wrong state");
+void smpp::SmppClient::checkState(int state) throw (smpp::SmppException)
+{
+	if (this->state != state) throw smpp::SmppException("Client in wrong state");
 }
