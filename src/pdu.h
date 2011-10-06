@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <boost/shared_array.hpp>
+#include <netinet/in.h>
 
 using namespace std;
 using namespace boost;
@@ -23,10 +24,11 @@ const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
 class PDU
 {
 private:
+	stringbuf sb;
+	iostream buf;
 	uint32_t cmdId;
 	uint32_t cmdStatus;
 	uint32_t seqNo;
-	iostream buf;
 	bool nullTerminateOctetStrings;
 public:
 	bool null;
@@ -34,36 +36,49 @@ public:
 public:
 
 	PDU() :
-			cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(true)
+			buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(true)
 	{
 	}
 
 	PDU(uint32_t _cmdId, uint32_t _cmdStatus, uint32_t _seqNo) :
-			buf(streambuf()), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo)
+			buf(&sb), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), null(false)
 	{
-		buf.seekp(HEADERFIELD_SIZE);
-		buf << cmdId;
-		buf << cmdStatus;
-		buf << seqNo;
+
+//		buf.seekp(HEADERFIELD_SIZE, ios::cur);
+
+		uint32_t size = 0;
+		buf.write(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+
+		uint32_t beCmdId = htonl(cmdId);
+		buf.write(reinterpret_cast<char*>(&beCmdId), sizeof(uint32_t));
+
+		uint32_t beCmdStatus = htonl(cmdStatus);
+		buf.write(reinterpret_cast<char*>(&beCmdStatus), sizeof(uint32_t));
+
+		uint32_t beSeqNo = htonl(seqNo);
+		buf.write(reinterpret_cast<char*>(&beSeqNo), sizeof(uint32_t));
+
 	}
 
-	PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer)
+	PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer) :
+			buf(&sb)
 	{
 		unsigned int bufSize = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8
 				| (int) pduLength[3];
 
-		streambuf tmpBuf;
+		sb.sputn((char*) pduLength.get(), HEADERFIELD_SIZE);
+		sb.sputn((char*) pduBuffer.get(), bufSize);
 
-		tmpBuf.sputn((char*) pduLength.get(), HEADERFIELD_SIZE);
-		tmpBuf.sputn((char*) pduBuffer.get(), bufSize);
-
-		buf = iostream(tmpBuf);
-
-		buf.seekg(HEADERFIELD_SIZE);
+		buf.seekg(HEADERFIELD_SIZE, ios::cur);
 
 		buf >> cmdId;
 		buf >> cmdStatus;
 		buf >> seqNo;
+
+		cmdId = ntohl(cmdId);
+		cmdStatus = ntohl(cmdStatus);
+		seqNo = ntohl(seqNo);
+
 	}
 
 	/**
@@ -103,11 +118,10 @@ public:
 	void setNullTerminateOctetStrings(const bool&);
 
 	/** Adds an integer as an unsigned 8 bit. */
-	inline PDU& operator+=(const int &);
-
-	inline PDU& operator+=(const uint8_t &i);
-	inline PDU& operator+=(const uint16_t &i);
-	inline PDU& operator+=(const uint32_t &i);
+	PDU& operator+=(const int &);
+	PDU& operator+=(const uint8_t &i);
+	PDU& operator+=(const uint16_t &i);
+	PDU& operator+=(const uint32_t &i);
 	PDU& operator+=(std::basic_string<char> s);
 	PDU& operator+=(const smpp::SmppAddress);
 	PDU& operator+=(const smpp::TLV);
