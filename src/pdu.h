@@ -43,21 +43,10 @@ public:
 	PDU(uint32_t _cmdId, uint32_t _cmdStatus, uint32_t _seqNo) :
 			buf(&sb), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), null(false)
 	{
-
-//		buf.seekp(HEADERFIELD_SIZE, ios::cur);
-
-		uint32_t size = 0;
-		buf.write(reinterpret_cast<char*>(&size), sizeof(uint32_t));
-
-		uint32_t beCmdId = htonl(cmdId);
-		buf.write(reinterpret_cast<char*>(&beCmdId), sizeof(uint32_t));
-
-		uint32_t beCmdStatus = htonl(cmdStatus);
-		buf.write(reinterpret_cast<char*>(&beCmdStatus), sizeof(uint32_t));
-
-		uint32_t beSeqNo = htonl(seqNo);
-		buf.write(reinterpret_cast<char*>(&beSeqNo), sizeof(uint32_t));
-
+		(*this) += uint32_t(0);
+		(*this) += cmdId;
+		(*this) += cmdStatus;
+		(*this) += seqNo;
 	}
 
 	PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer) :
