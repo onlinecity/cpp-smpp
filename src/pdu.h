@@ -41,7 +41,7 @@ public:
 	}
 
 	PDU(uint32_t _cmdId, uint32_t _cmdStatus, uint32_t _seqNo) :
-			buf(&sb), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), null(false)
+			buf(&sb), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), nullTerminateOctetStrings(true), null(false)
 	{
 		(*this) += uint32_t(0);
 		(*this) += cmdId;
@@ -50,24 +50,20 @@ public:
 	}
 
 	PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer) :
-			buf(&sb)
+
+			buf(&sb), nullTerminateOctetStrings(true), null(false)
 	{
 		unsigned int bufSize = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8
 				| (int) pduLength[3];
 
-		sb.sputn((char*) pduLength.get(), HEADERFIELD_SIZE);
-		sb.sputn((char*) pduBuffer.get(), bufSize);
+		buf.write((char*) pduLength.get(), HEADERFIELD_SIZE);
+		buf.write((char*) pduBuffer.get(), bufSize - HEADERFIELD_SIZE);
 
 		buf.seekg(HEADERFIELD_SIZE, ios::cur);
 
-		buf >> cmdId;
-		buf >> cmdStatus;
-		buf >> seqNo;
-
-		cmdId = ntohl(cmdId);
-		cmdStatus = ntohl(cmdStatus);
-		seqNo = ntohl(seqNo);
-
+		cmdId = read4Int();
+		cmdStatus = read4Int();
+		seqNo = read4Int();
 	}
 
 	/**
