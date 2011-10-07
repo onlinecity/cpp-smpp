@@ -308,7 +308,7 @@ void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportEx
 	timer.expires_from_now(boost::posix_time::seconds(5));
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
-	async_write(*socket, buffer(pdu.getOctets(), pdu.getSize()),
+	async_write(*socket, buffer(pdu.getOctets().get(), pdu.getSize()),
 			boost::bind(&SmppClient::handleTimeout, this, &ioResult, _1));
 
 	socketExecute();
@@ -324,8 +324,8 @@ void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportEx
 
 smpp::PDU SmppClient::sendCommand(PDU &pdu) throw (smpp::SmppException, smpp::TransportException)
 {
-
 	sendPdu(pdu);
+
 	PDU resp = readPduResponse(pdu.getSequenceNo(), pdu.getCommandId());
 
 	if (resp.getCommandStatus() != smpp::ESME_ROK) throw smpp::SmppException(
@@ -417,7 +417,7 @@ void SmppClient::socketExecute()
 }
 
 void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, size_t len,
-		shared_array<uint8_t> pduLength) throw (smpp::TransportException)
+		const shared_array<uint8_t> &pduLength) throw (smpp::TransportException)
 {
 	if (error) {
 
@@ -432,7 +432,8 @@ void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, si
 	shared_array<uint8_t> pduBuffer(new uint8_t[i]);
 
 	// start reading after the size mark of the pdu
-	async_read(*socket, buffer(pduBuffer.get(), i - 4), boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2));
+	async_read(*socket, buffer(pduBuffer.get(), i - 4),
+			boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2, pduLength, pduBuffer));
 
 	socketExecute();
 }
@@ -454,7 +455,6 @@ void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::err
 	opt->reset(error);
 
 	unsigned int i = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8 | (int) pduLength[3];
-
 	shared_array<uint8_t> pduBuffer(new uint8_t[i - 4]);
 
 	// start reading after the size mark of the pdu
@@ -472,7 +472,12 @@ void SmppClient::readPduBodyHandler(const boost::system::error_code &error, size
 	}
 
 	PDU pdu(pduLength, pduBuffer);
+
+	cout << "read pdu body handler:" << endl;
+	cout << pdu;
+
 	pdu_queue.push_back(pdu);
+
 }
 
 // blocks until response is read
