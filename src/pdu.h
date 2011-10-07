@@ -40,9 +40,10 @@ public:
 	{
 	}
 
-	PDU(uint32_t _cmdId, uint32_t _cmdStatus, uint32_t _seqNo) :
+	PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_seqNo) :
 			buf(&sb), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), nullTerminateOctetStrings(true), null(false)
 	{
+
 		(*this) += uint32_t(0);
 		(*this) += cmdId;
 		(*this) += cmdStatus;
@@ -64,6 +65,17 @@ public:
 		cmdId = read4Int();
 		cmdStatus = read4Int();
 		seqNo = read4Int();
+	}
+
+	PDU(const PDU &rhs) :
+					sb(rhs.sb.str()),
+					buf(&sb),
+					cmdId(rhs.cmdId),
+					cmdStatus(rhs.cmdStatus),
+					seqNo(rhs.seqNo),
+					nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
+					null(rhs.null)
+	{
 	}
 
 	/**

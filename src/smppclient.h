@@ -62,15 +62,7 @@ public:
 private:
 	int state;
 	shared_ptr<tcp::socket> socket;
-
 	uint32_t seqNo;
-
-
-//	uint8_t pduHeader[4];
-
-
-//	boost::asio::buffer pduBuffer;
-
 	list<PDU> pdu_queue;
 
 public:
@@ -181,10 +173,10 @@ public:
 	 * Sleeps the given number of milliseconds.
 	 * @param milliseconds Milliseconds to sleep.
 	 */
-	inline void sleep(const int &milliseconds)
-	{
-		boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
-	}
+//	inline void sleep(const int &milliseconds)
+//	{
+//		boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
+//	}
 
 	inline bool isBound()
 	{
@@ -293,7 +285,12 @@ private:
 	 * @param error Boost error code
 	 * @param read Bytes read
 	 */
-	void readPduHeaderHandler(const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength) throw (smpp::TransportException);
+	void readPduHeaderHandler(const boost::system::error_code &error, size_t read, const shared_array<uint8_t> &pduLength)
+			throw (smpp::TransportException);
+
+	void readPduHeaderHandlerBlocking(boost::optional<boost::system::error_code>* opt,
+			const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength)
+					throw (smpp::TransportException);
 
 	/**
 	 * Handler for reading a PDU body.
@@ -302,10 +299,8 @@ private:
 	 * @param error Boost error code
 	 * @param read Bytes read
 	 */
-	void readPduBodyHandler(const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength, shared_array<uint8_t> pduBuffer);
-
-	void readPduHeaderHandlerBlocking(boost::optional<boost::system::error_code>* opt,
-			const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduHeader) throw (smpp::TransportException);
+	void readPduBodyHandler(const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength,
+			shared_array<uint8_t> pduBuffer);
 
 	/**
 	 * Returns a response for a PDU we have sent,

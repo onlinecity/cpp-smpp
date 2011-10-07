@@ -80,8 +80,14 @@ smpp::PDU& smpp::PDU::operator+=(const uint16_t &i)
 
 smpp::PDU& smpp::PDU::operator+=(const uint32_t &i)
 {
-	uint32_t j = htonl(i);
-	buf.write(reinterpret_cast<char*>(&j), sizeof(uint32_t));
+
+	if (i != 0) {
+		uint32_t j = htonl(i);
+		buf.write(reinterpret_cast<char*>(&j), sizeof(uint32_t));
+	} else {
+		buf << "\0\0\0\0";
+	}
+
 	return *this;
 }
 
