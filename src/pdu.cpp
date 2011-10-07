@@ -15,18 +15,21 @@ const shared_array<uint8_t> smpp::PDU::getOctets()
 
 	buf.write(reinterpret_cast<char*>(&beSize), sizeof(uint32_t));
 	buf.seekp(0, ios::end);
-
 	buf.seekg(0, ios::beg);
+
 	shared_array<uint8_t> octets(new uint8_t[size]);
 	buf.read((char*) octets.get(), size);
 	buf.seekg(0, ios::beg);
+
 	return octets;
 }
 
 const int smpp::PDU::getSize()
 {
 	buf.seekp(0, ios_base::end);
-	return buf.tellp();
+	int s = buf.tellp();
+
+	return s;
 }
 
 const uint32_t smpp::PDU::getCommandId()
