@@ -19,7 +19,8 @@ private:
 	map<string, string> dict;
 
 public:
-	GsmEncoder()
+	GsmEncoder() :
+			dict()
 	{
 		dict.insert(pair<string, string>("@", "\x00"));
 		dict.insert(pair<string, string>("£", "\x01"));
