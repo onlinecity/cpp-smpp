@@ -35,12 +35,13 @@ public:
 
 public:
 
-	PDU() : sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(true)
+	PDU() :
+			sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(true)
 	{
 	}
 
 	PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_seqNo) :
-			buf(&sb), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), nullTerminateOctetStrings(true), null(false)
+			sb(""), buf(&sb), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), nullTerminateOctetStrings(true), null(false)
 	{
 		(*this) << uint32_t(0);
 		(*this) << cmdId;
@@ -49,8 +50,7 @@ public:
 	}
 
 	PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer) :
-
-			buf(&sb), nullTerminateOctetStrings(true), null(false)
+			sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false)
 	{
 		unsigned int bufSize = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8
 				| (int) pduLength[3];
@@ -66,13 +66,13 @@ public:
 	}
 
 	PDU(const PDU &rhs) :
-					sb(rhs.sb.str()),
-					buf(&sb),
-					cmdId(rhs.cmdId),
-					cmdStatus(rhs.cmdStatus),
-					seqNo(rhs.seqNo),
-					nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
-					null(rhs.null)
+			sb(rhs.sb.str()),
+			buf(&sb),
+			cmdId(rhs.cmdId),
+			cmdStatus(rhs.cmdStatus),
+			seqNo(rhs.seqNo),
+			nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
+			null(rhs.null)
 	{
 	}
 
@@ -138,26 +138,6 @@ public:
 	PDU& operator>>(uint16_t &i);
 	PDU& operator>>(uint32_t &i);
 	PDU& operator>>(std::basic_string<char> &s);
-
-	/**
-	 * Returns the next octet.
-	 * @return
-	 */
-	int readInt();
-
-	/**
-	 * @return Next two octets as an uint16_t.
-	 */
-	uint16_t read2Int();
-	/**
-	 * @return Next four octets as an uint32_t.
-	 */
-	uint32_t read4Int();
-
-	/**
-	 * @return Next null terminated string.
-	 */
-	string readString();
 
 	/**
 	 * Copy n octet into an array.

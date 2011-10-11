@@ -11,7 +11,7 @@ LIB_MAJOR_NAME=$(LIB_NAME).$(MAJOR_VERSION)
 LIB_MINOR_NAME=$(LIB_MAJOR_NAME).$(MINOR_VERSION)
 
 OPT?=2
-CFLAGS=-fPIC -c -Wall -I/usr/local/include -O${OPT}
+CFLAGS=-fPIC -c -Wall -Weffc++ -I/usr/local/include -O${OPT}
 LDFLAGS=-L/usr/local/lib -lboost_system -lboost_regex
 CXXFLAGS=${CFLAGS}
 

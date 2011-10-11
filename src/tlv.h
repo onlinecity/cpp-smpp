@@ -66,12 +66,13 @@ private:
 	shared_array<uint8_t> octets;
 
 public:
+
 	/**
 	 * Constructs a TLV with only the tag.
 	 * @param _tag TLV tag.
 	 */
 	TLV(const uint16_t &_tag) :
-			tag(_tag), len(0)
+			tag(_tag), len(0), octets()
 	{
 	}
 

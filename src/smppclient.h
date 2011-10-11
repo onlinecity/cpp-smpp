@@ -90,6 +90,7 @@ public:
 					state(OPEN),
 					socket(_socket),
 					seqNo(0),
+					pdu_queue(),
 					verbose(false)
 	{
 	}
