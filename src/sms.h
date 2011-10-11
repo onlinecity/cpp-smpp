@@ -59,41 +59,41 @@ public:
 			null(false)
 
 	{
-		service_type = pdu.readString();
+		pdu >> service_type;
 
-		source_addr_ton = pdu.readInt();
-		source_addr_npi = pdu.readInt();
-		source_addr = pdu.readString();
+		pdu >> source_addr_ton;
+		pdu >> source_addr_npi;
+		pdu >> source_addr;
 
-		dest_addr_ton = pdu.readInt();
-		dest_addr_npi = pdu.readInt();
-		dest_addr = pdu.readString();
+		pdu >> dest_addr_ton;
+		pdu >> dest_addr_npi;
+		pdu >> dest_addr;
 
-		esm_class = pdu.readInt();
-		protocol_id = pdu.readInt();
-		priority_flag = pdu.readInt();
-		schedule_delivery_time = pdu.readString();
-		validity_period = pdu.readString();
-		registered_delivery = pdu.readInt();
-		replace_if_present_flag = pdu.readInt();
-		data_coding = pdu.readInt();
-		sm_default_msg_id = pdu.readInt();
-		sm_length = pdu.readInt();
+		pdu >> esm_class;
+		pdu >> protocol_id;
+		pdu >> priority_flag;
+		pdu >> schedule_delivery_time;
+		pdu >> validity_period;
+		pdu >> registered_delivery;
+		pdu >> replace_if_present_flag;
+		pdu >> data_coding;
+		pdu >> sm_default_msg_id;
+		pdu >> sm_length;
 
-		short_message = pdu.readString();
+		pdu >> short_message;
 
 		// fetch any optional tags
 		uint16_t len = 0;
 		uint16_t tag = 0;
 
 		while (pdu.hasMoreData()) {
-			tag = pdu.read2Int();
+			pdu >> tag;
 			if (len == 0) {
 				tlvs.push_back(TLV(tag));
 				continue;
 			}
 
-			len = pdu.read2Int();
+			pdu >> len;
 			shared_array<uint8_t> octets(new uint8_t[len]);
 			pdu.readOctets(octets, len);
 			tlvs.push_back(TLV(tag, len, octets));
