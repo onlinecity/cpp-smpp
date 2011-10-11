@@ -143,7 +143,7 @@ public:
 		}
 	}
 
-	SMS(const smpp::SMS &sms) :
+	SMS(const SMS &sms) :
 			service_type(sms.service_type),
 			source_addr_ton(sms.source_addr_ton),
 			source_addr_npi(sms.source_addr_npi),
@@ -205,7 +205,7 @@ public:
 		return *this;
 	}
 
-	friend std::ostream& smpp::operator<<(std::ostream&, smpp::SMS&);
+	friend std::ostream &operator << (std::ostream &, const SMS &);
 
 };
 // SMS class

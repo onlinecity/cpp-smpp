@@ -151,7 +151,7 @@ public:
 	 */
 	bool hasMoreData();
 
-	friend std::ostream& smpp::operator<<(std::ostream&, smpp::PDU&);
+	friend std::ostream &smpp::operator<<(std::ostream&, smpp::PDU&);
 };
 
 std::ostream& operator<<(std::ostream&, smpp::PDU&);
