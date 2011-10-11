@@ -3,7 +3,7 @@
 
 using namespace std;
 
-std::ostream& smpp::operator<<(std::ostream& out, smpp::SMS& sms)
+std::ostream &operator << (std::ostream &out, const smpp::SMS &sms)
 {
 	if (sms.null) {
 		out << "sms values: NULL" << endl;

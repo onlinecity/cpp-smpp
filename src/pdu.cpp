@@ -175,7 +175,7 @@ bool smpp::PDU::hasMoreData()
 	return buf.eof();
 }
 
-std::ostream& smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
+std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
 {
 	using namespace std;
 
