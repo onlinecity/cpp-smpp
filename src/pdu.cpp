@@ -57,28 +57,28 @@ void smpp::PDU::setNullTerminateOctetStrings(const bool &b)
 	nullTerminateOctetStrings = b;
 }
 
-smpp::PDU& smpp::PDU::operator+=(const int &i)
+smpp::PDU& smpp::PDU::operator<<(const int &i)
 {
 	uint8_t x(i);
 	buf.write(reinterpret_cast<char*>(&x), sizeof(uint8_t));
 	return *this;
 }
 
-smpp::PDU& smpp::PDU::operator+=(const uint8_t &i)
+smpp::PDU& smpp::PDU::operator<<(const uint8_t &i)
 {
 	uint8_t x(i);
 	buf.write(reinterpret_cast<char*>(&x), sizeof(uint8_t));
 	return *this;
 }
 
-smpp::PDU& smpp::PDU::operator+=(const uint16_t &i)
+smpp::PDU& smpp::PDU::operator<<(const uint16_t &i)
 {
 	uint16_t j = htons(i);
 	buf.write(reinterpret_cast<char*>(&j), sizeof(uint16_t));
 	return *this;
 }
 
-smpp::PDU& smpp::PDU::operator+=(const uint32_t &i)
+smpp::PDU& smpp::PDU::operator<<(const uint32_t &i)
 {
 	uint32_t j = htonl(i);
 	buf.write(reinterpret_cast<char*>(&j), sizeof(uint32_t));
@@ -86,7 +86,7 @@ smpp::PDU& smpp::PDU::operator+=(const uint32_t &i)
 	return *this;
 }
 
-smpp::PDU& smpp::PDU::operator+=(std::basic_string<char> s)
+smpp::PDU& smpp::PDU::operator<<(const std::basic_string<char> &s)
 {
 	buf << s.c_str();
 	if (nullTerminateOctetStrings) {
@@ -96,18 +96,18 @@ smpp::PDU& smpp::PDU::operator+=(std::basic_string<char> s)
 	return *this;
 }
 
-smpp::PDU& smpp::PDU::operator +=(const smpp::SmppAddress s)
+smpp::PDU& smpp::PDU::operator <<(const smpp::SmppAddress s)
 {
-	(*this) += s.ton;
-	(*this) += s.npi;
-	(*this) += s.value;
+	(*this) << s.ton;
+	(*this) << s.npi;
+	(*this) << s.value;
 	return *this;
 }
 
-smpp::PDU& smpp::PDU::operator +=(smpp::TLV tlv)
+smpp::PDU& smpp::PDU::operator <<(smpp::TLV tlv)
 {
-	(*this) += tlv.getTag();
-	(*this) += tlv.getLen();
+	(*this) << tlv.getTag();
+	(*this) << tlv.getLen();
 	if (tlv.getLen() != 0) {
 
 		(*this).addOctets(tlv.getOctets(), (uint32_t) tlv.getLen());
@@ -131,32 +131,38 @@ void smpp::PDU::resetMarker()
 	buf.seekg(0, ios::beg);
 }
 
-uint16_t smpp::PDU::read2Int()
+smpp::PDU& smpp::PDU::operator>>(int &i)
 {
-	uint16_t i;
+	uint8_t j;
+	buf.read(reinterpret_cast<char*>(&j), sizeof(uint8_t));
+	i = j;
+	return *this;
+}
+
+smpp::PDU& smpp::PDU::operator>>(uint8_t &i)
+{
+	buf.read(reinterpret_cast<char*>(&i), sizeof(uint8_t));
+	return *this;
+}
+
+smpp::PDU& smpp::PDU::operator>>(uint16_t &i)
+{
 	buf.read(reinterpret_cast<char*>(&i), sizeof(uint16_t));
-	return ntohs(i);
+	i = ntohs(i);
+	return *this;
 }
 
-uint32_t smpp::PDU::read4Int()
+smpp::PDU& smpp::PDU::operator>>(uint32_t &i)
 {
-	uint32_t i;
 	buf.read(reinterpret_cast<char*>(&i), sizeof(uint32_t));
-	return ntohl(i);
+	i = ntohl(i);
+	return *this;
 }
 
-int smpp::PDU::readInt()
+smpp::PDU& smpp::PDU::operator>>(std::basic_string<char> &s)
 {
-	uint8_t i;
-	buf >> i;
-	return i;
-}
-
-string smpp::PDU::readString()
-{
-	string s;
 	getline(buf, s, '\0');
-	return s;
+	return *this;
 }
 
 void smpp::PDU::readOctets(shared_array<uint8_t> &octets, const streamsize &len)

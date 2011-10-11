@@ -48,13 +48,13 @@ void SmppClient::bind(uint32_t mode, const string &login, const string &password
 smpp::PDU SmppClient::setupBindPdu(uint32_t mode, const string &login, const string &password)
 {
 	PDU pdu(mode, 0, nextSequenceNumber());
-	pdu += login;
-	pdu += password;
-	pdu += system_type;
-	pdu += interfaceVersion;
-	pdu += addr_ton;
-	pdu += addr_npi;
-	pdu += addr_range;
+	pdu << login;
+	pdu << password;
+	pdu << system_type;
+	pdu << interfaceVersion;
+	pdu << addr_ton;
+	pdu << addr_npi;
+	pdu << addr_range;
 	return pdu;
 }
 
@@ -196,7 +196,7 @@ smpp::SMS SmppClient::parseSms()
 
 			// send response to smsc
 			PDU resp = PDU(DELIVER_SM_RESP, 0x0, (*it).getSequenceNo());
-			resp += 0x0;
+			resp << 0x0;
 			sendPdu(resp);
 			// remove sms from queue
 			pdu_queue.erase(it);
@@ -210,7 +210,7 @@ smpp::SMS SmppClient::parseSms()
 
 		if ((*it).getCommandId() == DATA_SM) {
 			PDU resp = PDU(DATA_SM_RESP, 0x0, (*it).getSequenceNo());
-			resp += 0x0;
+			resp << 0x0;
 			sendPdu(resp);
 			it = pdu_queue.erase(it);
 			continue;
@@ -250,39 +250,41 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 	checkState(BOUND_TX);
 
 	PDU pdu(smpp::SUBMIT_SM, 0, nextSequenceNumber());
-	pdu += service_type;
+	pdu << service_type;
 
-	pdu += sender;
-	pdu += receiver;
+	pdu << sender;
+	pdu << receiver;
 
-	pdu += esmClass;
-	pdu += protocol_id;
+	pdu << esmClass;
+	pdu << protocol_id;
 
-	pdu += priority_flag;
-	pdu += schedule_delivery_time;
-	pdu += validity_period;
+	pdu << priority_flag;
+	pdu << schedule_delivery_time;
+	pdu << validity_period;
 
-	pdu += registered_delivery;
-	pdu += replace_if_present_flag;
-	pdu += data_coding;
-	pdu += sm_default_msg_id;
+	pdu << registered_delivery;
+	pdu << replace_if_present_flag;
+	pdu << data_coding;
+	pdu << sm_default_msg_id;
 
 	if (useMsgPayload) {
-		pdu += 0; // sm_length = 0
-		pdu += TLV(smpp::tags::MESSAGE_PAYLOAD, shortMessage);
+		pdu << 0; // sm_length = 0
+		pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, shortMessage);
 	} else {
 		pdu.setNullTerminateOctetStrings(nullTerminateOctetStrings);
-		pdu += (int) shortMessage.length() + (nullTerminateOctetStrings ? 1 : 0);
-		pdu += shortMessage;
+		pdu << (int) shortMessage.length() + (nullTerminateOctetStrings ? 1 : 0);
+		pdu << shortMessage;
 		pdu.setNullTerminateOctetStrings(true);
 	}
 
 	// add  optional tags.
 	for (list<TLV>::iterator itr = tags.begin() ; itr != tags.end() ; itr++)
-		pdu += *itr;
+		pdu << *itr;
 
 	PDU resp = sendCommand(pdu);
-	return resp.readString();
+	string messageid;
+	resp >> messageid;
+	return messageid;
 }
 
 uint32_t SmppClient::nextSequenceNumber() throw (smpp::SmppException)
@@ -391,7 +393,7 @@ void SmppClient::readPduBlocking()
 			boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1, _2, pduHeader));
 
 	deadline_timer timer(socket->io_service());
-	timer.expires_from_now(boost::posix_time::seconds(5));
+	timer.expires_from_now(boost::posix_time::seconds(30));
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
 	socketExecute();
