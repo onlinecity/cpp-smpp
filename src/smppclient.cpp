@@ -31,7 +31,6 @@ void SmppClient::bind(uint32_t mode, const string &login, const string &password
 	checkConnection();
 	checkState(OPEN);
 
-	cout << "bind" << endl;
 	PDU pdu = setupBindPdu(mode, login, password);
 	sendCommand(pdu);
 
@@ -174,8 +173,6 @@ smpp::SMS SmppClient::readSms() throw (smpp::SmppException, smpp::TransportExcep
 		throw smpp::TransportException(e.what());
 	}
 
-	cout << "parse sms" << endl;
-
 	return parseSms();
 }
 
@@ -307,7 +304,7 @@ void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportEx
 	}
 
 	deadline_timer timer(socket->io_service());
-	timer.expires_from_now(boost::posix_time::seconds(5));
+	timer.expires_from_now(boost::posix_time::seconds(socketTimeout));
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
 	async_write(*socket, buffer(pdu.getOctets().get(), pdu.getSize()),
@@ -474,12 +471,7 @@ void SmppClient::readPduBodyHandler(const boost::system::error_code &error, size
 	}
 
 	PDU pdu(pduLength, pduBuffer);
-
-	cout << "read pdu body handler:" << endl;
-	cout << pdu;
-
 	pdu_queue.push_back(pdu);
-
 }
 
 // blocks until response is read
@@ -529,18 +521,6 @@ void smpp::SmppClient::enquireLinkRespond() throw (smpp::SmppException, smpp::Tr
 		PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.getSequenceNo());
 		sendPdu(resp);
 	}
-}
-
-uint32_t smpp::SmppClient::byteRead(uint8_t* bytes)
-{
-	uint32_t r = 0;
-
-	for (int i = 0 ; i < 4 ; i++) {
-		r <<= 8;
-		r |= (uint32_t) bytes[i];
-	}
-
-	return r;
 }
 
 void smpp::SmppClient::checkConnection() throw (smpp::TransportException)
