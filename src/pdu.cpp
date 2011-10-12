@@ -1,9 +1,4 @@
 #include "pdu.h"
-#include "smpp.h"
-#include <cstring>
-#include <iostream>
-#include <fstream>
-
 using namespace std;
 
 const shared_array<uint8_t> smpp::PDU::getOctets()

@@ -1,10 +1,4 @@
-#include <iostream>
-#include <sstream>
-
-#include "smpp.h"
 #include "smppclient.h"
-#include "pdu.h"
-
 using namespace smpp;
 
 smpp::SmppClient::~SmppClient()
@@ -68,14 +62,6 @@ void SmppClient::unbind() throw (smpp::SmppException, smpp::TransportException)
 	if (pduStatus != smpp::ESME_ROK) throw smpp::SmppException(smpp::getEsmeStatus(pduStatus));
 
 	state = OPEN;
-}
-
-void hexDump(const string &s)
-{
-	for (unsigned int i = 0 ; i < s.size() ; i++) {
-		cout << setw(2) << setfill('0') << hex << (int) s[i] << " ";
-	}
-	cout << endl << dec;
 }
 
 /**
