@@ -60,8 +60,11 @@ public:
 	bool nullTerminateOctetStrings;
 	bool useMsgPayload;
 
-	// Number of seconds to do a blocking wait on the socket, default is 5 seconds.
+	// Socket timeout in milliseconds. Default is 5000 milliseconds.
 	int socketTimeout;
+
+	// Number of milliseconds to do a blocking wait on the socket, default is 30000 milliseconds.
+	int blockingTimeout;
 
 private:
 	int state;
@@ -91,7 +94,8 @@ public:
 					sm_default_msg_id(0),
 					nullTerminateOctetStrings(false),
 					useMsgPayload(false),
-					socketTimeout(5),
+					socketTimeout(5000),
+					blockingTimeout(30000),
 					state(OPEN),
 					socket(_socket),
 					seqNo(0),
