@@ -12,6 +12,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <sstream>
 
 #include "smpp.h"
 #include "tlv.h"
@@ -324,7 +325,7 @@ private:
 	 * @throw SmppException if the client is not in the desired state.
 	 */
 
-	void checkState(int state) throw (smpp::SmppException);
+	void checkState(const int state) throw (smpp::SmppException);
 
 };
 }
