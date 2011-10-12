@@ -77,7 +77,6 @@ smpp::PDU& smpp::PDU::operator<<(const uint32_t &i)
 {
 	uint32_t j = htonl(i);
 	buf.write(reinterpret_cast<char*>(&j), sizeof(uint32_t));
-
 	return *this;
 }
 
