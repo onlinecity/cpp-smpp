@@ -59,6 +59,9 @@ public:
 	bool nullTerminateOctetStrings;
 	bool useMsgPayload;
 
+	// Number of seconds to do a blocking wait on the socket, default is 5 seconds.
+	int socketTimeout;
+
 private:
 	int state;
 	shared_ptr<tcp::socket> socket;
@@ -87,6 +90,7 @@ public:
 					sm_default_msg_id(0),
 					nullTerminateOctetStrings(false),
 					useMsgPayload(false),
+					socketTimeout(5),
 					state(OPEN),
 					socket(_socket),
 					seqNo(0),
@@ -169,15 +173,6 @@ public:
 	 * If they have, a response is sent.
 	 */
 	void enquireLinkRespond() throw (smpp::SmppException, smpp::TransportException);
-
-	/**
-	 * Sleeps the given number of milliseconds.
-	 * @param milliseconds Milliseconds to sleep.
-	 */
-//	inline void sleep(const int &milliseconds)
-//	{
-//		boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
-//	}
 
 	inline bool isBound()
 	{
@@ -316,15 +311,6 @@ private:
 	 */
 	PDU readPduResponse(const uint32_t &sequence, const uint32_t &commandId) throw (smpp::SmppException,
 			smpp::TransportException);
-
-	/**
-	 * Returns an array of four bytes as one uint32_t.
-	 * NOTE: This function reads four memory locations no matter what.
-	 *
-	 * @param bytes Array of bytes to be returned as one uint32_t
-	 * @return bytes as uint32_t.
-	 */
-	uint32_t byteRead(uint8_t* bytes);
 
 	/**
 	 * Checks the connection.
