@@ -62,7 +62,6 @@ public:
 
 	// Socket timeout in milliseconds. Default is 5000 milliseconds.
 	int socketTimeout;
-
 	// Number of milliseconds to do a blocking wait on the socket, default is 30000 milliseconds.
 	int blockingTimeout;
 
