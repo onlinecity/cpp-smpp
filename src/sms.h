@@ -7,6 +7,8 @@
 #include <locale>
 #include <boost/regex.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/date_time.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "smpp.h"
 #include "pdu.h"
@@ -14,6 +16,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace smpp {
 /**
@@ -34,6 +37,7 @@ public:
 	int esm_class;
 	int protocol_id;
 	int priority_flag;
+
 	string schedule_delivery_time;
 	string validity_period;
 	int registered_delivery;
@@ -116,6 +120,9 @@ public:
 		pdu >> protocol_id;
 		pdu >> priority_flag;
 		pdu >> schedule_delivery_time;
+
+//		schedule_delivery
+
 		pdu >> validity_period;
 		pdu >> registered_delivery;
 		pdu >> replace_if_present_flag;
