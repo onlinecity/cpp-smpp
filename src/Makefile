@@ -26,7 +26,7 @@ all: $(OBJ) lib
 sms.o: sms.cpp sms.h smpp.h pdu.h tlv.h
 pdu.o: pdu.cpp pdu.h smpp.h tlv.h
 smpp.o: smpp.cpp smpp.h
-smppclient.o: smppclient.cpp smpp.h smppclient.h tlv.h pdu.h sms.h exceptions.h
+smppclient.o: smppclient.cpp smpp.h smppclient.h tlv.h pdu.h sms.h exceptions.h timeformat.h
 
 lib: $(OBJ)	
 	gcc -shared -Wl,-soname,$(LIB_MINOR_NAME) -o $(LIB_NAME) $(OBJ) $(LDFLAGS)
