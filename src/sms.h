@@ -15,8 +15,6 @@
 #include "tlv.h"
 
 using namespace std;
-using namespace smpp::timeformat;
-
 using namespace boost;
 using namespace boost::posix_time;
 
