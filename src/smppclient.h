@@ -60,16 +60,15 @@ public:
 	bool nullTerminateOctetStrings;
 	bool useMsgPayload;
 
-	// Socket timeout in milliseconds. Default is 5000 milliseconds.
-	int socketTimeout;
-	// Number of milliseconds to do a blocking wait on the socket, default is 30000 milliseconds.
-	int blockingTimeout;
-
 private:
 	int state;
 	shared_ptr<tcp::socket> socket;
 	uint32_t seqNo;
 	list<PDU> pdu_queue;
+	// Socket write timeout in milliseconds. Default is 5000 milliseconds.
+	int socketWriteTimeout;
+	// Socket read timeout in milliseconds. Default is 30000 milliseconds.
+	int socketReadTimeout;
 
 public:
 	bool verbose;
@@ -93,12 +92,12 @@ public:
 					sm_default_msg_id(0),
 					nullTerminateOctetStrings(false),
 					useMsgPayload(false),
-					socketTimeout(5000),
-					blockingTimeout(30000),
 					state(OPEN),
 					socket(_socket),
 					seqNo(0),
 					pdu_queue(),
+					socketWriteTimeout(5000),
+					socketReadTimeout(30000),
 					verbose(false)
 	{
 	}
@@ -181,6 +180,26 @@ public:
 	inline bool isBound()
 	{
 		return state != OPEN;
+	}
+
+	inline void setSocketReadTimeout(const int &timeout)
+	{
+		socketReadTimeout = timeout;
+	}
+
+	inline int getSocketReadTimeout()
+	{
+		return socketReadTimeout;
+	}
+
+	inline void setSocketWriteTimeout(const int &timeout)
+	{
+		socketWriteTimeout = timeout;
+	}
+
+	inline int getSocketWriteTimeout()
+	{
+		return socketWriteTimeout;
 	}
 
 private:

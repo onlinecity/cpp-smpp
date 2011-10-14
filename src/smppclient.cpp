@@ -290,7 +290,7 @@ void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportEx
 	}
 
 	deadline_timer timer(socket->io_service());
-	timer.expires_from_now(boost::posix_time::milliseconds(socketTimeout));
+	timer.expires_from_now(boost::posix_time::milliseconds(socketWriteTimeout));
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
 	async_write(*socket, buffer(pdu.getOctets().get(), pdu.getSize()),
@@ -376,7 +376,7 @@ void SmppClient::readPduBlocking()
 			boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1, _2, pduHeader));
 
 	deadline_timer timer(socket->io_service());
-	timer.expires_from_now(boost::posix_time::milliseconds(blockingTimeout));
+	timer.expires_from_now(boost::posix_time::milliseconds(socketReadTimeout));
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
 	socketExecute();
