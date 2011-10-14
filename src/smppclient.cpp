@@ -266,6 +266,7 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 
 	PDU resp = sendCommand(pdu);
 	string messageid;
+	resp.skip(smpp::HEADER_SIZE);
 	resp >> messageid;
 	return messageid;
 }
