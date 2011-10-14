@@ -15,6 +15,12 @@ namespace timeformat {
 
 typedef pair<local_time::local_date_time, posix_time::time_duration> DatePair;
 
+/**
+ * Parses a relative timestamp and returns it as a time_duration.
+ *
+ * @param match
+ * @return time_duration representation of the timestamp.
+ */
 time_duration parseRelativeTimestamp(const smatch &match)
 {
 	stringstream ss;
@@ -58,38 +64,38 @@ time_duration parseRelativeTimestamp(const smatch &match)
 	return td;
 }
 
+/**
+ * Parses a absolute timestamp and returns it as a local_date_time.
+ * @param match
+ * @return local_date_time representation of the timestamp.
+ */
 local_time::local_date_time parseAbsoluteTimestamp(const smatch &match)
 {
-	for (unsigned int i = 0 ; i < match.size() ; i++) {
-		cout << i << ":" << match[i] << endl;
-	}
+	stringstream ss;
+	ss << "20" << match[1] << match[2] << match[3] << "T" << match[4] << match[5] << match[6];
 
-	stringstream s;
-	s << "20" << match[1] << match[2] << match[3] << "T" << match[4] << match[5] << match[6];
+	ptime ts(from_iso_string(ss.str()));
 
-	ptime ts(from_iso_string(s.str()));
-
-	string st = match[8];
-	int nn = atoi(st.c_str());
-
-	int offsetHours = (nn >> 2);
-	int offsetMinutes = (nn % 4) * 15;
+	string s = match[8];
+	int n = atoi(s.c_str());
+	int offsetHours = (n >> 2);
+	int offsetMinutes = (n % 4) * 15;
 
 	// construct timezone
 	stringstream gmt;
-	gmt << "GMT" << match[9] << setw(2) << setfill('0') << offsetHours << ":" << offsetMinutes;
-	string gmtStr;
-	gmt >> gmtStr;
-
-	cout << "gmtStr:" << gmtStr << endl;
-
-	local_time::time_zone_ptr zone(new local_time::posix_time_zone(gmtStr));
+	gmt << "GMT" << match[9] << setw(2) << setfill('0') << offsetHours << ":" << setw(2) << setfill('0') << offsetMinutes;
+	local_time::time_zone_ptr zone(new local_time::posix_time_zone(gmt.str()));
 	local_time::local_date_time ldt(ts, zone);
 
 	return ldt;
 }
 
-DatePair convert(const string &time)
+/**
+ * Parses a smpp timestamp and returns a DatePair representation of the timestamp.
+ * @param time
+ * @return
+ */
+DatePair parseSmppTimestamp(const string &time)
 {
 	// Matches the pattern“YYMMDDhhmmsstnnp”
 	regex pattern("^(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1})(\\d{2})([R+-])$", regex_constants::perl);
@@ -105,7 +111,6 @@ DatePair convert(const string &time)
 			local_time::local_date_time ldt = local_time::local_sec_clock::local_time(zone);
 
 			ldt += td;
-
 			return DatePair(ldt, td);
 
 		} else {
@@ -123,11 +128,11 @@ DatePair convert(const string &time)
 }
 
 /**
-
- * @param time
- * @return
+ * Parses a delivery receipt timestamp and returns it as ptime.
+ * @param time Timestamp to parse.
+ * @return ptime representation of the timestamp.
  */
-posix_time::ptime parseDlrTimeStamp(const string &time)
+posix_time::ptime parseDlrTimestamp(const string &time)
 {
 	stringstream ss;
 	time_input_facet *fac = new time_input_facet("%y%m%d%H%M%S");
