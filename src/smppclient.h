@@ -177,26 +177,46 @@ public:
 	 */
 	void enquireLinkRespond() throw (smpp::SmppException, smpp::TransportException);
 
+	/**
+	 * Returns true if the client is bound.
+	 * @return
+	 */
 	inline bool isBound()
 	{
 		return state != OPEN;
 	}
 
+	/**
+	 * Sets the socket read timeout in milliseconds. Default is 5000 milliseconds.
+	 * @param timeout Socket read timeout in milliseconds.
+	 */
 	inline void setSocketReadTimeout(const int &timeout)
 	{
 		socketReadTimeout = timeout;
 	}
 
+	/**
+	 * Returns the socket read timeout.
+	 * @return Socket read timeout in milliseconds.
+	 */
 	inline int getSocketReadTimeout()
 	{
 		return socketReadTimeout;
 	}
 
+	/**
+	 * Sets the socket write timeout in milliseconds. Default is 30000 milliseconds.
+	 * @param timeout Socket write timeout in milliseconds.
+	 */
 	inline void setSocketWriteTimeout(const int &timeout)
 	{
 		socketWriteTimeout = timeout;
 	}
 
+	/**
+	 * Returns the socket write timeout in milliseconds.
+	 * @return Socket write timeout in milliseconds.
+	 */
 	inline int getSocketWriteTimeout()
 	{
 		return socketWriteTimeout;
