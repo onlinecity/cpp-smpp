@@ -15,6 +15,8 @@
 #include "tlv.h"
 
 using namespace std;
+using namespace smpp::timeformat;
+
 using namespace boost;
 using namespace boost::posix_time;
 
@@ -40,6 +42,7 @@ public:
 
 	string schedule_delivery_time;
 	string validity_period;
+
 	int registered_delivery;
 	int replace_if_present_flag;
 
@@ -120,9 +123,6 @@ public:
 		pdu >> protocol_id;
 		pdu >> priority_flag;
 		pdu >> schedule_delivery_time;
-
-//		schedule_delivery
-
 		pdu >> validity_period;
 		pdu >> registered_delivery;
 		pdu >> replace_if_present_flag;
