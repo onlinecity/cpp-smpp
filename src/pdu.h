@@ -41,7 +41,13 @@ public:
 	}
 
 	PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_seqNo) :
-			sb(""), buf(&sb), cmdId(_cmdId), cmdStatus(_cmdStatus), seqNo(_seqNo), nullTerminateOctetStrings(true), null(false)
+					sb(""),
+					buf(&sb),
+					cmdId(_cmdId),
+					cmdStatus(_cmdStatus),
+					seqNo(_seqNo),
+					nullTerminateOctetStrings(true),
+					null(false)
 	{
 		(*this) << uint32_t(0);
 		(*this) << cmdId;
@@ -66,13 +72,13 @@ public:
 	}
 
 	PDU(const PDU &rhs) :
-			sb(rhs.sb.str()),
-			buf(&sb),
-			cmdId(rhs.cmdId),
-			cmdStatus(rhs.cmdStatus),
-			seqNo(rhs.seqNo),
-			nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
-			null(rhs.null)
+					sb(rhs.sb.str()),
+					buf(&sb),
+					cmdId(rhs.cmdId),
+					cmdStatus(rhs.cmdStatus),
+					seqNo(rhs.seqNo),
+					nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
+					null(rhs.null)
 	{
 	}
 
