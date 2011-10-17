@@ -12,6 +12,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <sstream>
 
 #include "smpp.h"
 #include "tlv.h"
@@ -64,6 +65,10 @@ private:
 	shared_ptr<tcp::socket> socket;
 	uint32_t seqNo;
 	list<PDU> pdu_queue;
+	// Socket write timeout in milliseconds. Default is 5000 milliseconds.
+	int socketWriteTimeout;
+	// Socket read timeout in milliseconds. Default is 30000 milliseconds.
+	int socketReadTimeout;
 
 public:
 	bool verbose;
@@ -91,6 +96,8 @@ public:
 					socket(_socket),
 					seqNo(0),
 					pdu_queue(),
+					socketWriteTimeout(5000),
+					socketReadTimeout(30000),
 					verbose(false)
 	{
 	}
@@ -171,17 +178,48 @@ public:
 	void enquireLinkRespond() throw (smpp::SmppException, smpp::TransportException);
 
 	/**
-	 * Sleeps the given number of milliseconds.
-	 * @param milliseconds Milliseconds to sleep.
+	 * Returns true if the client is bound.
+	 * @return
 	 */
-//	inline void sleep(const int &milliseconds)
-//	{
-//		boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
-//	}
-
 	inline bool isBound()
 	{
 		return state != OPEN;
+	}
+
+	/**
+	 * Sets the socket read timeout in milliseconds. Default is 5000 milliseconds.
+	 * @param timeout Socket read timeout in milliseconds.
+	 */
+	inline void setSocketReadTimeout(const int &timeout)
+	{
+		socketReadTimeout = timeout;
+	}
+
+	/**
+	 * Returns the socket read timeout.
+	 * @return Socket read timeout in milliseconds.
+	 */
+	inline int getSocketReadTimeout()
+	{
+		return socketReadTimeout;
+	}
+
+	/**
+	 * Sets the socket write timeout in milliseconds. Default is 30000 milliseconds.
+	 * @param timeout Socket write timeout in milliseconds.
+	 */
+	inline void setSocketWriteTimeout(const int &timeout)
+	{
+		socketWriteTimeout = timeout;
+	}
+
+	/**
+	 * Returns the socket write timeout in milliseconds.
+	 * @return Socket write timeout in milliseconds.
+	 */
+	inline int getSocketWriteTimeout()
+	{
+		return socketWriteTimeout;
 	}
 
 private:
@@ -318,15 +356,6 @@ private:
 			smpp::TransportException);
 
 	/**
-	 * Returns an array of four bytes as one uint32_t.
-	 * NOTE: This function reads four memory locations no matter what.
-	 *
-	 * @param bytes Array of bytes to be returned as one uint32_t
-	 * @return bytes as uint32_t.
-	 */
-	uint32_t byteRead(uint8_t* bytes);
-
-	/**
 	 * Checks the connection.
 	 * @throw TransportException if there was an problem with the connection.
 	 */
@@ -338,7 +367,7 @@ private:
 	 * @throw SmppException if the client is not in the desired state.
 	 */
 
-	void checkState(int state) throw (smpp::SmppException);
+	void checkState(const int state) throw (smpp::SmppException);
 
 };
 }

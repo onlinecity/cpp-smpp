@@ -7,6 +7,8 @@
 #include <locale>
 #include <boost/regex.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/date_time.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "smpp.h"
 #include "pdu.h"
@@ -14,6 +16,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace smpp {
 /**
@@ -34,8 +37,10 @@ public:
 	int esm_class;
 	int protocol_id;
 	int priority_flag;
+
 	string schedule_delivery_time;
 	string validity_period;
+
 	int registered_delivery;
 	int replace_if_present_flag;
 
@@ -50,26 +55,26 @@ public:
 	bool null;
 
 	SMS() :
-			service_type(""),
-			source_addr_ton(0),
-			source_addr_npi(0),
-			source_addr(""),
-			dest_addr_ton(0),
-			dest_addr_npi(0),
-			dest_addr(""),
-			esm_class(0),
-			protocol_id(0),
-			priority_flag(0),
-			schedule_delivery_time(""),
-			validity_period(""),
-			registered_delivery(0),
-			replace_if_present_flag(0),
-			data_coding(0),
-			sm_default_msg_id(0),
-			sm_length(0),
-			short_message(""),
-			tlvs(),
-			null(true)
+					service_type(""),
+					source_addr_ton(0),
+					source_addr_npi(0),
+					source_addr(""),
+					dest_addr_ton(0),
+					dest_addr_npi(0),
+					dest_addr(""),
+					esm_class(0),
+					protocol_id(0),
+					priority_flag(0),
+					schedule_delivery_time(""),
+					validity_period(""),
+					registered_delivery(0),
+					replace_if_present_flag(0),
+					data_coding(0),
+					sm_default_msg_id(0),
+					sm_length(0),
+					short_message(""),
+					tlvs(),
+					null(true)
 	{
 
 	}
@@ -80,26 +85,26 @@ public:
 	}
 
 	SMS(PDU &pdu) :
-			service_type(""),
-			source_addr_ton(0),
-			source_addr_npi(0),
-			source_addr(""),
-			dest_addr_ton(0),
-			dest_addr_npi(0),
-			dest_addr(""),
-			esm_class(0),
-			protocol_id(0),
-			priority_flag(0),
-			schedule_delivery_time(""),
-			validity_period(""),
-			registered_delivery(0),
-			replace_if_present_flag(0),
-			data_coding(0),
-			sm_default_msg_id(0),
-			sm_length(0),
-			short_message(""),
-			tlvs(),
-			null(false)
+					service_type(""),
+					source_addr_ton(0),
+					source_addr_npi(0),
+					source_addr(""),
+					dest_addr_ton(0),
+					dest_addr_npi(0),
+					dest_addr(""),
+					esm_class(0),
+					protocol_id(0),
+					priority_flag(0),
+					schedule_delivery_time(""),
+					validity_period(""),
+					registered_delivery(0),
+					replace_if_present_flag(0),
+					data_coding(0),
+					sm_default_msg_id(0),
+					sm_length(0),
+					short_message(""),
+					tlvs(),
+					null(false)
 
 	{
 		pdu >> service_type;
@@ -144,26 +149,26 @@ public:
 	}
 
 	SMS(const SMS &sms) :
-			service_type(sms.service_type),
-			source_addr_ton(sms.source_addr_ton),
-			source_addr_npi(sms.source_addr_npi),
-			source_addr(sms.source_addr),
-			dest_addr_ton(sms.dest_addr_ton),
-			dest_addr_npi(sms.dest_addr_npi),
-			dest_addr(sms.dest_addr),
-			esm_class(sms.esm_class),
-			protocol_id(sms.protocol_id),
-			priority_flag(sms.priority_flag),
-			schedule_delivery_time(sms.schedule_delivery_time),
-			validity_period(sms.validity_period),
-			registered_delivery(sms.registered_delivery),
-			replace_if_present_flag(sms.replace_if_present_flag),
-			data_coding(sms.data_coding),
-			sm_default_msg_id(sms.sm_default_msg_id),
-			sm_length(sms.sm_length),
-			short_message(sms.short_message),
-			tlvs(),
-			null(sms.null)
+					service_type(sms.service_type),
+					source_addr_ton(sms.source_addr_ton),
+					source_addr_npi(sms.source_addr_npi),
+					source_addr(sms.source_addr),
+					dest_addr_ton(sms.dest_addr_ton),
+					dest_addr_npi(sms.dest_addr_npi),
+					dest_addr(sms.dest_addr),
+					esm_class(sms.esm_class),
+					protocol_id(sms.protocol_id),
+					priority_flag(sms.priority_flag),
+					schedule_delivery_time(sms.schedule_delivery_time),
+					validity_period(sms.validity_period),
+					registered_delivery(sms.registered_delivery),
+					replace_if_present_flag(sms.replace_if_present_flag),
+					data_coding(sms.data_coding),
+					sm_default_msg_id(sms.sm_default_msg_id),
+					sm_length(sms.sm_length),
+					short_message(sms.short_message),
+					tlvs(),
+					null(sms.null)
 	{
 		if (!null) {
 			std::copy(sms.tlvs.begin(), sms.tlvs.end(), tlvs.begin());
@@ -205,7 +210,7 @@ public:
 		return *this;
 	}
 
-	friend std::ostream &operator << (std::ostream &, const SMS &);
+	friend std::ostream &operator <<(std::ostream &, const SMS &);
 
 };
 // SMS class
@@ -258,14 +263,14 @@ public:
 	}
 
 	DeliveryReport(const DeliveryReport &rhs) :
-			id(rhs.id),
-			sub(rhs.sub),
-			dlvrd(rhs.dlvrd),
-			submitDate(rhs.submitDate),
-			doneDate(rhs.doneDate),
-			stat(rhs.stat),
-			err(rhs.err),
-			text(rhs.text)
+					id(rhs.id),
+					sub(rhs.sub),
+					dlvrd(rhs.dlvrd),
+					submitDate(rhs.submitDate),
+					doneDate(rhs.doneDate),
+					stat(rhs.stat),
+					err(rhs.err),
+					text(rhs.text)
 	{
 	}
 

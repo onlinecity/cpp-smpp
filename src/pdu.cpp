@@ -1,9 +1,4 @@
 #include "pdu.h"
-#include "smpp.h"
-#include <cstring>
-#include <iostream>
-#include <fstream>
-
 using namespace std;
 
 const shared_array<uint8_t> smpp::PDU::getOctets()
@@ -82,7 +77,6 @@ smpp::PDU& smpp::PDU::operator<<(const uint32_t &i)
 {
 	uint32_t j = htonl(i);
 	buf.write(reinterpret_cast<char*>(&j), sizeof(uint32_t));
-
 	return *this;
 }
 
