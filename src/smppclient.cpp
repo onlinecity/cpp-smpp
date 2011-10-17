@@ -9,7 +9,7 @@ using namespace smpp;
 
 smpp::SmppClient::~SmppClient()
 {
-	unbind();
+	if (state != OPEN) unbind();
 }
 
 void SmppClient::bindTransmitter(const string &login, const string &pass) throw (smpp::SmppException,
