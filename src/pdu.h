@@ -80,6 +80,7 @@ public:
 					nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
 					null(rhs.null)
 	{
+		resetMarker(); // remember to reset the marker after copying.
 	}
 
 	/**

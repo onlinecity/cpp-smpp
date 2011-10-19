@@ -124,7 +124,8 @@ void smpp::PDU::skip(int octets)
 
 void smpp::PDU::resetMarker()
 {
-	buf.seekg(0, ios::beg);
+	// Seek to start of PDU body (after headers)
+	buf.seekg(HEADERFIELD_SIZE*4, ios::beg);
 }
 
 smpp::PDU& smpp::PDU::operator>>(int &i)
