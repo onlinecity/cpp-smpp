@@ -68,7 +68,6 @@ local_date_time parseAbsoluteTimestamp(const smatch &match)
 	// construct timezone
 	stringstream gmt;
 	gmt << "GMT" << match[9] << setw(2) << setfill('0') << offsetHours << ":" << setw(2) << setfill('0') << offsetMinutes;
-//	boost::local_time::posix_time_zone *ptz = ;
 
 	time_zone_ptr zone(new boost::local_time::posix_time_zone(gmt.str()));
 	boost::local_time::local_date_time ldt(ts.date(), ts.time_of_day(), zone, false);
