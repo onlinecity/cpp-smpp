@@ -12,41 +12,12 @@ namespace timeformat {
 
 time_duration parseRelativeTimestamp(const smatch &match)
 {
-	stringstream ss;
-
-	ss << match[1];
-	int yy;
-	ss >> yy;
-	ss.clear();
-
-	int mon;
-	ss.str("");
-	ss << match[2];
-	ss >> mon;
-	ss.clear();
-
-	int dd;
-	ss.str("");
-	ss << match[3];
-	ss >> dd;
-	ss.clear();
-
-	int hh;
-	ss.str("");
-	ss << match[4];
-	ss >> hh;
-	ss.clear();
-
-	int min;
-	ss.str("");
-	ss << match[5];
-	ss >> min;
-	ss.clear();
-
-	int sec;
-	ss.str("");
-	ss << match[6];
-	ss >> sec;
+	int yy = boost::lexical_cast<int>(match[1]);
+	int mon = boost::lexical_cast<int>(match[2]);
+	int dd = boost::lexical_cast<int>(match[3]);
+	int hh = boost::lexical_cast<int>(match[4]);
+	int min = boost::lexical_cast<int>(match[5]);
+	int sec = boost::lexical_cast<int>(match[6]);
 
 	int totalHours = (yy * 365 * 24) + (mon * 30 * 24) + (dd * 24) + hh;
 	time_duration td(totalHours, min, sec);
@@ -55,13 +26,9 @@ time_duration parseRelativeTimestamp(const smatch &match)
 
 local_date_time parseAbsoluteTimestamp(const smatch &match)
 {
-	stringstream ss;
-	ss << "20" << match[1] << match[2] << match[3] << "T" << match[4] << match[5] << match[6];
+	ptime ts(from_iso_string(string("20") + match[1] + match[2] + match[3] + "T" + match[4] + match[5] + match[6]));
 
-	ptime ts(from_iso_string(ss.str()));
-
-	string s = match[8];
-	int n = atoi(s.c_str());
+	int n = boost::lexical_cast<int>(match[8]);
 	int offsetHours = (n >> 2);
 	int offsetMinutes = (n % 4) * 15;
 
@@ -103,16 +70,13 @@ DatePair parseSmppTimestamp(const string &time)
 			return DatePair(ldt, td);
 		}
 	}
-	stringstream ss;
-	ss << "Timestamp \"" << time << "\" has the wrong format.";
-	throw smpp::SmppException(ss.str());
-
+	throw smpp::SmppException(string("Timestamp \"") + time + "\" has the wrong format.");
 }
 
 ptime parseDlrTimestamp(const string &time)
 {
 	stringstream ss;
-	time_input_facet *fac = new time_input_facet("%y%m%d%H%M%S");
+	time_input_facet *fac = new time_input_facet("%y%m%d%H%M%S"); // looks like a memleak, but it's not
 	ss.imbue(std::locale(std::locale::classic(), fac));
 	ss << time;
 	posix_time::ptime timestamp;
@@ -120,7 +84,7 @@ ptime parseDlrTimestamp(const string &time)
 	return timestamp;
 }
 
-string getTimeString(const local_date_time ldt)
+string getTimeString(const local_date_time &ldt)
 {
 	time_zone_ptr zone = ldt.zone();
 	ptime t = ldt.local_time();
