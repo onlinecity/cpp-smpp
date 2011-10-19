@@ -107,19 +107,19 @@ DatePair parseSmppTimestamp(const string &time)
 
 		// relative
 		if (match[match.size() - 1] == "R") {
-
+			// parse the relative timestamp
 			time_duration td = parseRelativeTimestamp(match);
-
+			// construct a absolute timestamp based on the relative timestamp
 			local_time::time_zone_ptr zone(new local_time::posix_time_zone("GMT"));
 			local_time::local_date_time ldt = local_time::local_sec_clock::local_time(zone);
-
 			ldt += td;
-			return DatePair(ldt, td);
 
+			return DatePair(ldt, td);
 		} else {
+			// parse the absolute timestamp
 			local_time::local_date_time ldt = parseAbsoluteTimestamp(match);
 			local_time::local_date_time lt = local_time::local_sec_clock::local_time(ldt.zone());
-
+			// construct a relative timestamp based on the local clock and the absolute timestamp
 			local_time::local_time_period ltp(ldt, lt);
 			time_duration td = ltp.length();
 
