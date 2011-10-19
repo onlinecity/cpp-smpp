@@ -13,6 +13,7 @@
 #include "smpp.h"
 #include "pdu.h"
 #include "tlv.h"
+#include "timeformat.h"
 
 using namespace std;
 using namespace boost;
@@ -229,14 +230,14 @@ public:
 	string id;
 	uint8_t sub;
 	uint8_t dlvrd;
-	string submitDate;
-	string doneDate;
+	posix_time::ptime submitDate;
+	posix_time::ptime doneDate;
 	string stat;
 	string err;
 	string text;
 
 	DeliveryReport() :
-			SMS(), id(""), sub(0), dlvrd(0), submitDate(""), doneDate(""), stat(""), err(""), text("")
+			SMS(), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("")
 	{
 	}
 
@@ -245,7 +246,7 @@ public:
 	 * @param sms SMS to construct delivery report from.
 	 */
 	DeliveryReport(const smpp::SMS &sms) :
-			smpp::SMS(sms), id(""), sub(0), dlvrd(0), submitDate(""), doneDate(""), stat(""), err(""), text("")
+			smpp::SMS(sms), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("")
 	{
 		using namespace boost;
 		regex expression(
@@ -257,8 +258,11 @@ public:
 			id = what[1];
 			sub = atoi(((string) what[2]).c_str());
 			dlvrd = atoi(((string) what[3]).c_str());
-			submitDate = what[4];
-			doneDate = what[5];
+
+
+
+			submitDate = smpp::timeformat::parseDlrTimestamp(((string) what[4]).c_str());
+			doneDate = smpp::timeformat::parseDlrTimestamp(((string) what[5]).c_str());
 
 			stat = what[6];
 			err = what[7];
