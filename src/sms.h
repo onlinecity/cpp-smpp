@@ -13,7 +13,6 @@
 #include "smpp.h"
 #include "pdu.h"
 #include "tlv.h"
-#include "timeformat.h"
 
 using namespace std;
 using namespace boost;
@@ -85,10 +84,6 @@ public:
 
 	}
 
-	/**
-	 * Constructs an SMS from an DELIVER_SM pdu.
-	 * @param pdu DELIVER_SM pdu.
-	 */
 	SMS(PDU &pdu) :
 					service_type(""),
 					source_addr_ton(0),
@@ -141,13 +136,12 @@ public:
 
 		while (pdu.hasMoreData()) {
 			pdu >> tag;
-			pdu >> len;
-
 			if (len == 0) {
 				tlvs.push_back(TLV(tag));
 				continue;
 			}
 
+			pdu >> len;
 			shared_array<uint8_t> octets(new uint8_t[len]);
 			pdu.readOctets(octets, len);
 			tlvs.push_back(TLV(tag, len, octets));
@@ -208,6 +202,7 @@ public:
 			null = sms.null;
 
 			if (!null) {
+//				short_message = new uint8_t[sm_length + 1];std::copy(sms.short_message, sms.short_message + sm_length + 1,short_message);
 				std::copy(sms.tlvs.begin(), sms.tlvs.end(), tlvs.begin());
 			}
 		}
@@ -230,14 +225,14 @@ public:
 	string id;
 	uint8_t sub;
 	uint8_t dlvrd;
-	posix_time::ptime submitDate;
-	posix_time::ptime doneDate;
+	string submitDate;
+	string doneDate;
 	string stat;
 	string err;
 	string text;
 
 	DeliveryReport() :
-			SMS(), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("")
+			SMS(), id(""), sub(0), dlvrd(0), submitDate(""), doneDate(""), stat(""), err(""), text("")
 	{
 	}
 
@@ -246,7 +241,7 @@ public:
 	 * @param sms SMS to construct delivery report from.
 	 */
 	DeliveryReport(const smpp::SMS &sms) :
-			smpp::SMS(sms), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("")
+			smpp::SMS(sms), id(""), sub(0), dlvrd(0), submitDate(""), doneDate(""), stat(""), err(""), text("")
 	{
 		using namespace boost;
 		regex expression(
@@ -258,11 +253,16 @@ public:
 			id = what[1];
 			sub = atoi(((string) what[2]).c_str());
 			dlvrd = atoi(((string) what[3]).c_str());
+<<<<<<< HEAD
 
 			string s1 = what[4];
 			submitDate = smpp::timeformat::parseDlrTimestamp(s1);
 			string s2 = what[5];
 			doneDate = smpp::timeformat::parseDlrTimestamp(s2);
+=======
+			submitDate = what[4];
+			doneDate = what[5];
+>>>>>>> fc7693a7feb3e65d515d374d69b566217139ca9f
 
 			stat = what[6];
 			err = what[7];

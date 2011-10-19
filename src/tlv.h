@@ -146,28 +146,16 @@ public:
 	{
 	}
 
-	/**
-	 * Returns the tag.
-	 * @return Tag
-	 */
 	inline const uint16_t getTag()
 	{
 		return tag;
 	}
 
-	/**
-	 * Returns the length
-	 * @return Legnth
-	 */
 	inline const uint16_t getLen()
 	{
 		return len;
 	}
 
-	/**
-	 * Returns this TLV as octets.
-	 * @return TLV as octets.
-	 */
 	inline shared_array<uint8_t> getOctets()
 	{
 		return octets;
