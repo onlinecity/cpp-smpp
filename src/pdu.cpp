@@ -82,7 +82,7 @@ smpp::PDU& smpp::PDU::operator<<(const uint32_t &i)
 
 smpp::PDU& smpp::PDU::operator<<(const std::basic_string<char> &s)
 {
-	buf << s.c_str();
+	buf.write(s.c_str(),s.length()); // use buf.write to allow for UCS-2 chars which are 16-bit.
 	if (nullTerminateOctetStrings) {
 		buf << ends;
 	}
