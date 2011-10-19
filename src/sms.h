@@ -9,10 +9,12 @@
 #include <boost/shared_array.hpp>
 #include <boost/date_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "smpp.h"
 #include "pdu.h"
 #include "tlv.h"
+#include "timeformat.h"
 
 using namespace std;
 using namespace boost;
@@ -107,6 +109,8 @@ public:
 					null(false)
 
 	{
+		cout << "sms construct" << endl;
+		cout << pdu << endl;
 		pdu >> service_type;
 
 		pdu >> source_addr_ton;
@@ -223,16 +227,16 @@ class DeliveryReport: public SMS
 
 public:
 	string id;
-	uint8_t sub;
-	uint8_t dlvrd;
-	string submitDate;
-	string doneDate;
+	uint32_t sub;
+	uint32_t dlvrd;
+	ptime submitDate;
+	ptime doneDate;
 	string stat;
 	string err;
 	string text;
 
 	DeliveryReport() :
-			SMS(), id(""), sub(0), dlvrd(0), submitDate(""), doneDate(""), stat(""), err(""), text("")
+			SMS(), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("")
 	{
 	}
 
@@ -241,7 +245,7 @@ public:
 	 * @param sms SMS to construct delivery report from.
 	 */
 	DeliveryReport(const smpp::SMS &sms) :
-			smpp::SMS(sms), id(""), sub(0), dlvrd(0), submitDate(""), doneDate(""), stat(""), err(""), text("")
+			smpp::SMS(sms), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("")
 	{
 		using namespace boost;
 		regex expression(
@@ -251,13 +255,11 @@ public:
 
 		if (regex_match(short_message.c_str(), what, expression)) {
 			id = what[1];
-			sub = atoi(((string) what[2]).c_str());
-			dlvrd = atoi(((string) what[3]).c_str());
+			sub = boost::lexical_cast<uint32_t>(what[2]);
+			dlvrd = boost::lexical_cast<uint32_t>(what[3]);
 
-			string s1 = what[4];
-			submitDate = smpp::timeformat::parseDlrTimestamp(s1);
-			string s2 = what[5];
-			doneDate = smpp::timeformat::parseDlrTimestamp(s2);
+			submitDate = smpp::timeformat::parseDlrTimestamp(what[4]);
+			doneDate = smpp::timeformat::parseDlrTimestamp(what[5]);
 
 			stat = what[6];
 			err = what[7];

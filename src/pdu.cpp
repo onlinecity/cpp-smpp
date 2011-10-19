@@ -14,7 +14,9 @@ const shared_array<uint8_t> smpp::PDU::getOctets()
 
 	shared_array<uint8_t> octets(new uint8_t[size]);
 	buf.read((char*) octets.get(), size);
-	buf.seekg(0, ios::beg);
+
+	// Seek to start of PDU body (after headers)
+	buf.seekg(HEADERFIELD_SIZE*4, ios::beg);
 
 	return octets;
 }
