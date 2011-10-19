@@ -34,7 +34,6 @@ public:
 	bool null;
 
 public:
-
 	PDU() :
 			sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(true)
 	{
