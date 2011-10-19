@@ -84,9 +84,9 @@ local_time::local_date_time parseAbsoluteTimestamp(const smatch &match)
 	// construct timezone
 	stringstream gmt;
 	gmt << "GMT" << match[9] << setw(2) << setfill('0') << offsetHours << ":" << setw(2) << setfill('0') << offsetMinutes;
-	local_time::time_zone_ptr zone(new local_time::posix_time_zone(gmt.str()));
-	local_time::local_date_time ldt(ts, zone);
 
+	local_time::time_zone_ptr zone(new local_time::posix_time_zone(gmt.str()));
+	local_time::local_date_time ldt(ts.date(), ts.time_of_day(), zone, false);
 	return ldt;
 }
 
@@ -146,6 +146,59 @@ posix_time::ptime parseDlrTimestamp(const string &time)
 	posix_time::ptime timestamp;
 	ss >> timestamp;
 	return timestamp;
+}
+
+/**
+ * Returns the local_date_time as a string formatted as an absolute timestamp
+ * @param ldt
+ * @return
+ */
+string getTimeString(const local_time::local_date_time ldt)
+{
+	using namespace boost::local_time;
+
+	time_zone_ptr zone = ldt.zone();
+	ptime t = ldt.local_time();
+	time_duration td = t.time_of_day();
+	stringstream output;
+	time_duration offset = ldt.is_dst() ? zone->dst_offset() : zone->base_utc_offset();
+
+	string p = offset.is_negative() ? "-" : "+";
+	int nn = abs((offset.hours() * 4) + (offset.minutes() / 15));
+
+	string d = to_iso_string(t.date());
+
+	output << d.substr(2, 6) << setw(2) << setfill('0') << td.hours() << setw(2) << td.minutes() << setw(2)
+			<< td.seconds() << "0" << setw(2) << nn << p;
+
+	return output.str();
+}
+
+/**
+ * Returns a relative timestamp created from the time_duration. Since a time_duration does not handle
+ * dates, the relative dates is calculated with the assumption of one year equals 365 days and a month is 30 days long.
+ * @param td time_duration to be calculated.
+ * @return
+ */
+string getTimeString(const time_duration &td)
+{
+	using namespace boost::local_time;
+
+	int totalHours = td.hours();
+
+	int yy = totalHours / 24 / 365;
+	totalHours -= (yy * 24 * 365);
+	int mon = totalHours / 24 / 30;
+	totalHours -= (mon * 24 * 30);
+	int dd = totalHours / 24;
+	totalHours -= (dd * 24);
+
+	stringstream output;
+
+	output << setfill('0') << setw(2) << yy << setw(2) << mon << setw(2) << dd << setw(2) << totalHours << setw(2)
+			<< td.minutes() << setw(2) << td.seconds() << "000R";
+
+	return output.str();
 }
 
 } // timeformat
