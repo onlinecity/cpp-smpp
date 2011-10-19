@@ -1,5 +1,14 @@
 #include "timeformat.h"
+
+using namespace std;
 using namespace smpp::timeformat;
+using namespace boost;
+using namespace boost::local_time;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
+
+namespace smpp {
+namespace timeformat {
 
 time_duration parseRelativeTimestamp(const smatch &match)
 {
@@ -44,7 +53,7 @@ time_duration parseRelativeTimestamp(const smatch &match)
 	return td;
 }
 
-local_time::local_date_time parseAbsoluteTimestamp(const smatch &match)
+local_date_time parseAbsoluteTimestamp(const smatch &match)
 {
 	stringstream ss;
 	ss << "20" << match[1] << match[2] << match[3] << "T" << match[4] << match[5] << match[6];
@@ -59,9 +68,11 @@ local_time::local_date_time parseAbsoluteTimestamp(const smatch &match)
 	// construct timezone
 	stringstream gmt;
 	gmt << "GMT" << match[9] << setw(2) << setfill('0') << offsetHours << ":" << setw(2) << setfill('0') << offsetMinutes;
+//	boost::local_time::posix_time_zone *ptz = ;
 
-	local_time::time_zone_ptr zone(new local_time::posix_time_zone(gmt.str()));
-	local_time::local_date_time ldt(ts.date(), ts.time_of_day(), zone, false);
+	time_zone_ptr zone(new boost::local_time::posix_time_zone(gmt.str()));
+	boost::local_time::local_date_time ldt(ts.date(), ts.time_of_day(), zone, false);
+
 	return ldt;
 }
 
@@ -84,22 +95,22 @@ DatePair parseSmppTimestamp(const string &time)
 			return DatePair(ldt, td);
 		} else {
 			// parse the absolute timestamp
-			local_time::local_date_time ldt = parseAbsoluteTimestamp(match);
-			local_time::local_date_time lt = local_time::local_sec_clock::local_time(ldt.zone());
+			boost::local_time::local_date_time ldt = parseAbsoluteTimestamp(match);
+			boost::local_time::local_date_time lt = boost::local_time::local_sec_clock::local_time(ldt.zone());
 			// construct a relative timestamp based on the local clock and the absolute timestamp
-			local_time::local_time_period ltp(ldt, lt);
+			boost::local_time::local_time_period ltp(ldt, lt);
 			time_duration td = ltp.length();
 
 			return DatePair(ldt, td);
 		}
-	} else {
-		stringstream ss;
-		ss << "Timestamp \"" << time << "\" has the wrong format.";
-		throw smpp::SmppException(ss.str());
 	}
+	stringstream ss;
+	ss << "Timestamp \"" << time << "\" has the wrong format.";
+	throw smpp::SmppException(ss.str());
+
 }
 
-posix_time::ptime parseDlrTimestamp(const string &time)
+ptime parseDlrTimestamp(const string &time)
 {
 	stringstream ss;
 	time_input_facet *fac = new time_input_facet("%y%m%d%H%M%S");
@@ -110,10 +121,8 @@ posix_time::ptime parseDlrTimestamp(const string &time)
 	return timestamp;
 }
 
-string getTimeString(const local_time::local_date_time ldt)
+string getTimeString(const local_date_time ldt)
 {
-	using namespace boost::local_time;
-
 	time_zone_ptr zone = ldt.zone();
 	ptime t = ldt.local_time();
 	time_duration td = t.time_of_day();
@@ -133,8 +142,6 @@ string getTimeString(const local_time::local_date_time ldt)
 
 string getTimeString(const time_duration &td)
 {
-	using namespace boost::local_time;
-
 	int totalHours = td.hours();
 
 	int yy = totalHours / 24 / 365;
@@ -152,3 +159,5 @@ string getTimeString(const time_duration &td)
 	return output.str();
 }
 
+}
+}

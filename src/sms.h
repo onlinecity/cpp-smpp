@@ -259,10 +259,10 @@ public:
 			sub = atoi(((string) what[2]).c_str());
 			dlvrd = atoi(((string) what[3]).c_str());
 
-
-
-			submitDate = smpp::timeformat::parseDlrTimestamp(((string) what[4]).c_str());
-			doneDate = smpp::timeformat::parseDlrTimestamp(((string) what[5]).c_str());
+			string s1 = what[4];
+			submitDate = smpp::timeformat::parseDlrTimestamp(s1);
+			string s2 = what[5];
+			doneDate = smpp::timeformat::parseDlrTimestamp(s2);
 
 			stat = what[6];
 			err = what[7];
