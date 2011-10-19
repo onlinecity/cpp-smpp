@@ -3,7 +3,7 @@ MAJOR_VERSION=1
 MINOR_VERSION=0
 
 CC=g++
-OBJ=sms.o pdu.o smpp.o smppclient.o 
+OBJ=sms.o timeformat.o pdu.o smpp.o smppclient.o 
 PROGRAM=smpp
 
 LIB_NAME=lib$(PROGRAM).so
@@ -25,6 +25,7 @@ INSTALL_LIBRARY_PATH=$(PREFIX)/$(LIBRARY_PATH)
 all: $(OBJ) lib 
 sms.o: sms.cpp sms.h smpp.h pdu.h tlv.h
 pdu.o: pdu.cpp pdu.h smpp.h tlv.h
+timeformat.o: timeformat.cpp timeformat.h exceptions.h
 smpp.o: smpp.cpp smpp.h
 smppclient.o: smppclient.cpp smpp.h smppclient.h tlv.h pdu.h sms.h exceptions.h timeformat.h
 
