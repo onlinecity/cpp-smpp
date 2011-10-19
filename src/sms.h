@@ -109,8 +109,6 @@ public:
 					null(false)
 
 	{
-		cout << "sms construct" << endl;
-		cout << pdu << endl;
 		pdu >> service_type;
 
 		pdu >> source_addr_ton;
