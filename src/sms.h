@@ -84,6 +84,10 @@ public:
 
 	}
 
+	/**
+	 * Constructs an SMS from an DELIVER_SM pdu.
+	 * @param pdu DELIVER_SM pdu.
+	 */
 	SMS(PDU &pdu) :
 					service_type(""),
 					source_addr_ton(0),
@@ -136,12 +140,13 @@ public:
 
 		while (pdu.hasMoreData()) {
 			pdu >> tag;
+			pdu >> len;
+
 			if (len == 0) {
 				tlvs.push_back(TLV(tag));
 				continue;
 			}
 
-			pdu >> len;
 			shared_array<uint8_t> octets(new uint8_t[len]);
 			pdu.readOctets(octets, len);
 			tlvs.push_back(TLV(tag, len, octets));
@@ -202,7 +207,6 @@ public:
 			null = sms.null;
 
 			if (!null) {
-//				short_message = new uint8_t[sm_length + 1];std::copy(sms.short_message, sms.short_message + sm_length + 1,short_message);
 				std::copy(sms.tlvs.begin(), sms.tlvs.end(), tlvs.begin());
 			}
 		}
