@@ -12,7 +12,7 @@ LIB_MINOR_NAME=$(LIB_MAJOR_NAME).$(MINOR_VERSION)
 
 OPT?=2
 CFLAGS=-fPIC -c -Wall -Weffc++ -I/usr/local/include -O${OPT}
-LDFLAGS=-L/usr/local/lib -lboost_system -lboost_regex
+LDFLAGS=-L/usr/local/lib -lboost_system -lboost_regex -lboost_date_time
 CXXFLAGS=${CFLAGS}
 
 INSTALL=cp -a
