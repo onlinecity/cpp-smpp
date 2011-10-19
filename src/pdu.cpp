@@ -103,7 +103,6 @@ smpp::PDU& smpp::PDU::operator <<(smpp::TLV tlv)
 	(*this) << tlv.getTag();
 	(*this) << tlv.getLen();
 	if (tlv.getLen() != 0) {
-
 		(*this).addOctets(tlv.getOctets(), (uint32_t) tlv.getLen());
 	}
 	return *this;
