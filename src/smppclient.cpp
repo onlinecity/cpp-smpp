@@ -27,6 +27,7 @@ void SmppClient::bind(uint32_t mode, const string &login, const string &password
 	checkState(OPEN);
 
 	PDU pdu = setupBindPdu(mode, login, password);
+
 	sendCommand(pdu);
 
 	switch (mode) {
@@ -81,8 +82,8 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
  * Send an sms to the smsc.
  */
 string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
-		const int dataCoding)
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
+		const string& validity_period, const int dataCoding)
 {
 
 	int messageLen = shortMessage.length();
@@ -256,7 +257,8 @@ vector<string> SmppClient::split(const string& shortMessage, const int split, co
 }
 
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period)
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
+		const string& validity_period)
 {
 
 	checkState(BOUND_TX);
@@ -507,7 +509,9 @@ PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &comman
 	while (true) {
 		PDU pdu = readPdu(true);
 		if (!pdu.null) {
-			if (pdu.getSequenceNo() == sequence && pdu.getCommandId() == response) return pdu;
+			if ((pdu.getSequenceNo() == sequence
+					&& (pdu.getCommandId() == response || pdu.getCommandId() == smpp::GENERIC_NACK))
+					|| (pdu.getSequenceNo() == 0 && pdu.getCommandId() == smpp::GENERIC_NACK)) return pdu;
 		}
 	}
 
