@@ -285,8 +285,6 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 		pdu << 0; // sm_length = 0
 		pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, shortMessage);
 	} else {
-		cout << shortMessage << endl;
-		cout << shortMessage.length() << endl;
 		pdu.setNullTerminateOctetStrings(nullTerminateOctetStrings);
 		pdu << (int) shortMessage.length() + (nullTerminateOctetStrings ? 1 : 0);
 		pdu << shortMessage;
