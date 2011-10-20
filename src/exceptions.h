@@ -6,15 +6,15 @@ namespace smpp {
 /**
  * Exception thrown when there is SMPP protocol related issues.
  */
-class SmppException: public std::logic_error
+class SmppException: public std::runtime_error
 {
 public:
 	SmppException() :
-			std::logic_error("Default SmppException.")
+			std::runtime_error("Default SmppException.")
 	{
 	}
 	SmppException(const std::string &message) :
-			std::logic_error(message)
+			std::runtime_error(message)
 	{
 	}
 };
@@ -22,15 +22,15 @@ public:
 /**
  * Exception thrown when there is transport/connection related issues.
  */
-class TransportException: public std::logic_error
+class TransportException: public std::runtime_error
 {
 public:
 	TransportException() :
-			std::logic_error("Default TransportException.")
+			std::runtime_error("Default TransportException.")
 	{
 	}
 	TransportException(const std::string &message) :
-			std::logic_error(message)
+			std::runtime_error(message)
 	{
 	}
 };
