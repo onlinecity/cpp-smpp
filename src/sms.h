@@ -132,14 +132,22 @@ public:
 		uint16_t len = 0;
 		uint16_t tag = 0;
 
+		using namespace std;
+
 		while (pdu.hasMoreData()) {
+
 			pdu >> tag;
+			pdu >> len;
+
+			if (tag == 0) {
+				break;
+			}
+
 			if (len == 0) {
 				tlvs.push_back(TLV(tag));
 				continue;
 			}
 
-			pdu >> len;
 			boost::shared_array<uint8_t> octets(new uint8_t[len]);
 			pdu.readOctets(octets, len);
 			tlvs.push_back(TLV(tag, len, octets));
