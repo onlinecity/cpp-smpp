@@ -208,7 +208,6 @@ public:
 			null = sms.null;
 
 			if (!null) {
-//				short_message = new uint8_t[sm_length + 1];std::copy(sms.short_message, sms.short_message + sm_length + 1,short_message);
 				std::copy(sms.tlvs.begin(), sms.tlvs.end(), tlvs.begin());
 			}
 		}
