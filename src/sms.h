@@ -132,8 +132,6 @@ public:
 		uint16_t len = 0;
 		uint16_t tag = 0;
 
-		using namespace std;
-
 		while (pdu.hasMoreData()) {
 
 			pdu >> tag;
