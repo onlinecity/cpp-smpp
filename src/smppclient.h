@@ -6,6 +6,8 @@
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/tuple/tuple_io.hpp>
 
 #include <string>
 #include <stdint.h>
@@ -19,8 +21,12 @@
 #include "pdu.h"
 #include "sms.h"
 #include "exceptions.h"
+#include "timeformat.h"
 
 namespace smpp {
+
+typedef boost::tuple<std::string, boost::local_time::local_date_time, int, int> QuerySmResult;
+
 /**
  * Class for sending and receiving SMSes through the SMPP protocol.
  * This clients goal is to simplify sending an SMS and receiving
@@ -155,6 +161,19 @@ public:
 	 * or does a blocking read on the socket until we receive an SMS from the SMSC.
 	 */
 	smpp::SMS readSms();
+
+	/**
+	 * Query the SMSC about current state/status of a previous sent SMS.
+	 * You must specify the SMSC assigned message id and source of the sent SMS.
+	 * Returns an boost::tuple with elements: message_id, final_date, message_state and error_code.
+	 * message_state would be one of the SMPP::STATE_* constants. (SMPP v3.4 section 5.2.28)
+	 * error_code depends on the telco network, so could be anything.
+	 *
+	 * @param messageid
+	 * @param source
+	 * @return QuerySmResult
+	 */
+	QuerySmResult querySm(std::string messageid, SmppAddress source);
 
 	/**
 	 * Sends an enquire link command to SMSC and blocks until we a response.
