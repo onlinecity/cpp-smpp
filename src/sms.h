@@ -250,9 +250,9 @@ public:
 		regex expression(
 				"^id:([^ ]+) sub:(\\d{1,3}) dlvrd:(\\d{3}) submit date:(\\d{10}) done date:(\\d{10}) stat:([A-Z]{7}) err:(\\d{3}) text:(.*)$",
 				regex_constants::perl);
-		cmatch what;
+		smatch what;
 
-		if (regex_match(short_message.c_str(), what, expression)) {
+		if (regex_match(short_message, what, expression)) {
 			id = what[1];
 			sub = boost::lexical_cast<uint32_t>(what[2]);
 			dlvrd = boost::lexical_cast<uint32_t>(what[3]);
