@@ -5,7 +5,7 @@ using namespace boost;
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
-smpp::SmppClient::~SmppClient()
+SmppClient::~SmppClient()
 {
 	if (state != OPEN) unbind();
 }
@@ -42,7 +42,7 @@ void SmppClient::bind(uint32_t mode, const string &login, const string &password
 	}
 }
 
-smpp::PDU SmppClient::setupBindPdu(uint32_t mode, const string &login, const string &password)
+PDU SmppClient::setupBindPdu(uint32_t mode, const string &login, const string &password)
 {
 	PDU pdu(mode, 0, nextSequenceNumber());
 	pdu << login;
@@ -132,7 +132,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	return smsId;
 }
 
-smpp::SMS SmppClient::readSms() throw (smpp::SmppException, smpp::TransportException)
+SMS SmppClient::readSms() throw (smpp::SmppException, smpp::TransportException)
 {
 	// see if we're bound correct.
 	checkState(BOUND_RX);
@@ -146,6 +146,7 @@ smpp::SMS SmppClient::readSms() throw (smpp::SmppException, smpp::TransportExcep
 
 		while (!b) {
 			PDU pdu = readPdu(true);
+
 			if (pdu.getCommandId() == ENQUIRE_LINK) {
 				PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.getSequenceNo());
 				sendPdu(resp);
@@ -172,7 +173,7 @@ void SmppClient::enquireLink() throw (smpp::SmppException, smpp::TransportExcept
 	sendCommand(pdu);
 }
 
-smpp::SMS SmppClient::parseSms()
+SMS SmppClient::parseSms()
 {
 	if (pdu_queue.empty()) return SMS();
 
@@ -312,7 +313,7 @@ void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportEx
 	socketExecute();
 }
 
-smpp::PDU SmppClient::sendCommand(PDU &pdu) throw (smpp::SmppException, smpp::TransportException)
+PDU SmppClient::sendCommand(PDU &pdu) throw (smpp::SmppException, smpp::TransportException)
 {
 	sendPdu(pdu);
 
@@ -328,7 +329,7 @@ void SmppClient::writeHandler(const boost::system::error_code &error)
 {
 }
 
-smpp::PDU SmppClient::readPdu(const bool &isBlocking) throw (smpp::SmppException, smpp::TransportException)
+PDU SmppClient::readPdu(const bool &isBlocking) throw (smpp::SmppException, smpp::TransportException)
 {
 
 	// return NULL pdu if there is nothing on the wire for us.
@@ -466,8 +467,8 @@ void SmppClient::readPduBodyHandler(const boost::system::error_code &error, size
 }
 
 // blocks until response is read
-smpp::PDU smpp::SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &commandId)
-		throw (smpp::SmppException, smpp::TransportException)
+PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &commandId) throw (smpp::SmppException,
+		smpp::TransportException)
 {
 	uint32_t response = GENERIC_NACK | commandId;
 	list<PDU>::iterator it = pdu_queue.begin();
@@ -514,12 +515,12 @@ void smpp::SmppClient::enquireLinkRespond() throw (smpp::SmppException, smpp::Tr
 	}
 }
 
-void smpp::SmppClient::checkConnection() throw (smpp::TransportException)
+void SmppClient::checkConnection() throw (smpp::TransportException)
 {
 	if (!socket->is_open()) throw smpp::TransportException("Socket is closed");
 }
 
-void smpp::SmppClient::checkState(int state) throw (smpp::SmppException)
+void SmppClient::checkState(int state) throw (smpp::SmppException)
 {
 	if (this->state != state) throw smpp::SmppException("Client in wrong state");
 }
