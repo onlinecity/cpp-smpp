@@ -44,11 +44,11 @@ PDU SmppClient::setupBindPdu(uint32_t mode, const string &login, const string &p
 	PDU pdu(mode, 0, nextSequenceNumber());
 	pdu << login;
 	pdu << password;
-	pdu << system_type;
+	pdu << systemType;
 	pdu << interfaceVersion;
-	pdu << addr_ton;
-	pdu << addr_npi;
-	pdu << addr_range;
+	pdu << addrTon;
+	pdu << addrNpi;
+	pdu << addrRange;
 	return pdu;
 }
 
@@ -234,22 +234,22 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 	checkState(BOUND_TX);
 
 	PDU pdu(smpp::SUBMIT_SM, 0, nextSequenceNumber());
-	pdu << service_type;
+	pdu << serviceType;
 
 	pdu << sender;
 	pdu << receiver;
 
 	pdu << esmClass;
-	pdu << protocol_id;
+	pdu << protocolId;
 
 	pdu << priority_flag;
 	pdu << schedule_delivery_time;
 	pdu << validity_period;
 
-	pdu << registered_delivery;
-	pdu << replace_if_present_flag;
-	pdu << data_coding;
-	pdu << sm_default_msg_id;
+	pdu << registeredDelivery;
+	pdu << replaceIfPresentFlag;
+	pdu << dataCoding;
+	pdu << smDefaultMsgId;
 
 	if (useMsgPayload) {
 		pdu << 0; // sm_length = 0

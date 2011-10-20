@@ -34,28 +34,26 @@ public:
 	{
 		OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
 	};
-
+private:
 	// SMPP bind parameters
-	std::string system_type;
+	std::string systemType;
 	uint8_t interfaceVersion; //= 0x34;
-	uint8_t addr_ton; // = 0;
-	uint8_t addr_npi; // = 0;
-	std::string addr_range;
-
+	uint8_t addrTon; // = 0;
+	uint8_t addrNpi; // = 0;
+	std::string addrRange;
 	// ESME transmitter parameters
-	std::string service_type;
+	std::string serviceType;
 	uint8_t esmClass;
-	uint8_t protocol_id;
-	uint8_t registered_delivery;
-	uint8_t replace_if_present_flag;
-	uint8_t data_coding;
-	uint8_t sm_default_msg_id;
+	uint8_t protocolId;
+	uint8_t registeredDelivery;
+	uint8_t replaceIfPresentFlag;
+	uint8_t dataCoding;
+	uint8_t smDefaultMsgId;
 
 	// Extra options;
 	bool nullTerminateOctetStrings;
 	bool useMsgPayload;
 
-private:
 	int state;
 	boost::shared_ptr<boost::asio::ip::tcp::socket> socket;
 	uint32_t seqNo;
@@ -65,7 +63,6 @@ private:
 	// Socket read timeout in milliseconds. Default is 30000 milliseconds.
 	int socketReadTimeout;
 
-public:
 	bool verbose;
 
 public:
@@ -73,18 +70,18 @@ public:
 	 * Constructs a new SmppClient object.
 	 */
 	SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) :
-					system_type("WWW"),
+					systemType("WWW"),
 					interfaceVersion(0x34),
-					addr_ton(0),
-					addr_npi(0),
-					addr_range(""),
-					service_type(""),
+					addrTon(0),
+					addrNpi(0),
+					addrRange(""),
+					serviceType(""),
 					esmClass(0),
-					protocol_id(0),
-					registered_delivery(0),
-					replace_if_present_flag(0),
-					data_coding(0),
-					sm_default_msg_id(0),
+					protocolId(0),
+					registeredDelivery(0),
+					replaceIfPresentFlag(0),
+					dataCoding(0),
+					smDefaultMsgId(0),
 					nullTerminateOctetStrings(false),
 					useMsgPayload(false),
 					state(OPEN),
@@ -179,6 +176,146 @@ public:
 		return state != OPEN;
 	}
 
+	inline void setSystemType(const std::string s)
+	{
+		systemType = s;
+	}
+
+	inline std::string getSystemType() const
+	{
+		return systemType;
+	}
+
+	inline void setInterfaceVersion(const uint8_t i)
+	{
+		interfaceVersion = i;
+	}
+
+	inline uint8_t getInterfaceVersion() const
+	{
+		return interfaceVersion;
+	}
+
+	inline void setAddrTon(const uint8_t i)
+	{
+		addrTon = i;
+	}
+
+	inline uint8_t getAddrTon() const
+	{
+		return addrTon;
+	}
+
+	inline void setAddrNpi(const uint8_t i)
+	{
+		addrNpi = i;
+	}
+
+	inline uint8_t getAddrNpi() const
+	{
+		return addrNpi;
+	}
+
+	inline void setAddrRange(const std::string &s)
+	{
+		addrRange = s;
+	}
+
+	inline std::string getAddrRange() const
+	{
+		return addrRange;
+	}
+
+	inline void setServiceType(const std::string &s)
+	{
+		serviceType = s;
+	}
+
+	inline std::string getServiceType() const
+	{
+		return serviceType;
+	}
+
+	inline void setEsmClass(const uint8_t i)
+	{
+		esmClass = i;
+	}
+
+	inline uint8_t getEsmClass() const
+	{
+		return esmClass;
+	}
+
+	inline void setProtocolId(const uint8_t i)
+	{
+		protocolId = i;
+	}
+
+	inline uint8_t getProtocolId() const
+	{
+		return protocolId;
+	}
+
+	inline void setRegisteredDelivery(const uint8_t i)
+	{
+		registeredDelivery = i;
+	}
+
+	inline uint8_t getRegisteredDelivery() const
+	{
+		return registeredDelivery;
+	}
+
+	inline void setReplaceIfPresentFlag(const uint8_t i)
+	{
+		replaceIfPresentFlag = i;
+	}
+
+	inline uint8_t getReplaceIfPresentFlag() const
+	{
+		return replaceIfPresentFlag;
+	}
+
+	inline void setDataCoding(const uint8_t i)
+	{
+		dataCoding = i;
+	}
+
+	inline uint8_t getDataCoding() const
+	{
+		return dataCoding;
+	}
+
+	inline void setSmDefaultMsgId(const uint8_t i)
+	{
+		smDefaultMsgId = i;
+	}
+
+	inline uint8_t getSmDefaultMsgId() const
+	{
+		return smDefaultMsgId;
+	}
+
+	inline void setNullTerminateOctetStrings(const bool b)
+	{
+		nullTerminateOctetStrings = b;
+	}
+
+	inline bool getNullTerminateOctetStrings() const
+	{
+		return nullTerminateOctetStrings;
+	}
+
+	inline void setUseMsgPayload(const bool b)
+	{
+		useMsgPayload = b;
+	}
+
+	inline bool getUseMsgPayload() const
+	{
+		return useMsgPayload;
+	}
+
 	/**
 	 * Sets the socket read timeout in milliseconds. Default is 5000 milliseconds.
 	 * @param timeout Socket read timeout in milliseconds.
@@ -192,7 +329,7 @@ public:
 	 * Returns the socket read timeout.
 	 * @return Socket read timeout in milliseconds.
 	 */
-	inline int getSocketReadTimeout()
+	inline int getSocketReadTimeout() const
 	{
 		return socketReadTimeout;
 	}
@@ -210,9 +347,19 @@ public:
 	 * Returns the socket write timeout in milliseconds.
 	 * @return Socket write timeout in milliseconds.
 	 */
-	inline int getSocketWriteTimeout()
+	inline int getSocketWriteTimeout() const
 	{
 		return socketWriteTimeout;
+	}
+
+	inline void setVerbose(const bool b)
+	{
+		verbose = b;
+	}
+
+	inline bool isVerbose() const
+	{
+		return verbose;
 	}
 
 private:
@@ -279,14 +426,14 @@ private:
 	/**
 	 * Sends one PDU to the SMSC.
 	 */
-	void sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportException);
+	void sendPdu(PDU &pdu);
 
 	/**
 	 * Sends one PDU to the SMSC and blocks until we a response to it.
 	 * @param pdu PDU to send.
 	 * @return PDU PDU response to the one we sent.
 	 */
-	smpp::PDU sendCommand(PDU &pdu) throw (smpp::SmppException, smpp::TransportException);
+	smpp::PDU sendCommand(PDU &pdu);
 
 	/** Async write callback */
 	void writeHandler(const boost::system::error_code&);
