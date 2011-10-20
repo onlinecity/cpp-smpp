@@ -3,8 +3,7 @@
 
 #include <map>
 #include <string>
-#include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
+#include <sstream>
 
 namespace smpp {
 /**
@@ -75,33 +74,92 @@ public:
 
 	/**
 	 * Returns the input string encoded in GSM 0338.
-	 * @param str String to be encoded.
+	 * @param input String to be encoded.
 	 * @return Encoded string.
 	 */
-	std::string getGsm0338(std::string &str)
+	std::string getGsm0338(const std::string &input)
 	{
-		std::map<std::string, std::string>::iterator it = dict.begin();
-		for (; it != dict.end() ; it++) {
-			boost::replace_all(str, it->first, it->second);
-		}
+		std::stringstream ss(input);
 
-		static const boost::regex pattern("([\\xC0-\\xDF].)|([\\xE0-\\xEF]..)|([\\xF0-\\xFF]...)", boost::regex_constants::perl);
-		return boost::regex_replace(str, pattern, "?");
+		std::string out;
+
+		std::map<std::string, std::string>::iterator it;
+
+		char c[4];
+		for (unsigned int i = 0 ; i < input.length() ; i++) {
+			c[3] = c[2] = c[1] = c[0] = 0; // reset array
+			ss.read(c, 1);
+			uint8_t code = static_cast<uint8_t>(c[0]);
+			if (code == 0x40) { 							// @
+				out += '\0';
+			} else if (code == 0x60) { 						// `
+				out += '?';
+			} else if (code == 0x24) { 						// $
+				out += "\x02";
+			} else if (code >= 0x5B && code <= 0x5F) { 		// 0x5B - 0x5F
+				it = dict.find(c);
+				out += it->second;
+			} else if (code >= 0x20 && code <= 0x7A) { 		// 0x20 - 0x7A (except 0x40, 0x24, 0x5B-0x5F and 0x60)
+				out += c[0];
+			} else if (code >= 0x7B && code <= 0x7E) { 		// 0x7B - 0x7E
+				it = dict.find(c);
+				out += it->second;
+			} else if (code >= 0x7F) { 						// UTF-8 escape sequence
+				std::string s;
+				if (code >= 0xC0 && code <= 0xDF) { 		// Double byte UTF-8
+					ss.read(c + 1, 1);
+					i++;
+					s = std::string(c, 2);
+				} else if (code >= 0xE0 && code <= 0xF0) { 	// Triple byte UTF-8
+					ss.read(c + 1, 2);
+					i += 2;
+					s = std::string(c, 3);
+				} else { 									// Quad byte UTF-8
+					ss.read(c + 1, 3);
+					i += 3;
+					s = std::string(c, 4);
+				}
+				it = dict.find(s);
+				if (it != dict.end()) {
+					out += it->second;
+				} else {
+					out += '?';
+				}
+			} else { 										// Unprintable char: ignore
+
+			}
+		}
+		return out;
 	}
 
 	/**
 	 * Converts an GSM 0338 encoded string into UTF8.
-	 * @param str String to be encoded.
+	 * @param input String to be encoded.
 	 * @return UTF8-encoded string.
 	 */
-	std::string getUtf8(std::string &str)
+	std::string getUtf8(const std::string &input)
 	{
-		std::map<std::string, std::string>::iterator it = dict.begin();
-		for (; it != dict.end() ; it++) {
-			boost::replace_all(str, it->second, it->first);
+		std::stringstream ss(input);
+		std::string out;
+		std::map<std::string, std::string>::iterator it;
+
+		char c[1];
+		for (unsigned int i = 0 ; i < input.length() ; i++) {
+			ss.read(c, 1);
+			uint8_t code = static_cast<uint8_t>(c[0]);
+			if (code >= 0x20 && code <= 0x5A) {
+				out += c[0];
+			} else {
+				it = dict.find(c);
+				if (it != dict.end()) {
+					out += it->second;
+				} else {
+					out += c[0];
+				}
+			}
 		}
 
-		return str;
+		return out;
 	}
 };
 }
