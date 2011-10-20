@@ -103,7 +103,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 
 	// submit_sm if the short message could fit into one pdu.
 	if (messageLen <= singleSmsOctetLimit) return submitSm(sender, receiver, shortMessage, tags, priority_flag,
-			schedule_delivery_time, validity_period);
+			schedule_delivery_time, validity_period, dataCoding);
 
 	// split message
 	vector<string> parts = split(shortMessage, csmsSplit, dataCoding);
@@ -258,7 +258,7 @@ vector<string> SmppClient::split(const string& shortMessage, const int split, co
 
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
 		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
-		const string& validity_period)
+		const string& validity_period, const int dataCoding)
 {
 
 	checkState(BOUND_TX);
@@ -285,6 +285,8 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 		pdu << 0; // sm_length = 0
 		pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, shortMessage);
 	} else {
+		cout << shortMessage << endl;
+		cout << shortMessage.length() << endl;
 		pdu.setNullTerminateOctetStrings(nullTerminateOctetStrings);
 		pdu << (int) shortMessage.length() + (nullTerminateOctetStrings ? 1 : 0);
 		pdu << shortMessage;
