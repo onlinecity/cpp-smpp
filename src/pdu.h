@@ -10,9 +10,6 @@
 #include <boost/shared_array.hpp>
 #include <netinet/in.h>
 
-using namespace std;
-using namespace boost;
-
 namespace smpp {
 
 const int HEADERFIELD_SIZE = 4;
@@ -24,8 +21,8 @@ const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
 class PDU
 {
 private:
-	stringbuf sb;
-	iostream buf;
+	std::stringbuf sb;
+	std::iostream buf;
 	uint32_t cmdId;
 	uint32_t cmdStatus;
 	uint32_t seqNo;
@@ -55,7 +52,7 @@ public:
 		(*this) << seqNo;
 	}
 
-	PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer) :
+	PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_array<uint8_t> &pduBuffer) :
 			sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false)
 	{
 		unsigned int bufSize = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8
@@ -64,7 +61,7 @@ public:
 		buf.write((char*) pduLength.get(), HEADERFIELD_SIZE);
 		buf.write((char*) pduBuffer.get(), bufSize - HEADERFIELD_SIZE);
 
-		buf.seekg(HEADERFIELD_SIZE, ios::cur);
+		buf.seekg(HEADERFIELD_SIZE, std::ios::cur);
 
 		(*this) >> cmdId;
 		(*this) >> cmdStatus;
@@ -86,7 +83,7 @@ public:
 	/**
 	 * @return All data in this PDU as array of unsigned char array.
 	 */
-	const shared_array<uint8_t> getOctets();
+	const boost::shared_array<uint8_t> getOctets();
 
 	/**
 	 * @return PDU size in octets.
@@ -127,7 +124,7 @@ public:
 	PDU& operator<<(const std::basic_string<char> &s);
 	PDU& operator<<(const smpp::SmppAddress);
 	PDU& operator<<(const smpp::TLV);
-	PDU& addOctets(const shared_array<uint8_t> &octets, const streamsize &len);
+	PDU& addOctets(const boost::shared_array<uint8_t> &octets, const std::streamsize &len);
 
 	/**
 	 * Skips n octets.
@@ -151,7 +148,7 @@ public:
 	 * @param array Target array.
 	 * @param n Octets to copy.
 	 */
-	void readOctets(shared_array<uint8_t> &octets, const streamsize &n);
+	void readOctets(boost::shared_array<uint8_t> &octets, const std::streamsize &n);
 
 	/**
 	 * @return True if the read marker is not at the end of the PDU.

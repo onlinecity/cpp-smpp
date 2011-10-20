@@ -1,5 +1,6 @@
 #include "pdu.h"
 using namespace std;
+using namespace boost;
 
 const shared_array<uint8_t> smpp::PDU::getOctets()
 {

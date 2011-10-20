@@ -53,8 +53,6 @@ const uint16_t ITS_REPLY_TYPE = 0x1380;
 const uint16_t ITS_SESSION_INFO = 0x1383;
 } // tlv tags
 
-using namespace boost;
-
 /**
  * TLV container class.
  */
@@ -63,7 +61,7 @@ class TLV
 private:
 	uint16_t tag;
 	uint16_t len;
-	shared_array<uint8_t> octets;
+	boost::shared_array<uint8_t> octets;
 
 public:
 
@@ -141,7 +139,7 @@ public:
 	 * @param _len Length of octet array.
 	 * @param _octets Array of octets.
 	 */
-	TLV(const uint16_t &_tag, const uint16_t &_len, const shared_array<uint8_t> &_octets) :
+	TLV(const uint16_t &_tag, const uint16_t &_len, const boost::shared_array<uint8_t> &_octets) :
 			tag(_tag), len(_len), octets(_octets)
 	{
 	}
@@ -156,7 +154,7 @@ public:
 		return len;
 	}
 
-	inline shared_array<uint8_t> getOctets()
+	inline boost::shared_array<uint8_t> getOctets()
 	{
 		return octets;
 	}

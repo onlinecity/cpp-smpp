@@ -1,5 +1,9 @@
 #include "smppclient.h"
+using namespace std;
 using namespace smpp;
+using namespace boost;
+using namespace boost::asio;
+using boost::asio::ip::tcp;
 
 smpp::SmppClient::~SmppClient()
 {

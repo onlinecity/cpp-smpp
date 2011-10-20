@@ -16,10 +16,6 @@
 #include "tlv.h"
 #include "timeformat.h"
 
-using namespace std;
-using namespace boost;
-using namespace boost::posix_time;
-
 namespace smpp {
 /**
  * Class representing an SMS.
@@ -27,21 +23,21 @@ namespace smpp {
 class SMS
 {
 public:
-	string service_type;
+	std::string service_type;
 	int source_addr_ton;
 	int source_addr_npi;
-	string source_addr;
+	std::string source_addr;
 
 	int dest_addr_ton;
 	int dest_addr_npi;
-	string dest_addr;
+	std::string dest_addr;
 
 	int esm_class;
 	int protocol_id;
 	int priority_flag;
 
-	string schedule_delivery_time;
-	string validity_period;
+	std::string schedule_delivery_time;
+	std::string validity_period;
 
 	int registered_delivery;
 	int replace_if_present_flag;
@@ -50,7 +46,7 @@ public:
 	int sm_default_msg_id;
 	int sm_length;
 
-	string short_message;
+	std::string short_message;
 
 	std::list<TLV> tlvs;
 
@@ -144,7 +140,7 @@ public:
 			}
 
 			pdu >> len;
-			shared_array<uint8_t> octets(new uint8_t[len]);
+			boost::shared_array<uint8_t> octets(new uint8_t[len]);
 			pdu.readOctets(octets, len);
 			tlvs.push_back(TLV(tag, len, octets));
 		}
@@ -224,14 +220,14 @@ class DeliveryReport: public SMS
 {
 
 public:
-	string id;
+	std::string id;
 	uint32_t sub;
 	uint32_t dlvrd;
-	ptime submitDate;
-	ptime doneDate;
-	string stat;
-	string err;
-	string text;
+	boost::posix_time::ptime submitDate;
+	boost::posix_time::ptime doneDate;
+	std::string stat;
+	std::string err;
+	std::string text;
 
 	DeliveryReport() :
 			SMS(), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("")
