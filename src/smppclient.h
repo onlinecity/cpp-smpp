@@ -82,7 +82,7 @@ public:
 					replaceIfPresentFlag(0),
 					dataCoding(0),
 					smDefaultMsgId(0),
-					nullTerminateOctetStrings(false),
+					nullTerminateOctetStrings(true),
 					useMsgPayload(false),
 					state(OPEN),
 					socket(_socket),
