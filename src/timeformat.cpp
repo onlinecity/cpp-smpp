@@ -45,7 +45,7 @@ local_date_time parseAbsoluteTimestamp(const smatch &match)
 DatePair parseSmppTimestamp(const string &time)
 {
 	// Matches the pattern “YYMMDDhhmmsstnnp”
-	regex pattern("^(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1})(\\d{2})([R+-])$", regex_constants::perl);
+	static regex pattern("^(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1})(\\d{2})([R+-])$", regex_constants::perl);
 	smatch match;
 	if (regex_match(time.begin(), time.end(), match, pattern)) {
 
