@@ -53,7 +53,6 @@ private:
 	uint8_t protocolId;
 	uint8_t registeredDelivery;
 	uint8_t replaceIfPresentFlag;
-	uint8_t dataCoding;
 	uint8_t smDefaultMsgId;
 
 	// Extra options;
@@ -86,7 +85,6 @@ public:
 					protocolId(0),
 					registeredDelivery(0),
 					replaceIfPresentFlag(0),
-					dataCoding(0),
 					smDefaultMsgId(0),
 					nullTerminateOctetStrings(true),
 					useMsgPayload(false),
@@ -295,16 +293,6 @@ public:
 		return replaceIfPresentFlag;
 	}
 
-	inline void setDataCoding(const uint8_t i)
-	{
-		dataCoding = i;
-	}
-
-	inline uint8_t getDataCoding() const
-	{
-		return dataCoding;
-	}
-
 	inline void setSmDefaultMsgId(const uint8_t i)
 	{
 		smDefaultMsgId = i;
@@ -434,7 +422,7 @@ private:
 	 */
 	std::string submitSm(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
 			std::list<TLV> tags, const uint8_t priority_flag, const std::string &schedule_delivery_time,
-			const std::string& validity_period);
+			const std::string& validity_period, const int dataCoding = smpp::DATA_CODING_DEFAULT);
 
 	/**
 	 * @return Returns the next sequence number.
