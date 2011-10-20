@@ -1,8 +1,9 @@
 #include "sms.h"
 
 using namespace std;
+using namespace smpp;
 
-std::ostream &operator << (std::ostream &out, const smpp::SMS &sms)
+ostream &operator <<(ostream &out, const SMS &sms)
 {
 	if (sms.null) {
 		out << "sms values: NULL" << endl;

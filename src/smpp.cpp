@@ -1,6 +1,9 @@
 #include "smpp.h"
 
-std::string smpp::getEsmeStatus(uint32_t i)
+using namespace std;
+namespace smapp {
+
+string getEsmeStatus(uint32_t i)
 {
 	switch (i) {
 		case smpp::ESME_ROK:
@@ -103,4 +106,5 @@ std::string smpp::getEsmeStatus(uint32_t i)
 		default:
 			return "Unknown";
 	}
+}
 }
