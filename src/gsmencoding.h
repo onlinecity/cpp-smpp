@@ -85,7 +85,7 @@ public:
 			boost::replace_all(str, it->first, it->second);
 		}
 
-		const boost::regex pattern("([\\xC0-\\xDF].)|([\\xE0-\\xEF]..)|([\\xF0-\\xFF]...)", boost::regex_constants::perl);
+		static const boost::regex pattern("([\\xC0-\\xDF].)|([\\xE0-\\xEF]..)|([\\xF0-\\xFF]...)", boost::regex_constants::perl);
 		return boost::regex_replace(str, pattern, "?");
 	}
 
