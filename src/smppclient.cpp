@@ -10,21 +10,18 @@ SmppClient::~SmppClient()
 	if (state != OPEN) unbind();
 }
 
-void SmppClient::bindTransmitter(const string &login, const string &pass) throw (smpp::SmppException,
-		smpp::TransportException)
+void SmppClient::bindTransmitter(const string &login, const string &pass)
 {
 
 	bind(smpp::BIND_TRANSMITTER, login, pass);
 }
 
-void SmppClient::bindReceiver(const string &login, const string &pass) throw (smpp::SmppException,
-		smpp::TransportException)
+void SmppClient::bindReceiver(const string &login, const string &pass)
 {
 	bind(smpp::BIND_RECEIVER, login, pass);
 }
 
-void SmppClient::bind(uint32_t mode, const string &login, const string &password) throw (smpp::SmppException,
-		smpp::TransportException)
+void SmppClient::bind(uint32_t mode, const string &login, const string &password)
 {
 	checkConnection();
 	checkState(OPEN);
@@ -55,7 +52,7 @@ PDU SmppClient::setupBindPdu(uint32_t mode, const string &login, const string &p
 	return pdu;
 }
 
-void SmppClient::unbind() throw (smpp::SmppException, smpp::TransportException)
+void SmppClient::unbind()
 {
 	checkConnection();
 	PDU pdu(smpp::UNBIND, 0, nextSequenceNumber());
@@ -73,7 +70,7 @@ void SmppClient::unbind() throw (smpp::SmppException, smpp::TransportException)
  */
 string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
 		const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
-		const int dataCoding) throw (smpp::SmppException, smpp::TransportException)
+		const int dataCoding)
 {
 
 	return sendSms(sender, receiver, shortMessage, list<TLV>(), priority_flag, schedule_delivery_time, validity_period,
@@ -85,7 +82,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
  */
 string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
 		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
-		const int dataCoding) throw (smpp::SmppException, smpp::TransportException)
+		const int dataCoding)
 {
 
 	int messageLen = shortMessage.length();
@@ -132,7 +129,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	return smsId;
 }
 
-SMS SmppClient::readSms() throw (smpp::SmppException, smpp::TransportException)
+SMS SmppClient::readSms()
 {
 	// see if we're bound correct.
 	checkState(BOUND_RX);
@@ -167,7 +164,7 @@ SMS SmppClient::readSms() throw (smpp::SmppException, smpp::TransportException)
 	return parseSms();
 }
 
-void SmppClient::enquireLink() throw (smpp::SmppException, smpp::TransportException)
+void SmppClient::enquireLink()
 {
 	PDU pdu = PDU(ENQUIRE_LINK, 0, nextSequenceNumber());
 	sendCommand(pdu);
@@ -232,7 +229,6 @@ vector<string> SmppClient::split(const string& shortMessage, const int split, co
 
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
 		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period)
-				throw (smpp::SmppException, smpp::TransportException)
 {
 
 	checkState(BOUND_TX);
@@ -276,14 +272,14 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 	return messageid;
 }
 
-uint32_t SmppClient::nextSequenceNumber() throw (smpp::SmppException)
+uint32_t SmppClient::nextSequenceNumber()
 {
 	if (++seqNo > 0x7FFFFFFF) throw SmppException("Ran out of sequence numbers");
 
 	return seqNo;
 }
 
-void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportException)
+void SmppClient::sendPdu(PDU &pdu)
 {
 	checkConnection();
 
@@ -313,7 +309,7 @@ void SmppClient::sendPdu(PDU &pdu) throw (smpp::SmppException, smpp::TransportEx
 	socketExecute();
 }
 
-PDU SmppClient::sendCommand(PDU &pdu) throw (smpp::SmppException, smpp::TransportException)
+PDU SmppClient::sendCommand(PDU &pdu)
 {
 	sendPdu(pdu);
 
@@ -329,9 +325,8 @@ void SmppClient::writeHandler(const boost::system::error_code &error)
 {
 }
 
-PDU SmppClient::readPdu(const bool &isBlocking) throw (smpp::SmppException, smpp::TransportException)
+PDU SmppClient::readPdu(const bool &isBlocking)
 {
-
 	// return NULL pdu if there is nothing on the wire for us.
 	if (!isBlocking && !socketPeek()) return PDU();
 
@@ -408,7 +403,7 @@ void SmppClient::socketExecute()
 }
 
 void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, size_t len,
-		const shared_array<uint8_t> &pduLength) throw (smpp::TransportException)
+		const shared_array<uint8_t> &pduLength)
 {
 	if (error) {
 
@@ -431,7 +426,6 @@ void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, si
 
 void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::error_code>* opt,
 		const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength)
-				throw (smpp::TransportException)
 {
 
 	if (error) {
@@ -467,8 +461,7 @@ void SmppClient::readPduBodyHandler(const boost::system::error_code &error, size
 }
 
 // blocks until response is read
-PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &commandId) throw (smpp::SmppException,
-		smpp::TransportException)
+PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &commandId)
 {
 	uint32_t response = GENERIC_NACK | commandId;
 	list<PDU>::iterator it = pdu_queue.begin();
@@ -494,7 +487,7 @@ PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &comman
 	return pdu;
 }
 
-void smpp::SmppClient::enquireLinkRespond() throw (smpp::SmppException, smpp::TransportException)
+void smpp::SmppClient::enquireLinkRespond()
 {
 	list<PDU>::iterator it = pdu_queue.begin();
 
@@ -515,12 +508,12 @@ void smpp::SmppClient::enquireLinkRespond() throw (smpp::SmppException, smpp::Tr
 	}
 }
 
-void SmppClient::checkConnection() throw (smpp::TransportException)
+void SmppClient::checkConnection()
 {
 	if (!socket->is_open()) throw smpp::TransportException("Socket is closed");
 }
 
-void SmppClient::checkState(int state) throw (smpp::SmppException)
+void SmppClient::checkState(int state)
 {
 	if (this->state != state) throw smpp::SmppException("Client in wrong state");
 }
