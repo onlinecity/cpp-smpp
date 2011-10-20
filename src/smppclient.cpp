@@ -510,8 +510,8 @@ PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &comman
 		PDU pdu = readPdu(true);
 		if (!pdu.null) {
 			if ((pdu.getSequenceNo() == sequence
-					&& (pdu.getCommandId() == response || pdu.getCommandId() == smpp::GENERIC_NACK))
-					|| (pdu.getSequenceNo() == 0 && pdu.getCommandId() == smpp::GENERIC_NACK)) return pdu;
+					&& (pdu.getCommandId() == response || pdu.getCommandId() == GENERIC_NACK))
+					|| (pdu.getSequenceNo() == 0 && pdu.getCommandId() == GENERIC_NACK)) return pdu;
 		}
 	}
 
