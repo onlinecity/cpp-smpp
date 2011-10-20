@@ -8,6 +8,8 @@
 #include <boost/thread/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_io.hpp>
+#include <boost/function.hpp>
+#include <boost/bind/bind.hpp>
 
 #include <string>
 #include <stdint.h>
@@ -35,12 +37,12 @@ typedef boost::tuple<std::string, boost::local_time::local_date_time, int, int> 
  */
 class SmppClient
 {
-public:
+private:
 	enum
 	{
 		OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
 	};
-private:
+
 	// SMPP bind parameters
 	std::string systemType;
 	uint8_t interfaceVersion; //= 0x34;
@@ -58,6 +60,8 @@ private:
 	// Extra options;
 	bool nullTerminateOctetStrings;
 	bool useMsgPayload;
+
+	boost::function<uint16_t()> msgRefCallback;
 
 	int state;
 	boost::shared_ptr<boost::asio::ip::tcp::socket> socket;
@@ -88,6 +92,7 @@ public:
 					smDefaultMsgId(0),
 					nullTerminateOctetStrings(true),
 					useMsgPayload(false),
+					msgRefCallback(boost::bind(&SmppClient::defaultMessageRef, this)),
 					state(OPEN),
 					socket(_socket),
 					seqNo(0),
@@ -369,6 +374,16 @@ public:
 		return verbose;
 	}
 
+	/**
+	 * Set callback method for generating message references.
+	 * The returned integer must be modulo 65535 (0xffff)
+	 * @param cb
+	 */
+	inline void setMsgRefCallback(boost::function<uint16_t()> cb)
+	{
+		msgRefCallback = cb;
+	}
+
 private:
 
 	/**
@@ -513,6 +528,18 @@ private:
 	 */
 
 	void checkState(const int state);
+
+	/**
+	 * Default implementation for msgRefCallback.
+	 * Simple initializes a integer on the heap and increments it for each message reference.
+	 * Returns a modulo 0xffff int.
+	 * @return
+	 */
+	uint16_t defaultMessageRef()
+	{
+		static int ref = 0;
+		return (ref++ % 0xffff);
+	}
 
 };
 }

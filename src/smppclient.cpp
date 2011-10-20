@@ -109,7 +109,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	vector<string> parts = split(shortMessage, csmsSplit, dataCoding);
 	vector<string>::iterator itr = parts.begin();
 
-	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, (uint16_t) 0x1234));
+	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, (uint16_t) msgRefCallback()));
 	tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, (uint8_t) parts.size()));
 	int segment = 0;
 
