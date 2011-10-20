@@ -164,6 +164,34 @@ SMS SmppClient::readSms()
 	return parseSms();
 }
 
+QuerySmResult SmppClient::querySm(std::string messageid, SmppAddress source)
+{
+	using namespace boost::local_time;
+	PDU pdu = PDU(QUERY_SM, 0, nextSequenceNumber());
+	pdu << messageid;
+	pdu << source.ton;
+	pdu << source.npi;
+	pdu << source.value;
+	PDU reply = sendCommand(pdu);
+	string msgid;
+	string final_date;
+	uint8_t message_state;
+	uint8_t error_code;
+	reply >> msgid;
+	reply >> final_date;
+	reply >> message_state;
+	reply >> error_code;
+
+	local_date_time ldt(not_a_date_time);
+
+	if (final_date.length() > 1) {
+		smpp::timeformat::DatePair p = smpp::timeformat::parseSmppTimestamp(final_date);
+		ldt = p.first;
+	}
+
+	return QuerySmResult(msgid, ldt, message_state, error_code);
+}
+
 void SmppClient::enquireLink()
 {
 	PDU pdu = PDU(ENQUIRE_LINK, 0, nextSequenceNumber());
