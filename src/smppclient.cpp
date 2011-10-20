@@ -102,7 +102,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	}
 
 	// submit_sm if the short message could fit into one pdu.
-	if (messageLen <= singleSmsOctetLimit) return submitSm(sender, receiver, shortMessage, tags, priority_flag,
+	if (messageLen <= singleSmsOctetLimit || useMsgPayload) return submitSm(sender, receiver, shortMessage, tags, priority_flag,
 			schedule_delivery_time, validity_period, dataCoding);
 
 	// split message
