@@ -327,7 +327,11 @@ void SmppClient::sendPdu(PDU &pdu)
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
 	async_write(*socket, buffer(pdu.getOctets().get(), pdu.getSize()),
-			boost::bind(&SmppClient::handleTimeout, this, &ioResult, _1));
+			boost::bind(&SmppClient::writeHandler, this, _1));
+
+//	async_write(*socket, buffer(pdu.getOctets().get(), pdu.getSize()),
+//			boost::bind(&SmppClient::writeHandler, this, &ioResult, _1));
+
 
 	socketExecute();
 
@@ -423,6 +427,13 @@ void SmppClient::handleTimeout(boost::optional<boost::system::error_code>* opt, 
 	opt->reset(error);
 }
 
+void SmppClient::writeHandler(const boost::system::error_code &error)
+{
+	if (error) {
+		throw TransportException(boost::system::system_error(error).what());
+	}
+}
+
 void SmppClient::socketExecute()
 {
 	socket->get_io_service().run_one();
@@ -453,7 +464,6 @@ void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, si
 void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::error_code>* opt,
 		const boost::system::error_code &error, size_t read, shared_array<uint8_t> pduLength)
 {
-
 	if (error) {
 
 		if (error == boost::asio::error::operation_aborted) {
