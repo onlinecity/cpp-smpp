@@ -17,7 +17,7 @@ const shared_array<uint8_t> PDU::getOctets()
 	buf.seekg(0, ios::beg);
 
 	shared_array<uint8_t> octets(new uint8_t[size]);
-	buf.read((char*) octets.get(), size);
+	buf.read(reinterpret_cast<char*>(octets.get()), size);
 
 	// Seek to start of PDU body (after headers)
 	buf.seekg(HEADERFIELD_SIZE * 4, ios::beg);
@@ -25,7 +25,7 @@ const shared_array<uint8_t> PDU::getOctets()
 	return octets;
 }
 
-const int PDU::getSize()
+ int PDU::getSize()
 {
 	buf.seekp(0, ios_base::end);
 	int s = buf.tellp();
@@ -33,22 +33,22 @@ const int PDU::getSize()
 	return s;
 }
 
-const uint32_t PDU::getCommandId()
+ uint32_t PDU::getCommandId() const
 {
 	return cmdId;
 }
 
-const uint32_t PDU::getCommandStatus()
+ uint32_t PDU::getCommandStatus() const
 {
 	return cmdStatus;
 }
 
-const uint32_t PDU::getSequenceNo()
+ uint32_t PDU::getSequenceNo() const
 {
 	return seqNo;
 }
 
-const bool PDU::isNullTerminating()
+ bool PDU::isNullTerminating() const
 {
 	return nullTerminateOctetStrings;
 }
@@ -117,7 +117,8 @@ PDU& PDU::operator <<(smpp::TLV tlv)
 
 PDU& PDU::addOctets(const shared_array<uint8_t> &octets, const streamsize &len)
 {
-	buf.write((char*) octets.get(), len);
+
+	buf.write(reinterpret_cast<char*>(octets.get()), len);
 	return *this;
 }
 
@@ -168,7 +169,7 @@ PDU& PDU::operator>>(std::basic_string<char> &s)
 
 void PDU::readOctets(shared_array<uint8_t> &octets, const streamsize &len)
 {
-	buf.readsome((char*) octets.get(), len);
+	buf.readsome(reinterpret_cast<char*>(octets.get()), len);
 }
 
 bool PDU::hasMoreData()
@@ -179,26 +180,24 @@ bool PDU::hasMoreData()
 
 std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
 {
-	using namespace std;
-
 	if (pdu.null) {
-		out << "PDU IS NULL" << endl;
+		out << "PDU IS NULL" << std::endl;
 		return out;
 	}
 
 	int size = pdu.getSize();
 
-	out << "size      :" << size << endl;
-	out << "sequence  :" << pdu.seqNo << endl;
-	out << "cmd id    :0x" << hex << pdu.cmdId << dec << endl;
-	out << "cmd status:0x" << hex << pdu.cmdStatus << dec << " : " << smpp::getEsmeStatus(pdu.cmdStatus) << endl;
+	out << "size      :" << size << std::endl;
+	out << "sequence  :" << pdu.seqNo << std::endl;
+	out << "cmd id    :0x" << hex << pdu.cmdId << dec << std::endl;
+	out << "cmd status:0x" << hex << pdu.cmdStatus << dec << " : " << smpp::getEsmeStatus(pdu.cmdStatus) << std::endl;
 
 	shared_array<uint8_t> octets = pdu.getOctets();
 
 	for (int i = 0 ; i < size ; i++) {
-		out << setw(2) << setfill('0') << hex << (int) octets[i] << " ";
+		out << std::setw(2) << std::setfill('0') << std::hex << (int) octets[i] << " ";
 	}
 
-	out << dec << endl;
+	out << dec << std::endl;
 	return out;
 }
