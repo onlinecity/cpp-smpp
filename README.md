@@ -32,28 +32,52 @@ make install
 
 Basic usage
 -
-To send a SMS:
+Sending a SMS:
 
-``` cpp
-boost::asio::io_service io_service;
-tcp::endpoint endpoint(ip::address_v4::from_string("127.0.0.1"), 2775);
-tcp::socket* socket = new tcp::socket(io_service);
-socket->connect(endpoint);
+``` c++
+/*
+ * transmit.cpp
+ * Compile with (on Ubuntu):
+ * g++ transmit.cpp -I/usr/local/include -lsmpp -lboost_system -lboost_regex -lboost_date_time
+ */
 
-SmppClient client(socket);
+#include <smpp/smppclient.h>
+#include <smpp/gsmencoding.h>
+#include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
+#include <iostream>
 
-client.bindTransmitter("username", "password");
-SmppAddress from("cppSmpp", smpp::TON_ALPHANUMERIC, smpp::DATA_CODING_DEFAULT);
-SmppAddress to("45123456789", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
-string message = "message to send";
+using namespace boost;
+using namespace boost::asio;
+using namespace boost::asio::ip;
+using namespace smpp;
+using namespace std;
 
-GsmEncoder encoder;
+int main(int argc, char** argv) 
+{
+	boost::asio::io_service io_service;
+	tcp::endpoint endpoint(ip::address_v4::from_string("127.0.0.1"), 2775);
+	shared_ptr<tcp::socket> socket(new tcp::socket(io_service));
+	socket->connect(endpoint);
 
-client.sendSms(from, to, encoder.getGsm0338(lorem));
-client.unbind();
+	SmppClient client(socket);
+	client.setVerbose(true);
+	client.bindTransmitter("username", "password");
+
+	SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
+	SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
+	GsmEncoder encoder;
+	string message = "message to send";
+	string smscId = client.sendSms(from, to, encoder.getGsm0338(message));
+	
+	cout << smscId << endl;
+	client.unbind();
+
+	return 0;
+}
 ```
 
-To receive SMS:
+Receiving a SMS:
 
 ``` cpp
 boost::asio::io_service io_service;
@@ -68,3 +92,4 @@ cout << sms << endl;
 
 client.unbind();
 ```
+
