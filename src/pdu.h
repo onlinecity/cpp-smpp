@@ -13,6 +13,7 @@
 
 namespace smpp {
 
+uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader);
 const int HEADERFIELD_SIZE = 4;
 const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
 
@@ -56,8 +57,7 @@ public:
 	PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_array<uint8_t> &pduBuffer) :
 			sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false)
 	{
-		unsigned int bufSize = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8
-				| (int) pduLength[3];
+		uint32_t bufSize = getPduLength(pduLength);
 
 		buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);
 		buf.write(reinterpret_cast<char*>(pduBuffer.get()), bufSize - HEADERFIELD_SIZE);
@@ -158,8 +158,8 @@ public:
 
 	friend std::ostream &smpp::operator<<(std::ostream&, smpp::PDU&);
 };
-
+// PDU
 std::ostream& operator<<(std::ostream&, smpp::PDU&);
-}
+} // namespace smpp
 
 #endif /* PDU_H_ */

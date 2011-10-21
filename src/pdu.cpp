@@ -200,3 +200,11 @@ std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
 	out << dec << std::endl;
 	return out;
 }
+
+namespace smpp {
+uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader)
+{
+	uint32_t* i = reinterpret_cast<uint32_t*>(pduHeader.get());
+
+return	ntohl(*i);
+}}

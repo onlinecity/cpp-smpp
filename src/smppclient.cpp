@@ -109,9 +109,9 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	vector<string> parts = split(shortMessage, csmsSplit);
 	vector<string>::iterator itr = parts.begin();
 
-	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, (uint16_t) msgRefCallback()));
+	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
 
-	tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, (uint8_t) parts.size()));
+	tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
 	int segment = 0;
 
 	string smsId;
@@ -244,7 +244,7 @@ vector<string> SmppClient::split(const string& shortMessage, const int split)
 	int n = split;
 
 	while (pos < len) {
-		if ((int) shortMessage[pos + n - 1] == 0x1b) // do not split at escape char
+		if (static_cast<int>(shortMessage[pos + n - 1]) == 0x1b) // do not split at escape char
 		n--;
 
 		parts.push_back(shortMessage.substr(pos, n));
@@ -287,7 +287,7 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 		pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, shortMessage);
 	} else {
 		pdu.setNullTerminateOctetStrings(nullTerminateOctetStrings);
-		pdu << (int) shortMessage.length() + (nullTerminateOctetStrings ? 1 : 0);
+		pdu << boost::numeric_cast<uint8_t>(shortMessage.length()) + (nullTerminateOctetStrings ? 1 : 0);
 		pdu << shortMessage;
 		pdu.setNullTerminateOctetStrings(true);
 	}
@@ -449,7 +449,7 @@ void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, si
 		throw TransportException(boost::system::system_error(error).what());
 	}
 
-	unsigned int i = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8 | (int) pduLength[3];
+	uint32_t i = smpp::getPduLength(pduLength);
 	shared_array<uint8_t> pduBuffer(new uint8_t[i]);
 
 	// start reading after the size mark of the pdu
@@ -473,7 +473,7 @@ void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::err
 
 	opt->reset(error);
 
-	unsigned int i = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8 | (int) pduLength[3];
+	uint32_t i = smpp::getPduLength(pduLength);
 	shared_array<uint8_t> pduBuffer(new uint8_t[i - 4]);
 
 	// start reading after the size mark of the pdu
