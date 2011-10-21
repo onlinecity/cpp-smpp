@@ -24,15 +24,17 @@ To build this library you need:
 We have built this library against boost 1.46.
 
 Installation
----
+----
 ``` sh
+git clone git@github.com:onlinecity/cpp-smpp.git 
+cd cpp-smpp/src
 make
+su 
 make install
 ```
 
-Basic usage
--
 Sending a SMS:
+----
 
 ``` c++
 /*
@@ -78,6 +80,7 @@ int main(int argc, char** argv)
 ```
 
 Receiving a SMS:
+----
 
 ``` c++
 /*
@@ -128,4 +131,6 @@ int main(int argc, char** argv)
 	return 0;
 }
 ```
+
+
 
