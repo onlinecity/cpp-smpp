@@ -58,8 +58,8 @@ public:
 		unsigned int bufSize = (int) pduLength[0] << 24 | (int) pduLength[1] << 16 | (int) pduLength[2] << 8
 				| (int) pduLength[3];
 
-		buf.write((char*) pduLength.get(), HEADERFIELD_SIZE);
-		buf.write((char*) pduBuffer.get(), bufSize - HEADERFIELD_SIZE);
+		buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);
+		buf.write(reinterpret_cast<char*>(pduBuffer.get()), bufSize - HEADERFIELD_SIZE);
 
 		buf.seekg(HEADERFIELD_SIZE, std::ios::cur);
 
@@ -88,27 +88,27 @@ public:
 	/**
 	 * @return PDU size in octets.
 	 */
-	const int getSize();
+	int getSize();
 
 	/**
 	 * @return PDU command id.
 	 */
-	const uint32_t getCommandId();
+	uint32_t getCommandId() const;
 
 	/**
 	 * @return PDU command status.
 	 */
-	const uint32_t getCommandStatus();
+	uint32_t getCommandStatus() const;
 
 	/**
 	 * @return PDU sequence number.
 	 */
-	const uint32_t getSequenceNo();
+	uint32_t getSequenceNo() const;
 
 	/**
 	 * @return True if null termination is on.
 	 */
-	const bool isNullTerminating();
+	bool isNullTerminating() const;
 
 	/**
 	 * Turns null termination on or off.
