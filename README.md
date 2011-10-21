@@ -5,14 +5,27 @@ This is a simplified SMPP client lib for sending and receiving smses through the
 It only implements a handful of the SMPP features.
 
 Dependencies
--
+----
 To build this library you need:
- * [Boost Asio](http://www.boost.org/doc/libs/1_47_0/doc/html/boost_asio.html)
- * [Boost Regex](http://www.boost.org/doc/libs/1_47_0/libs/regex/doc/html/index.html)
+ - [Boost Asio](http://www.boost.org/doc/libs/1_47_0/doc/html/boost_asio.html)
+ - [Boost.Bimap](http://www.boost.org/doc/libs/1_47_0/libs/bimap/doc/html/index.html)
+ - [Boost Regex](http://www.boost.org/doc/libs/1_47_0/libs/regex/doc/html/index.html)
+ - [Boost.Smart_ptr](http://www.boost.org/doc/libs/1_47_0/libs/smart_ptr/shared_ptr.htm)
+ - [Boost.Conversion](http://www.boost.org/doc/libs/1_47_0/libs/conversion/lexical_cast.htm)
+ - [Boost.NumericConversion](http://www.boost.org/doc/libs/1_47_0/libs/numeric/conversion/doc/html/index.html)
+ - [Boost.Bind](http://www.boost.org/doc/libs/1_47_0/libs/bind/bind.html)
+ - [Boost.Date_time](http://www.boost.org/doc/libs/1_47_0/doc/html/date_time.html)
+ - [Boost.Thread](http://www.boost.org/doc/libs/1_47_0/doc/html/thread.html)
+ - [Boost.Tuple](http://www.boost.org/doc/libs/1_47_0/libs/tuple/doc/tuple_users_guide.html)
+ - [Boost.Function](http://www.boost.org/doc/libs/1_47_0/doc/html/function.html)
+ 
+ 
+We have built this library against boost 1.46
 
 Install
 -
 ```
+make
 make install
 ```
 
