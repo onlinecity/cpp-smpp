@@ -3,7 +3,7 @@ MAJOR_VERSION=1
 MINOR_VERSION=0
 
 CC=g++
-OBJ=sms.o timeformat.o pdu.o smpp.o smppclient.o 
+OBJ=sms.o timeformat.o pdu.o smpp.o smppclient.o gsmencoding.o
 PROGRAM=smpp
 
 LIB_NAME=lib$(PROGRAM).so
@@ -28,6 +28,7 @@ pdu.o: pdu.cpp pdu.h smpp.h tlv.h
 timeformat.o: timeformat.cpp timeformat.h exceptions.h
 smpp.o: smpp.cpp smpp.h
 smppclient.o: smppclient.cpp smpp.h smppclient.h tlv.h pdu.h sms.h exceptions.h timeformat.h
+gsmencoding.o: gsmencoding.cpp gsmencoding.h
 
 lib: $(OBJ)	
 	gcc -shared -Wl,-soname,$(LIB_MINOR_NAME) -o $(LIB_NAME) $(OBJ) $(LDFLAGS)
