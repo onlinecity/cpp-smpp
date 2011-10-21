@@ -135,17 +135,15 @@ int main(int argc, char** argv)
 F.A.Q.
 ----
 
-**How do I enable delivery reports?**
+**How do I enable delivery reports?**  
 You must set the registered delivery flag: ```client.setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);```
 
-**Why do I get 'Failed to read reply to command: 0x4', 'Message Length is invalid' or 'Error in optional part' errors?**
- 
+**Why do I get 'Failed to read reply to command: 0x4', 'Message Length is invalid' or 'Error in optional part' errors?**  
 Most likely your SMPP provider doesn't support NULL-terminating the message field. The specs aren't clear on this issue, so there is a toggle. Set ```client.setNullTerminateOctetStrings(false);``` and try again. 
 
-**Can I test the client library without a SMPP server?**
- 
+**Can I test the client library without a SMPP server?**  
 Many service providers can give you a demo account, but you can also use the [logica opensmpp simulator](http://opensmpp.logica.com/CommonPart/Introduction/Introduction.htm#simulator) (java) or [smsforum client test tool](http://www.smsforum.net/sctt_v1.0.Linux.tar.gz) (linux binary). In addition to a number of real-life SMPP servers this library is tested against these simulators.
 
-**How do I set socket timeouts?**
+**How do I set socket timeouts?**  
 You cannot modify the connect timeout since it uses the default boost::asio::ip::tcp socket. You can set the socket read/write timeouts by calling ```client.setSocketWriteTimeout(1000)``` and ```client.setSocketReadTimeout(1000)```. All timeouts are in milliseconds.  
 
