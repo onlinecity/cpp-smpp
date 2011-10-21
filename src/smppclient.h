@@ -193,137 +193,137 @@ public:
 	 * Returns true if the client is bound.
 	 * @return
 	 */
-	inline bool isBound()
+	bool isBound()
 	{
 		return state != OPEN;
 	}
 
-	inline void setSystemType(const std::string s)
+	void setSystemType(const std::string s)
 	{
 		systemType = s;
 	}
 
-	inline std::string getSystemType() const
+	std::string getSystemType() const
 	{
 		return systemType;
 	}
 
-	inline void setInterfaceVersion(const uint8_t i)
+	void setInterfaceVersion(const uint8_t i)
 	{
 		interfaceVersion = i;
 	}
 
-	inline uint8_t getInterfaceVersion() const
+	uint8_t getInterfaceVersion() const
 	{
 		return interfaceVersion;
 	}
 
-	inline void setAddrTon(const uint8_t i)
+	void setAddrTon(const uint8_t i)
 	{
 		addrTon = i;
 	}
 
-	inline uint8_t getAddrTon() const
+	uint8_t getAddrTon() const
 	{
 		return addrTon;
 	}
 
-	inline void setAddrNpi(const uint8_t i)
+	void setAddrNpi(const uint8_t i)
 	{
 		addrNpi = i;
 	}
 
-	inline uint8_t getAddrNpi() const
+	uint8_t getAddrNpi() const
 	{
 		return addrNpi;
 	}
 
-	inline void setAddrRange(const std::string &s)
+	void setAddrRange(const std::string &s)
 	{
 		addrRange = s;
 	}
 
-	inline std::string getAddrRange() const
+	std::string getAddrRange() const
 	{
 		return addrRange;
 	}
 
-	inline void setServiceType(const std::string &s)
+	void setServiceType(const std::string &s)
 	{
 		serviceType = s;
 	}
 
-	inline std::string getServiceType() const
+	std::string getServiceType() const
 	{
 		return serviceType;
 	}
 
-	inline void setEsmClass(const uint8_t i)
+	void setEsmClass(const uint8_t i)
 	{
 		esmClass = i;
 	}
 
-	inline uint8_t getEsmClass() const
+	uint8_t getEsmClass() const
 	{
 		return esmClass;
 	}
 
-	inline void setProtocolId(const uint8_t i)
+	void setProtocolId(const uint8_t i)
 	{
 		protocolId = i;
 	}
 
-	inline uint8_t getProtocolId() const
+	uint8_t getProtocolId() const
 	{
 		return protocolId;
 	}
 
-	inline void setRegisteredDelivery(const uint8_t i)
+	void setRegisteredDelivery(const uint8_t i)
 	{
 		registeredDelivery = i;
 	}
 
-	inline uint8_t getRegisteredDelivery() const
+	uint8_t getRegisteredDelivery() const
 	{
 		return registeredDelivery;
 	}
 
-	inline void setReplaceIfPresentFlag(const uint8_t i)
+	void setReplaceIfPresentFlag(const uint8_t i)
 	{
 		replaceIfPresentFlag = i;
 	}
 
-	inline uint8_t getReplaceIfPresentFlag() const
+	uint8_t getReplaceIfPresentFlag() const
 	{
 		return replaceIfPresentFlag;
 	}
 
-	inline void setSmDefaultMsgId(const uint8_t i)
+	void setSmDefaultMsgId(const uint8_t i)
 	{
 		smDefaultMsgId = i;
 	}
 
-	inline uint8_t getSmDefaultMsgId() const
+	uint8_t getSmDefaultMsgId() const
 	{
 		return smDefaultMsgId;
 	}
 
-	inline void setNullTerminateOctetStrings(const bool b)
+	void setNullTerminateOctetStrings(const bool b)
 	{
 		nullTerminateOctetStrings = b;
 	}
 
-	inline bool getNullTerminateOctetStrings() const
+	bool getNullTerminateOctetStrings() const
 	{
 		return nullTerminateOctetStrings;
 	}
 
-	inline void setUseMsgPayload(const bool b)
+	void setUseMsgPayload(const bool b)
 	{
 		useMsgPayload = b;
 	}
 
-	inline bool getUseMsgPayload() const
+	bool getUseMsgPayload() const
 	{
 		return useMsgPayload;
 	}
@@ -332,7 +332,7 @@ public:
 	 * Sets the socket read timeout in milliseconds. Default is 5000 milliseconds.
 	 * @param timeout Socket read timeout in milliseconds.
 	 */
-	inline void setSocketReadTimeout(const int &timeout)
+	void setSocketReadTimeout(const int &timeout)
 	{
 		socketReadTimeout = timeout;
 	}
@@ -341,7 +341,7 @@ public:
 	 * Returns the socket read timeout.
 	 * @return Socket read timeout in milliseconds.
 	 */
-	inline int getSocketReadTimeout() const
+	int getSocketReadTimeout() const
 	{
 		return socketReadTimeout;
 	}
@@ -350,7 +350,7 @@ public:
 	 * Sets the socket write timeout in milliseconds. Default is 30000 milliseconds.
 	 * @param timeout Socket write timeout in milliseconds.
 	 */
-	inline void setSocketWriteTimeout(const int &timeout)
+	void setSocketWriteTimeout(const int &timeout)
 	{
 		socketWriteTimeout = timeout;
 	}
@@ -359,17 +359,17 @@ public:
 	 * Returns the socket write timeout in milliseconds.
 	 * @return Socket write timeout in milliseconds.
 	 */
-	inline int getSocketWriteTimeout() const
+	int getSocketWriteTimeout() const
 	{
 		return socketWriteTimeout;
 	}
 
-	inline void setVerbose(const bool b)
+	void setVerbose(const bool b)
 	{
 		verbose = b;
 	}
 
-	inline bool isVerbose() const
+	bool isVerbose() const
 	{
 		return verbose;
 	}
@@ -379,7 +379,7 @@ public:
 	 * The returned integer must be modulo 65535 (0xffff)
 	 * @param cb
 	 */
-	inline void setMsgRefCallback(boost::function<uint16_t()> cb)
+	void setMsgRefCallback(boost::function<uint16_t()> cb)
 	{
 		msgRefCallback = cb;
 	}
