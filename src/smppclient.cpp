@@ -106,7 +106,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 			priority_flag, schedule_delivery_time, validity_period, dataCoding);
 
 	// split message
-	vector<string> parts = split(shortMessage, csmsSplit, dataCoding);
+	vector<string> parts = split(shortMessage, csmsSplit);
 	vector<string>::iterator itr = parts.begin();
 
 	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, (uint16_t) msgRefCallback()));
@@ -235,7 +235,7 @@ SMS SmppClient::parseSms()
 	return SMS();
 }
 
-vector<string> SmppClient::split(const string& shortMessage, const int split, const int dataCoding)
+vector<string> SmppClient::split(const string& shortMessage, const int split)
 {
 	vector<string> parts;
 	int len = shortMessage.length();
@@ -352,10 +352,6 @@ PDU SmppClient::sendCommand(PDU &pdu)
 	return resp;
 }
 
-void SmppClient::writeHandler(const boost::system::error_code &error)
-{
-}
-
 PDU SmppClient::readPdu(const bool &isBlocking)
 {
 	// return NULL pdu if there is nothing on the wire for us.
@@ -437,7 +433,6 @@ void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, si
 		const shared_array<uint8_t> &pduLength)
 {
 	if (error) {
-
 		if (error == boost::asio::error::operation_aborted) {
 			// Not treated as an error
 			return;

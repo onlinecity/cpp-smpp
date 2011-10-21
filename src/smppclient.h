@@ -416,11 +416,9 @@ private:
 	 *
 	 * @param shortMessage String to split.
 	 * @param split How long each substring should be.
-	 * @param dataCoding
 	 * @return Vector of substrings.
 	 */
-	std::vector<std::string> split(const std::string &shortMessage, const int split, const int dataCoding =
-			smpp::DATA_CODING_DEFAULT);
+	std::vector<std::string> split(const std::string &shortMessage, const int split);
 
 	/**
 	 * Sends a SUBMIT_SM pdu with the required details for sending an SMS to the SMSC.
@@ -456,9 +454,6 @@ private:
 	 * @return PDU PDU response to the one we sent.
 	 */
 	smpp::PDU sendCommand(PDU &pdu);
-
-	/** Async write callback */
-	void writeHandler(const boost::system::error_code&);
 
 	/**
 	 * Returns one PDU from SMSC.
