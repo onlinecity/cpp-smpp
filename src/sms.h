@@ -179,40 +179,6 @@ public:
 		}
 	}
 
-	const SMS & operator=(const smpp::SMS &sms)
-	{
-		if (this != &sms) {
-			service_type = sms.service_type;
-			source_addr_ton = sms.source_addr_ton;
-			source_addr_npi = sms.source_addr_npi;
-			source_addr = sms.source_addr;
-			dest_addr_ton = sms.dest_addr_ton;
-
-			dest_addr_npi = sms.dest_addr_npi;
-			dest_addr = sms.dest_addr;
-			esm_class = sms.esm_class;
-			protocol_id = sms.protocol_id;
-			priority_flag = sms.priority_flag;
-
-			schedule_delivery_time = sms.schedule_delivery_time;
-			validity_period = sms.validity_period;
-			registered_delivery = sms.registered_delivery;
-
-			replace_if_present_flag = sms.replace_if_present_flag;
-			data_coding = sms.data_coding;
-			sm_default_msg_id = sms.sm_default_msg_id;
-			sm_length = sms.sm_length;
-
-			null = sms.null;
-
-			if (!null) {
-				std::copy(sms.tlvs.begin(), sms.tlvs.end(), tlvs.begin());
-			}
-		}
-
-		return *this;
-	}
-
 	friend std::ostream &operator <<(std::ostream &, const SMS &);
 
 };
@@ -267,6 +233,7 @@ public:
 	}
 
 	DeliveryReport(const DeliveryReport &rhs) :
+					smpp::SMS(rhs),
 					id(rhs.id),
 					sub(rhs.sub),
 					dlvrd(rhs.dlvrd),
@@ -276,21 +243,6 @@ public:
 					err(rhs.err),
 					text(rhs.text)
 	{
-	}
-
-	const DeliveryReport & operator=(const DeliveryReport &rhs)
-	{
-		if (this != &rhs) {
-			id = rhs.id;
-			sub = rhs.sub;
-			dlvrd = rhs.dlvrd;
-			submitDate = rhs.submitDate;
-			doneDate = rhs.doneDate;
-			stat = rhs.stat;
-			err = rhs.err;
-			text = rhs.text;
-		}
-		return *this;
 	}
 };
 
