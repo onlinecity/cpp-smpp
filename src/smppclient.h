@@ -10,6 +10,7 @@
 #include <boost/tuple/tuple_io.hpp>
 #include <boost/function.hpp>
 #include <boost/bind/bind.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <string>
 #include <stdint.h>
