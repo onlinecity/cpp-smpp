@@ -82,8 +82,8 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
  * Send an sms to the smsc.
  */
 string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
-		const string& validity_period, const int dataCoding)
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
+		const int dataCoding)
 {
 
 	int messageLen = shortMessage.length();
@@ -102,8 +102,8 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	}
 
 	// submit_sm if the short message could fit into one pdu.
-	if (messageLen <= singleSmsOctetLimit || useMsgPayload) return submitSm(sender, receiver, shortMessage, tags, priority_flag,
-			schedule_delivery_time, validity_period, dataCoding);
+	if (messageLen <= singleSmsOctetLimit || useMsgPayload) return submitSm(sender, receiver, shortMessage, tags,
+			priority_flag, schedule_delivery_time, validity_period, dataCoding);
 
 	// split message
 	vector<string> parts = split(shortMessage, csmsSplit, dataCoding);
@@ -257,8 +257,8 @@ vector<string> SmppClient::split(const string& shortMessage, const int split, co
 }
 
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
-		const string& validity_period, const int dataCoding)
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
+		const int dataCoding)
 {
 
 	checkState(BOUND_TX);
@@ -296,9 +296,10 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 		pdu << *itr;
 
 	PDU resp = sendCommand(pdu);
+
 	string messageid;
-	resp.skip(smpp::HEADER_SIZE);
 	resp >> messageid;
+
 	return messageid;
 }
 
@@ -509,8 +510,7 @@ PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &comman
 	while (true) {
 		PDU pdu = readPdu(true);
 		if (!pdu.null) {
-			if ((pdu.getSequenceNo() == sequence
-					&& (pdu.getCommandId() == response || pdu.getCommandId() == GENERIC_NACK))
+			if ((pdu.getSequenceNo() == sequence && (pdu.getCommandId() == response || pdu.getCommandId() == GENERIC_NACK))
 					|| (pdu.getSequenceNo() == 0 && pdu.getCommandId() == GENERIC_NACK)) return pdu;
 		}
 	}
