@@ -465,6 +465,13 @@ private:
 	void handleTimeout(boost::optional<boost::system::error_code>* opt, const boost::system::error_code &error);
 
 	/**
+	 * Async write handler.
+	 * @param
+	 * @throw TransportException if an error occurred.
+	 */
+	void writeHandler(const boost::system::error_code &error);
+
+	/**
 	 * Peeks at the socket and returns true if there is data to be read.
 	 * @return True if there is data to be read.
 	 */
