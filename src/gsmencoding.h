@@ -82,43 +82,42 @@ public:
 		std::string out;
 		GsmDictionay::left_const_iterator it;
 
-		const char *ic = input.c_str();
 		for (unsigned int i = 0 ; i < input.length() ; i++) {
-			uint8_t code = static_cast<uint8_t>(ic[i]);
-			if (code == 0x40) { 							// @
+			uint8_t code = static_cast<uint8_t>(input[i]);
+			if (code == 0x40) { // @
 				out += '\0';
-			} else if (code == 0x60) { 						// `
+			} else if (code == 0x60) { // `
 				out += '?';
-			} else if (code == 0x24) { 						// $
+			} else if (code == 0x24) { // $
 				out += "\x02";
-			} else if (code >= 0x5B && code <= 0x5F) { 		// 0x5B - 0x5F
-				char c[] = { ic[i], '\0' };
+			} else if (code >= 0x5B && code <= 0x5F) { // 0x5B - 0x5F
+				char c[] = { input[i], '\0' };
 				it = dict.left.find(c);
 				if (it == dict.left.end()) { // just in case
-					out += ic[i];
+					out += input[i];
 				} else {
 					out += it->second;
 				}
-			} else if (code >= 0x20 && code <= 0x7A) { 		// 0x20 - 0x7A (except 0x40, 0x24, 0x5B-0x5F and 0x60)
-				out += ic[i];
-			} else if (code >= 0x7B && code <= 0x7E) { 		// 0x7B - 0x7E
-				char c[] = { ic[i], '\0' };
+			} else if (code >= 0x20 && code <= 0x7A) { // 0x20 - 0x7A (except 0x40, 0x24, 0x5B-0x5F and 0x60)
+				out += input[i];
+			} else if (code >= 0x7B && code <= 0x7E) { // 0x7B - 0x7E
+				char c[] = { input[i], '\0' };
 				it = dict.left.find(c);
 				if (it == dict.left.end()) { // just in case
-					out += ic[i];
+					out += input[i];
 				} else {
 					out += it->second;
 				}
-			} else if (code >= 0x7F) { 						// UTF-8 escape sequence
+			} else if (code >= 0x7F) { // UTF-8 escape sequence
 				std::string s;
-				if (code >= 0xC0 && code <= 0xDF) { 		// Double byte UTF-8
-					char c[2] = { ic[i], ic[++i] };
+				if (code >= 0xC0 && code <= 0xDF) { // Double byte UTF-8
+					char c[2] = { input[i], input[++i] };
 					s = std::string(c, 2);
-				} else if (code >= 0xE0 && code <= 0xF0) { 	// Triple byte UTF-8
-					char c[3] = { ic[i], ic[++i], ic[++i] };
+				} else if (code >= 0xE0 && code <= 0xF0) { // Triple byte UTF-8
+					char c[3] = { input[i], input[++i], input[++i] };
 					s = std::string(c, 3);
-				} else { 									// Quad byte UTF-8
-					char c[4] = { ic[i], ic[++i], ic[++i], ic[++i] };
+				} else { // Quad byte UTF-8
+					char c[4] = { input[i], input[++i], input[++i], input[++i] };
 					s = std::string(c, 4);
 				}
 				it = dict.left.find(s);
@@ -127,7 +126,7 @@ public:
 				} else {
 					out += '?';
 				}
-			} else { 										// Unprintable char: ignore
+			} else { // Unprintable char: ignore
 
 			}
 		}
@@ -145,25 +144,24 @@ public:
 
 		GsmDictionay::right_const_iterator it;
 
-		const char *ic = input.c_str();
 		for (unsigned int i = 0 ; i < input.length() ; i++) {
-			uint8_t code = static_cast<uint8_t>(ic[i]);
+			uint8_t code = static_cast<uint8_t>(input[i]);
 			if (code != 0x24 && code >= 0x20 && code <= 0x5A) { // Shortcut (avoid dictionary)
-				out += ic[i];
+				out += input[i];
 			} else if (code >= 0x61 && code <= 0x7A) { // Shortcut (avoid dictionary)
-				out += ic[i];
+				out += input[i];
 			} else {
-				char c[2] = { ic[i], '\0' };
+				char c[2] = { input[i], '\0' };
 				std::string s(c);
 				if (code == 0x1B) { // GSM 03.38 escape sequence read next
-					c[1] = ic[++i];
+					c[1] = input[++i];
 					s = std::string(c, 2);
 				}
 				it = dict.right.find(s);
 				if (it != dict.right.end()) {
 					out += it->second;
 				} else {
-					out += ic[i];
+					out += input[i];
 				}
 			}
 		}
