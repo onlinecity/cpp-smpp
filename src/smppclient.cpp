@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2011 OnlineCity
+ * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+ * @author hd@onlinecity.dk & td@onlinecity.dk
+ */
+
 #include "smppclient.h"
 using namespace std;
 using namespace smpp;
@@ -111,7 +117,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 
 	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
 
-	tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
+tags	.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
 	int segment = 0;
 
 	string smsId;

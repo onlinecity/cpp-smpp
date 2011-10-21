@@ -1,5 +1,12 @@
+/*
+ * Copyright (C) 2011 OnlineCity
+ * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+ * @author hd@onlinecity.dk & td@onlinecity.dk
+ */
+
 #ifndef EXCEPTIONS_H_
 #define EXCEPTIONS_H_
+
 #include <stdexcept>
 
 namespace smpp {
