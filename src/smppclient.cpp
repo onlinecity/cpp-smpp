@@ -110,6 +110,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	vector<string>::iterator itr = parts.begin();
 
 	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, (uint16_t) msgRefCallback()));
+
 	tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, (uint8_t) parts.size()));
 	int segment = 0;
 
@@ -327,11 +328,7 @@ void SmppClient::sendPdu(PDU &pdu)
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
 	async_write(*socket, buffer(pdu.getOctets().get(), pdu.getSize()),
-			boost::bind(&SmppClient::writeHandler, this, _1));
-
-//	async_write(*socket, buffer(pdu.getOctets().get(), pdu.getSize()),
-//			boost::bind(&SmppClient::writeHandler, this, &ioResult, _1));
-
+			boost::bind(&SmppClient::writeHandler, this, &ioResult, _1));
 
 	socketExecute();
 
@@ -427,8 +424,9 @@ void SmppClient::handleTimeout(boost::optional<boost::system::error_code>* opt, 
 	opt->reset(error);
 }
 
-void SmppClient::writeHandler(const boost::system::error_code &error)
+void SmppClient::writeHandler(boost::optional<boost::system::error_code>* opt, const boost::system::error_code &error)
 {
+	opt->reset(error);
 	if (error) {
 		throw TransportException(boost::system::system_error(error).what());
 	}
