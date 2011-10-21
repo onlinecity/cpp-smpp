@@ -144,17 +144,17 @@ public:
 	{
 	}
 
-	inline const uint16_t getTag()
+	const uint16_t getTag() const
 	{
 		return tag;
 	}
 
-	inline const uint16_t getLen()
+	const uint16_t getLen() const
 	{
 		return len;
 	}
 
-	inline boost::shared_array<uint8_t> getOctets()
+	boost::shared_array<uint8_t> getOctets() const
 	{
 		return octets;
 	}
