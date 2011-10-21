@@ -144,12 +144,12 @@ public:
 	{
 	}
 
-	const uint16_t getTag() const
+	uint16_t getTag() const
 	{
 		return tag;
 	}
 
-	const uint16_t getLen() const
+	uint16_t getLen() const
 	{
 		return len;
 	}
