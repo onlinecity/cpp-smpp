@@ -1,5 +1,6 @@
 #ifndef PDU_H_
 #define PDU_H_
+#include <boost/numeric/conversion/cast.hpp>
 #include "smpp.h"
 #include "tlv.h"
 #include <stdint.h> // types

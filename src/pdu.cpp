@@ -25,7 +25,7 @@ const shared_array<uint8_t> PDU::getOctets()
 	return octets;
 }
 
- int PDU::getSize()
+int PDU::getSize()
 {
 	buf.seekp(0, ios_base::end);
 	int s = buf.tellp();
@@ -33,22 +33,22 @@ const shared_array<uint8_t> PDU::getOctets()
 	return s;
 }
 
- uint32_t PDU::getCommandId() const
+uint32_t PDU::getCommandId() const
 {
 	return cmdId;
 }
 
- uint32_t PDU::getCommandStatus() const
+uint32_t PDU::getCommandStatus() const
 {
 	return cmdStatus;
 }
 
- uint32_t PDU::getSequenceNo() const
+uint32_t PDU::getSequenceNo() const
 {
 	return seqNo;
 }
 
- bool PDU::isNullTerminating() const
+bool PDU::isNullTerminating() const
 {
 	return nullTerminateOctetStrings;
 }
@@ -193,9 +193,8 @@ std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
 	out << "cmd status:0x" << hex << pdu.cmdStatus << dec << " : " << smpp::getEsmeStatus(pdu.cmdStatus) << std::endl;
 
 	shared_array<uint8_t> octets = pdu.getOctets();
-
 	for (int i = 0 ; i < size ; i++) {
-		out << std::setw(2) << std::setfill('0') << std::hex << (int) octets[i] << " ";
+		out << std::setw(2) << std::setfill('0') << std::hex << boost::numeric_cast<int>(octets[i]) << " ";
 	}
 
 	out << dec << std::endl;
