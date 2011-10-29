@@ -9,6 +9,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/version.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
@@ -548,6 +549,19 @@ private:
 	{
 		static int ref = 0;
 		return (ref++ % 0xffff);
+	}
+
+	/**
+	 * Calls io_service or get_io_service on the current socket depending on the Boost.Asio version
+	 * In Boost ASIO 1.6.0+/Boost 1.47 io_service is renamed to get_io_service
+	 */
+	boost::asio::io_service& getIoService() const
+	{
+#if defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
+		return socket->get_io_service();
+#else
+		return socket->io_service();
+#endif // defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
 	}
 
 };

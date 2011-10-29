@@ -22,7 +22,7 @@ SET(Boost_USE_STATIC_LIBS OFF) # Or we get errors with -fPIC
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_RUNTIME OFF)
 
-FIND_PACKAGE(Boost 1.41 COMPONENTS system regex REQUIRED)
+FIND_PACKAGE(Boost 1.41 COMPONENTS date_time system filesystem regex REQUIRED)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
 ADD_LIBRARY(smpp SHARED ${headers} ${sources})
