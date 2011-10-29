@@ -329,7 +329,7 @@ void SmppClient::sendPdu(PDU &pdu)
 		std::cout << pdu << endl;
 	}
 
-	deadline_timer timer(socket->io_service());
+	deadline_timer timer(getIoService());
 	timer.expires_from_now(boost::posix_time::milliseconds(socketWriteTimeout));
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
@@ -388,9 +388,9 @@ bool SmppClient::socketPeek()
 	async_read(*socket, buffer(pduHeader.get(), 4),
 			boost::bind(&smpp::SmppClient::readPduHeaderHandler, this, _1, _2, pduHeader));
 
-	size_t handlersCalled = socket->get_io_service().poll_one();
+	size_t handlersCalled = getIoService().poll_one();
+	getIoService().reset();
 
-	socket->get_io_service().reset();
 	socket->cancel();
 
 	socketExecute();
@@ -410,7 +410,8 @@ void SmppClient::readPduBlocking()
 	async_read(*socket, boost::asio::buffer(pduHeader.get(), 4),
 			boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1, _2, pduHeader));
 
-	deadline_timer timer(socket->io_service());
+	deadline_timer timer(getIoService());
+
 	timer.expires_from_now(boost::posix_time::milliseconds(socketReadTimeout));
 	timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
 
@@ -440,8 +441,8 @@ void SmppClient::writeHandler(boost::optional<boost::system::error_code>* opt, c
 
 void SmppClient::socketExecute()
 {
-	socket->get_io_service().run_one();
-	socket->get_io_service().reset();
+	getIoService().run_one();
+	getIoService().reset();
 }
 
 void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, size_t len,
