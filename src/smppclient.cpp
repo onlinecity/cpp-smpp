@@ -11,6 +11,31 @@ using namespace boost;
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
+SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) :
+				systemType("WWW"),
+				interfaceVersion(0x34),
+				addrTon(0),
+				addrNpi(0),
+				addrRange(""),
+				serviceType(""),
+				esmClass(0),
+				protocolId(0),
+				registeredDelivery(0),
+				replaceIfPresentFlag(0),
+				smDefaultMsgId(0),
+				nullTerminateOctetStrings(true),
+				useMsgPayload(false),
+				msgRefCallback(boost::bind(&SmppClient::defaultMessageRef, this)),
+				state(OPEN),
+				socket(_socket),
+				seqNo(0),
+				pdu_queue(),
+				socketWriteTimeout(5000),
+				socketReadTimeout(30000),
+				verbose(false)
+{
+}
+
 SmppClient::~SmppClient()
 {
 	if (state != OPEN) unbind();
@@ -88,8 +113,8 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
  * Send an sms to the smsc.
  */
 string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
-		const int dataCoding)
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
+		const string& validity_period, const int dataCoding)
 {
 
 	int messageLen = shortMessage.length();
@@ -117,7 +142,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 
 	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
 
-tags	.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
+	tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
 	int segment = 0;
 
 	string smsId;
@@ -264,8 +289,8 @@ vector<string> SmppClient::split(const string& shortMessage, const int split)
 }
 
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
-		const int dataCoding)
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
+		const string& validity_period, const int dataCoding)
 {
 
 	checkState(BOUND_TX);
@@ -484,7 +509,7 @@ void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::err
 	shared_array<uint8_t> pduBuffer(new uint8_t[i - 4]);
 
 	// start reading after the size mark of the pdu
-async_read	(*socket, buffer(pduBuffer.get(), i - 4),
+	async_read(*socket, buffer(pduBuffer.get(), i - 4),
 			boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2, pduLength, pduBuffer));
 
 	socketExecute();
@@ -520,7 +545,8 @@ PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &comman
 	while (true) {
 		PDU pdu = readPdu(true);
 		if (!pdu.null) {
-			if ((pdu.getSequenceNo() == sequence && (pdu.getCommandId() == response || pdu.getCommandId() == GENERIC_NACK))
+			if ((pdu.getSequenceNo() == sequence
+					&& (pdu.getCommandId() == response || pdu.getCommandId() == GENERIC_NACK))
 					|| (pdu.getSequenceNo() == 0 && pdu.getCommandId() == GENERIC_NACK)) return pdu;
 		}
 	}

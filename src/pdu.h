@@ -40,52 +40,31 @@ public:
 
 public:
 
-	PDU() :
-			sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(true)
-	{
-	}
+	/**
+	 * Construct an empty PDU, ie. a null PDU
+	 */
+	PDU();
 
-	PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_seqNo) :
-					sb(""),
-					buf(&sb),
-					cmdId(_cmdId),
-					cmdStatus(_cmdStatus),
-					seqNo(_seqNo),
-					nullTerminateOctetStrings(true),
-					null(false)
-	{
-		(*this) << uint32_t(0);
-		(*this) << cmdId;
-		(*this) << cmdStatus;
-		(*this) << seqNo;
-	}
+	/**
+	 * Construct a PDU from a command set, useful for sending PDUs
+	 * @param _cmdId
+	 * @param _cmdStatus
+	 * @param _seqNo
+	 */
+	PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_seqNo);
 
-	PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_array<uint8_t> &pduBuffer) :
-			sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false)
-	{
-		uint32_t bufSize = getPduLength(pduLength);
+	/**
+	 * Construct a PDU from binary data, useful for receiving PDUs
+	 * @param pduLength
+	 * @param pduBuffer
+	 */
+	PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_array<uint8_t> &pduBuffer);
 
-		buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);
-		buf.write(reinterpret_cast<char*>(pduBuffer.get()), bufSize - HEADERFIELD_SIZE);
-
-		buf.seekg(HEADERFIELD_SIZE, std::ios::cur);
-
-		(*this) >> cmdId;
-		(*this) >> cmdStatus;
-		(*this) >> seqNo;
-	}
-
-	PDU(const PDU &rhs) :
-					sb(rhs.sb.str()),
-					buf(&sb),
-					cmdId(rhs.cmdId),
-					cmdStatus(rhs.cmdStatus),
-					seqNo(rhs.seqNo),
-					nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
-					null(rhs.null)
-	{
-		resetMarker(); // remember to reset the marker after copying.
-	}
+	/**
+	 * Copy constructor
+	 * @param rhs
+	 */
+	PDU(const PDU &rhs);
 
 	/**
 	 * @return All data in this PDU as array of unsigned char array.

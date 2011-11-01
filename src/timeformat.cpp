@@ -96,7 +96,8 @@ string getTimeString(const local_date_time &ldt)
 	ptime t = ldt.local_time();
 	time_duration td = t.time_of_day();
 	stringstream output;
-	time_duration offset = ldt.is_dst() ? zone->dst_offset() : zone->base_utc_offset();
+	time_duration offset = zone->base_utc_offset();
+	if (ldt.is_dst()) offset += zone->dst_offset();
 
 	string p = offset.is_negative() ? "-" : "+";
 	int nn = abs((offset.hours() * 4) + (offset.minutes() / 15));
@@ -119,6 +120,8 @@ string getTimeString(const time_duration &td)
 	totalHours -= (mon * 24 * 30);
 	int dd = totalHours / 24;
 	totalHours -= (dd * 24);
+
+	if (yy > 99) throw SmppException("Time duration overflows");
 
 	stringstream output;
 

@@ -11,6 +11,53 @@ using namespace boost;
 
 namespace smpp {
 
+PDU::PDU() :
+		sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(true)
+{
+}
+
+PDU::PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_seqNo) :
+				sb(""),
+				buf(&sb),
+				cmdId(_cmdId),
+				cmdStatus(_cmdStatus),
+				seqNo(_seqNo),
+				nullTerminateOctetStrings(true),
+				null(false)
+{
+	(*this) << uint32_t(0);
+	(*this) << cmdId;
+	(*this) << cmdStatus;
+	(*this) << seqNo;
+}
+
+PDU::PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_array<uint8_t> &pduBuffer) :
+		sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false)
+{
+	uint32_t bufSize = getPduLength(pduLength);
+
+	buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);
+	buf.write(reinterpret_cast<char*>(pduBuffer.get()), bufSize - HEADERFIELD_SIZE);
+
+	buf.seekg(HEADERFIELD_SIZE, std::ios::cur);
+
+	(*this) >> cmdId;
+	(*this) >> cmdStatus;
+	(*this) >> seqNo;
+}
+
+PDU::PDU(const PDU &rhs) :
+				sb(rhs.sb.str()),
+				buf(&sb),
+				cmdId(rhs.cmdId),
+				cmdStatus(rhs.cmdStatus),
+				seqNo(rhs.seqNo),
+				nullTerminateOctetStrings(rhs.nullTerminateOctetStrings),
+				null(rhs.null)
+{
+	resetMarker(); // remember to reset the marker after copying.
+}
+
 const shared_array<uint8_t> PDU::getOctets()
 {
 	uint32_t size = getSize();
@@ -212,5 +259,6 @@ uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader)
 {
 	uint32_t* i = reinterpret_cast<uint32_t*>(pduHeader.get());
 
-return	ntohl(*i);
-}}
+	return ntohl(*i);
+}
+}
