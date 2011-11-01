@@ -86,30 +86,7 @@ public:
 	/**
 	 * Constructs a new SmppClient object.
 	 */
-	SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) :
-					systemType("WWW"),
-					interfaceVersion(0x34),
-					addrTon(0),
-					addrNpi(0),
-					addrRange(""),
-					serviceType(""),
-					esmClass(0),
-					protocolId(0),
-					registeredDelivery(0),
-					replaceIfPresentFlag(0),
-					smDefaultMsgId(0),
-					nullTerminateOctetStrings(true),
-					useMsgPayload(false),
-					msgRefCallback(boost::bind(&SmppClient::defaultMessageRef, this)),
-					state(OPEN),
-					socket(_socket),
-					seqNo(0),
-					pdu_queue(),
-					socketWriteTimeout(5000),
-					socketReadTimeout(30000),
-					verbose(false)
-	{
-	}
+	SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket);
 
 	~SmppClient();
 

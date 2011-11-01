@@ -8,8 +8,11 @@
 using namespace std;
 using namespace smpp;
 
-GsmEncoder::GsmEncoder() : dict()
+GsmDictionay& GsmEncoder::getDictionary()
 {
+	static GsmDictionay dict;
+	if (!dict.empty()) return dict;
+
 	dict.insert(GsmDictionay::value_type("@", "\x00"));
 	dict.insert(GsmDictionay::value_type("£", "\x01"));
 	dict.insert(GsmDictionay::value_type("$", "\x02"));
@@ -60,10 +63,13 @@ GsmEncoder::GsmEncoder() : dict()
 	dict.insert(GsmDictionay::value_type("]", "\x1B\x3E"));
 	dict.insert(GsmDictionay::value_type("|", "\x1B\x40"));
 	dict.insert(GsmDictionay::value_type("€", "\x1B\x65"));
+	return dict;
 }
 
 string GsmEncoder::getGsm0338(const string &input)
 {
+	GsmDictionay dict = GsmEncoder::getDictionary();
+
 	string out;
 	GsmDictionay::left_const_iterator it;
 
@@ -131,6 +137,7 @@ string GsmEncoder::getGsm0338(const string &input)
 
 string GsmEncoder::getUtf8(const string &input)
 {
+	GsmDictionay dict = GsmEncoder::getDictionary();
 	string out;
 
 	GsmDictionay::right_const_iterator it;

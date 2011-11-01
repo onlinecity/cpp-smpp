@@ -4,3 +4,6 @@ project (cpp-smpp)
 set(CMAKE_CXX_FLAGS "-Wall -pedantic -Wno-long-long")
 
 add_subdirectory (src) 
+
+ENABLE_TESTING()
+add_subdirectory (test)
