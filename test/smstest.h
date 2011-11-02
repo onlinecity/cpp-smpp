@@ -36,7 +36,7 @@ public:
 	 */
 	void testCopyCtor()
 	{
-		uint8_t testheader[] = {0x00,0x00,0x00,0x43};
+		uint8_t testheader[] = {0x00,0x00,0x00,57};
 		uint8_t testdata[] = {
 				0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
 				0x00,
@@ -50,8 +50,8 @@ public:
 
 		boost::shared_array<uint8_t> head(new uint8_t[4]);
 		std::copy(testheader,testheader+4,head.get());
-		boost::shared_array<uint8_t> data(new uint8_t[0x3f]);
-		std::copy(testdata,testdata+0x3f,data.get());
+		boost::shared_array<uint8_t> data(new uint8_t[53]);
+		std::copy(testdata,testdata+53,data.get());
 
 		smpp::PDU pdu(head, data);
 		smpp::SMS sms(pdu);
