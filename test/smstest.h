@@ -32,7 +32,7 @@ public:
 
 	/**
 	 * Test the construct and copy-construct of SMS
-	 * The purpose of this test is to reveal a corruption by the use of TLV params and std::copy.
+	 * The purpose of this test is to reveal a corruption by the use of TLV params (and std::copy without resizing)
 	 */
 	void testCopyCtor()
 	{
@@ -58,6 +58,20 @@ public:
 		smpp::SMS sms2(sms);
 		CPPUNIT_ASSERT(sms.is_null == sms2.is_null);
 		CPPUNIT_ASSERT(!sms2.is_null);
+
+		// Compare TLVs
+		CPPUNIT_ASSERT(sms.tlvs.size() == sms2.tlvs.size());
+		list<smpp::TLV>::iterator it;
+		list<smpp::TLV>::iterator it2;
+		it = sms.tlvs.begin();
+		it2 = sms2.tlvs.begin();
+		while (it != sms.tlvs.end()) {
+			CPPUNIT_ASSERT((*it).getTag() == (*it2).getTag());
+			CPPUNIT_ASSERT((*it).getLen() == (*it2).getLen());
+			CPPUNIT_ASSERT((*it).getOctets() == (*it2).getOctets());
+			it++;
+			it2++;
+		}
 	}
 
 	void testDlr()
