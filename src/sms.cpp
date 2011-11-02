@@ -30,7 +30,7 @@ SMS::SMS() :
 				sm_length(0),
 				short_message(""),
 				tlvs(),
-				null(true)
+				is_null(true)
 {
 
 }
@@ -55,7 +55,7 @@ SMS::SMS(PDU &pdu) :
 				sm_length(0),
 				short_message(""),
 				tlvs(),
-				null(false)
+				is_null(false)
 
 {
 	pdu >> service_type;
@@ -81,8 +81,8 @@ SMS::SMS(PDU &pdu) :
 
 	// read short_message with readOctets to ensure we get all chars including null bytes
 	boost::shared_array<uint8_t> msg(new uint8_t[sm_length]);
-	pdu.readOctets(msg,boost::numeric_cast<streamsize>(sm_length));
-	short_message = string(reinterpret_cast<char*>(msg.get()),boost::numeric_cast<size_t>(sm_length));
+	pdu.readOctets(msg, boost::numeric_cast<streamsize>(sm_length));
+	short_message = string(reinterpret_cast<char*>(msg.get()), boost::numeric_cast<size_t>(sm_length));
 
 	// fetch any optional tags
 	uint16_t len = 0;
@@ -107,30 +107,30 @@ SMS::SMS(PDU &pdu) :
 	}
 }
 
-SMS::SMS(const SMS &sms) :
-				service_type(sms.service_type),
-				source_addr_ton(sms.source_addr_ton),
-				source_addr_npi(sms.source_addr_npi),
-				source_addr(sms.source_addr),
-				dest_addr_ton(sms.dest_addr_ton),
-				dest_addr_npi(sms.dest_addr_npi),
-				dest_addr(sms.dest_addr),
-				esm_class(sms.esm_class),
-				protocol_id(sms.protocol_id),
-				priority_flag(sms.priority_flag),
-				schedule_delivery_time(sms.schedule_delivery_time),
-				validity_period(sms.validity_period),
-				registered_delivery(sms.registered_delivery),
-				replace_if_present_flag(sms.replace_if_present_flag),
-				data_coding(sms.data_coding),
-				sm_default_msg_id(sms.sm_default_msg_id),
-				sm_length(sms.sm_length),
-				short_message(sms.short_message),
+SMS::SMS(const SMS &rhs) :
+				service_type(rhs.service_type),
+				source_addr_ton(rhs.source_addr_ton),
+				source_addr_npi(rhs.source_addr_npi),
+				source_addr(rhs.source_addr),
+				dest_addr_ton(rhs.dest_addr_ton),
+				dest_addr_npi(rhs.dest_addr_npi),
+				dest_addr(rhs.dest_addr),
+				esm_class(rhs.esm_class),
+				protocol_id(rhs.protocol_id),
+				priority_flag(rhs.priority_flag),
+				schedule_delivery_time(rhs.schedule_delivery_time),
+				validity_period(rhs.validity_period),
+				registered_delivery(rhs.registered_delivery),
+				replace_if_present_flag(rhs.replace_if_present_flag),
+				data_coding(rhs.data_coding),
+				sm_default_msg_id(rhs.sm_default_msg_id),
+				sm_length(rhs.sm_length),
+				short_message(rhs.short_message),
 				tlvs(),
-				null(sms.null)
+				is_null(rhs.is_null)
 {
-	if (!null) {
-		std::copy(sms.tlvs.begin(), sms.tlvs.end(), tlvs.begin());
+	if (!is_null) {
+		tlvs.assign(rhs.tlvs.begin(), rhs.tlvs.end());
 	}
 }
 
@@ -179,7 +179,7 @@ DeliveryReport::DeliveryReport(const DeliveryReport &rhs) :
 
 std::ostream &smpp::operator<<(std::ostream& out, smpp::SMS& sms)
 {
-	if (sms.null) {
+	if (sms.is_null) {
 		out << "sms values: NULL" << endl;
 		return out;
 	}

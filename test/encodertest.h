@@ -10,6 +10,7 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestSuite.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "gsmencoding.h"
 #include <string>
 
@@ -41,12 +42,10 @@ public:
 		CPPUNIT_ASSERT(i1 == o3);
 	}
 
-	static CppUnit::Test *suite()
-	{
-		CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("EncoderTest");
-		suiteOfTests->addTest(new CppUnit::TestCaller<EncoderTest>("testEncodeDecode", &EncoderTest::testEncodeDecode));
-		return suiteOfTests;
-	}
+	CPPUNIT_TEST_SUITE(EncoderTest);
+	CPPUNIT_TEST(testEncodeDecode);
+	CPPUNIT_TEST_SUITE_END();
+
 };
 
 #endif /* ENCODERTEST_H_ */

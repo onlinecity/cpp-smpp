@@ -2,15 +2,9 @@
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "pdutest.h"
-#include "encodertest.h"
-#include "timetest.h"
-#include "smstest.h"
+#include "clienttest.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION(PduTest);
-CPPUNIT_TEST_SUITE_REGISTRATION(EncoderTest);
-CPPUNIT_TEST_SUITE_REGISTRATION(TimeTest);
-CPPUNIT_TEST_SUITE_REGISTRATION(SmsTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(ClientTest);
 
 int main(int argc, char **argv)
 {
@@ -19,3 +13,4 @@ int main(int argc, char **argv)
 	runner.addTest(registry.makeTest());
 	return runner.run() ? 0 : 1;
 }
+

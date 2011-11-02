@@ -6,6 +6,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestSuite.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "timeformat.h"
 #include <string>
 
@@ -99,17 +100,14 @@ public:
 		CPPUNIT_ASSERT_THROW(getTimeString(time_duration(876143,34,29)),smpp::SmppException); // 876143 would overflow 99 years
 	}
 
-	static CppUnit::Test *suite()
-	{
-		CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TimeTest");
-		suiteOfTests->addTest(new CppUnit::TestCaller<TimeTest>("testFormats", &TimeTest::testFormats));
-		suiteOfTests->addTest(new CppUnit::TestCaller<TimeTest>("testAbsolute", &TimeTest::testAbsolute));
-		suiteOfTests->addTest(new CppUnit::TestCaller<TimeTest>("testRelative", &TimeTest::testRelative));
-		suiteOfTests->addTest(new CppUnit::TestCaller<TimeTest>("testDlr", &TimeTest::testDlr));
-		suiteOfTests->addTest(new CppUnit::TestCaller<TimeTest>("testFormatAbsolute", &TimeTest::testFormatAbsolute));
-		suiteOfTests->addTest(new CppUnit::TestCaller<TimeTest>("testFormatRelative", &TimeTest::testFormatRelative));
-		return suiteOfTests;
-	}
+	CPPUNIT_TEST_SUITE(TimeTest);
+	CPPUNIT_TEST(testFormats);
+	CPPUNIT_TEST(testAbsolute);
+	CPPUNIT_TEST(testRelative);
+	CPPUNIT_TEST(testDlr);
+	CPPUNIT_TEST(testFormatAbsolute);
+	CPPUNIT_TEST(testFormatRelative);
+	CPPUNIT_TEST_SUITE_END();
 };
 
 #endif /* TIMETEST_H_ */
