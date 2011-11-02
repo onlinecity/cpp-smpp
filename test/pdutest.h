@@ -74,8 +74,8 @@ public:
 
 		boost::shared_array<uint8_t> head(new uint8_t[4]);
 		std::copy(testheader, testheader + 4, head.get());
-		boost::shared_array<uint8_t> data(new uint8_t[0x1c]);
-		std::copy(testdata, testdata + 0x1c, data.get());
+		boost::shared_array<uint8_t> data(new uint8_t[0x1c-4]);
+		std::copy(testdata, testdata + 0x1c-4, data.get());
 
 		smpp::PDU pdu(head, data);
 

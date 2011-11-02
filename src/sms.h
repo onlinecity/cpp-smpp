@@ -16,6 +16,7 @@
 #include <boost/date_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "smpp.h"
 #include "pdu.h"
@@ -69,9 +70,10 @@ public:
 
 	SMS(const SMS &sms);
 
-	friend std::ostream &operator <<(std::ostream &, const SMS &);
+	friend std::ostream &smpp::operator<<(std::ostream&, smpp::SMS&);
 
 };
+std::ostream& operator<<(std::ostream&, smpp::SMS&);
 // SMS class
 
 /**

@@ -37,9 +37,12 @@ PDU::PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_arra
 	uint32_t bufSize = getPduLength(pduLength);
 
 	buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write length");
 	buf.write(reinterpret_cast<char*>(pduBuffer.get()), bufSize - HEADERFIELD_SIZE);
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write octets");
 
 	buf.seekg(HEADERFIELD_SIZE, std::ios::cur);
+	if (buf.fail()) throw smpp::SmppException("PDU failed to skip size header");
 
 	(*this) >> cmdId;
 	(*this) >> cmdStatus;
@@ -66,14 +69,16 @@ const shared_array<uint8_t> PDU::getOctets()
 	buf.seekp(0, ios::beg);
 
 	buf.write(reinterpret_cast<char*>(&beSize), sizeof(uint32_t));
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write length");
 	buf.seekp(0, ios::end);
 	buf.seekg(0, ios::beg);
 
 	shared_array<uint8_t> octets(new uint8_t[size]);
 	buf.read(reinterpret_cast<char*>(octets.get()), size);
+	if (buf.fail()) throw smpp::SmppException("PDU failed to read octets");
 
-	// Seek to start of PDU body (after headers)
-	buf.seekg(HEADERFIELD_SIZE * 4, ios::beg);
+	// Seek to start of PDU body
+	resetMarker();
 
 	return octets;
 }
@@ -115,6 +120,7 @@ PDU& PDU::operator<<(const int &i)
 {
 	uint8_t x(i);
 	buf.write(reinterpret_cast<char*>(&x), sizeof(uint8_t));
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write int");
 	return *this;
 }
 
@@ -122,6 +128,7 @@ PDU& PDU::operator<<(const uint8_t &i)
 {
 	uint8_t x(i);
 	buf.write(reinterpret_cast<char*>(&x), sizeof(uint8_t));
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write uint8_t");
 	return *this;
 }
 
@@ -129,6 +136,7 @@ PDU& PDU::operator<<(const uint16_t &i)
 {
 	uint16_t j = htons(i);
 	buf.write(reinterpret_cast<char*>(&j), sizeof(uint16_t));
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write uint16_t");
 	return *this;
 }
 
@@ -136,12 +144,14 @@ PDU& PDU::operator<<(const uint32_t &i)
 {
 	uint32_t j = htonl(i);
 	buf.write(reinterpret_cast<char*>(&j), sizeof(uint32_t));
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write uint32_t");
 	return *this;
 }
 
 PDU& PDU::operator<<(const std::basic_string<char> &s)
 {
 	buf.write(s.c_str(), s.length()); // use buf.write to allow for UCS-2 chars which are 16-bit.
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write string");
 	if (nullTerminateOctetStrings) {
 		buf << ends;
 	}
@@ -170,26 +180,29 @@ PDU& PDU::operator <<(smpp::TLV tlv)
 
 PDU& PDU::addOctets(const shared_array<uint8_t> &octets, const streamsize &len)
 {
-
 	buf.write(reinterpret_cast<char*>(octets.get()), len);
+	if (buf.fail()) throw smpp::SmppException("PDU failed to write octets");
 	return *this;
 }
 
 void PDU::skip(int octets)
 {
 	buf.seekg(octets, ios_base::cur);
+	if (buf.fail()) throw smpp::SmppException(buf.bad() ? "Last PDU IO operation failed" : "PDU seek to invalid pos");
 }
 
 void PDU::resetMarker()
 {
 	// Seek to start of PDU body (after headers)
 	buf.seekg(HEADERFIELD_SIZE * 4, ios::beg);
+	if (buf.fail()) throw smpp::SmppException("PDU failed to reset marker");
 }
 
 PDU& PDU::operator>>(int &i)
 {
 	uint8_t j;
 	buf.read(reinterpret_cast<char*>(&j), sizeof(uint8_t));
+	if (buf.fail()) throw smpp::SmppException(buf.eof() ? "PDU reached EOF" : "Last PDU IO operation failed");
 	i = j;
 	return *this;
 }
@@ -197,12 +210,14 @@ PDU& PDU::operator>>(int &i)
 PDU& PDU::operator>>(uint8_t &i)
 {
 	buf.read(reinterpret_cast<char*>(&i), sizeof(uint8_t));
+	if (buf.fail()) throw smpp::SmppException(buf.eof() ? "PDU reached EOF" : "Last PDU IO operation failed");
 	return *this;
 }
 
 PDU& PDU::operator>>(uint16_t &i)
 {
 	buf.read(reinterpret_cast<char*>(&i), sizeof(uint16_t));
+	if (buf.fail()) throw smpp::SmppException(buf.eof() ? "PDU reached EOF" : "Last PDU IO operation failed");
 	i = ntohs(i);
 	return *this;
 }
@@ -210,6 +225,7 @@ PDU& PDU::operator>>(uint16_t &i)
 PDU& PDU::operator>>(uint32_t &i)
 {
 	buf.read(reinterpret_cast<char*>(&i), sizeof(uint32_t));
+	if (buf.fail()) throw smpp::SmppException(buf.eof() ? "PDU reached EOF" : "Last PDU IO operation failed");
 	i = ntohl(i);
 	return *this;
 }
@@ -223,11 +239,13 @@ PDU& PDU::operator>>(std::basic_string<char> &s)
 void PDU::readOctets(shared_array<uint8_t> &octets, const streamsize &len)
 {
 	buf.readsome(reinterpret_cast<char*>(octets.get()), len);
+	if (buf.fail()) throw smpp::SmppException(buf.eof() ? "PDU reached EOF" : "Last PDU IO operation failed");
 }
 
 bool PDU::hasMoreData()
 {
-	return buf.eof();
+	buf.peek(); // peek sets eof, it's not set until you try to read or peek at the data
+	return !buf.eof();
 }
 }
 
