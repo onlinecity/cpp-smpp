@@ -1,6 +1,8 @@
 set(headers
 	pdutest.h
 	encodertest.h
+	smstest.h
+	timetest.h
 )
 
 set(sources

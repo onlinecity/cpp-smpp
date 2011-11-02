@@ -9,6 +9,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include "smpp.h"
 #include "tlv.h"
+#include "exceptions.h"
 #include <stdint.h> // types
 #include <iostream>
 #include <iomanip>

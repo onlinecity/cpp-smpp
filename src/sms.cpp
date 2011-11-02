@@ -79,14 +79,16 @@ SMS::SMS(PDU &pdu) :
 	pdu >> sm_default_msg_id;
 	pdu >> sm_length;
 
-	pdu >> short_message;
+	// read short_message with readOctets to ensure we get all chars including null bytes
+	boost::shared_array<uint8_t> msg(new uint8_t[sm_length]);
+	pdu.readOctets(msg,boost::numeric_cast<streamsize>(sm_length));
+	short_message = string(reinterpret_cast<char*>(msg.get()),boost::numeric_cast<size_t>(sm_length));
 
 	// fetch any optional tags
 	uint16_t len = 0;
 	uint16_t tag = 0;
 
 	while (pdu.hasMoreData()) {
-
 		pdu >> tag;
 		pdu >> len;
 
@@ -175,7 +177,7 @@ DeliveryReport::DeliveryReport(const DeliveryReport &rhs) :
 
 } // namespace smpp
 
-ostream &operator <<(ostream &out, const SMS &sms)
+std::ostream &smpp::operator<<(std::ostream& out, smpp::SMS& sms)
 {
 	if (sms.null) {
 		out << "sms values: NULL" << endl;
