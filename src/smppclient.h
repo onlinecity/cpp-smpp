@@ -86,7 +86,7 @@ public:
 	/**
 	 * Constructs a new SmppClient object.
 	 */
-	SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket);
+	SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket>);
 
 	~SmppClient();
 
@@ -110,24 +110,6 @@ public:
 	void unbind();
 
 	/**
-	 * Sends an SMS without tags to the SMSC.
-	 * The SMS is split into multiple if it doesn't into one.
-	 *
-	 * @param sender
-	 * @param receiver
-	 * @param shortMessage
-	 * @param priority_flag
-	 * @param schedule_delivery_time
-	 * @param validity_period
-	 * @param dataCoding
-	 * @return SMSC sms id.
-	 */
-	std::string
-	sendSms(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
-			const uint8_t priority_flag = 0, const std::string &schedule_delivery_time = "",
-			const std::string &validity_period = "", const int dataCoding = smpp::DATA_CODING_DEFAULT);
-
-	/**
 	 * Sends an SMS to the SMSC.
 	 * The SMS is split into multiple if it doesn't into one.
 	 *
@@ -142,8 +124,9 @@ public:
 	 * @return SMSC sms id.
 	 */
 	std::string sendSms(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
-			std::list<TLV> tags, const uint8_t priority_flag = 0, const std::string &schedule_delivery_time = "",
-			const std::string &validity_period = "", const int dataCoding = smpp::DATA_CODING_DEFAULT);
+			std::list<TLV> tags = std::list<TLV>(), const uint8_t priority_flag = 0,
+			const std::string &schedule_delivery_time = "", const std::string &validity_period = "",
+			const int dataCoding = smpp::DATA_CODING_DEFAULT);
 	/**
 	 * Returns the first SMS in the PDU queue,
 	 * or does a blocking read on the socket until we receive an SMS from the SMSC.

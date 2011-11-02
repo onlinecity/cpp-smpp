@@ -101,18 +101,6 @@ void SmppClient::unbind()
  * Send an sms to the smsc.
  */
 string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
-		const int dataCoding)
-{
-
-	return sendSms(sender, receiver, shortMessage, list<TLV>(), priority_flag, schedule_delivery_time, validity_period,
-			dataCoding);
-}
-
-/**
- * Send an sms to the smsc.
- */
-string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
 		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
 		const string& validity_period, const int dataCoding)
 {

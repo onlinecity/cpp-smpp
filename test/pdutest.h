@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestSuite.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include <boost/shared_ptr.hpp>
 #include "pdu.h"
 
@@ -94,13 +95,10 @@ public:
 		CPPUNIT_ASSERT(o8 == 0x80);
 	}
 
-	static CppUnit::Test *suite()
-	{
-		CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("PduTest");
-		suiteOfTests->addTest(new CppUnit::TestCaller<PduTest>("testReadWrite", &PduTest::testReadWrite));
-		suiteOfTests->addTest(new CppUnit::TestCaller<PduTest>("testBinary", &PduTest::testBinary));
-		return suiteOfTests;
-	}
+	CPPUNIT_TEST_SUITE(PduTest);
+	CPPUNIT_TEST(testReadWrite);
+	CPPUNIT_TEST(testBinary);
+	CPPUNIT_TEST_SUITE_END();
 };
 
 #endif /* PDUTEST_H_ */

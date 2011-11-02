@@ -5,6 +5,7 @@
 #include <string>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestSuite.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include "sms.h"
@@ -27,6 +28,36 @@ public:
 	void tearDown()
 	{
 
+	}
+
+	/**
+	 * Test the construct and copy-construct of SMS
+	 * The purpose of this test is to reveal a corruption by the use of TLV params and std::copy.
+	 */
+	void testCopyCtor()
+	{
+		uint8_t testheader[] = {0x00,0x00,0x00,0x43};
+		uint8_t testdata[] = {
+				0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+				0x00,
+				0x01, 0x01, 0x34, 0x35, 0x32, 0x36, 0x31, 0x35, 0x39, 0x39, 0x31, 0x37, 0x00,
+				0x05, 0x00, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x00,
+				0x04, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00,
+				0x02,
+					0x69, 0x00,
+				0x04, 0x27, 0x00, 0x01,	0x02
+		};
+
+		boost::shared_array<uint8_t> head(new uint8_t[4]);
+		std::copy(testheader,testheader+4,head.get());
+		boost::shared_array<uint8_t> data(new uint8_t[0x3f]);
+		std::copy(testdata,testdata+0x3f,data.get());
+
+		smpp::PDU pdu(head, data);
+		smpp::SMS sms(pdu);
+		smpp::SMS sms2(sms);
+		CPPUNIT_ASSERT(sms.is_null == sms2.is_null);
+		CPPUNIT_ASSERT(!sms2.is_null);
 	}
 
 	void testDlr()
@@ -73,7 +104,7 @@ public:
 		CPPUNIT_ASSERT(sms.dest_addr_ton == 5);
 		CPPUNIT_ASSERT(sms.dest_addr_npi == 0);
 		CPPUNIT_ASSERT(sms.esm_class == smpp::ESM_DELIVER_SMSC_RECEIPT);
-		CPPUNIT_ASSERT(!sms.null);
+		CPPUNIT_ASSERT(!sms.is_null);
 		CPPUNIT_ASSERT(sms.data_coding == smpp::DATA_CODING_ISO8859_1);
 
 		// Assertions for TLV fields
@@ -96,12 +127,11 @@ public:
 		CPPUNIT_ASSERT(dlr.err == "000");
 	}
 
-	static CppUnit::Test *suite()
-	{
-		CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("SmsTest");
-		suiteOfTests->addTest(new CppUnit::TestCaller<SmsTest>("testDlr", &SmsTest::testDlr));
-		return suiteOfTests;
-	}
+
+	CPPUNIT_TEST_SUITE(SmsTest);
+	CPPUNIT_TEST(testDlr);
+	CPPUNIT_TEST(testCopyCtor);
+	CPPUNIT_TEST_SUITE_END();
 };
 
 

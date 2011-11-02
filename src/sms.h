@@ -57,7 +57,7 @@ public:
 
 	std::list<TLV> tlvs;
 
-	bool null;
+	bool is_null;
 
 	SMS();
 
