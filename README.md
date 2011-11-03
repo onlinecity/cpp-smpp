@@ -20,18 +20,31 @@ To build this library you need:
  - [Boost.Thread](http://www.boost.org/doc/libs/1_47_0/doc/html/thread.html)
  - [Boost.Tuple](http://www.boost.org/doc/libs/1_47_0/libs/tuple/doc/tuple_users_guide.html)
  - [Boost.System](http://www.boost.org/doc/libs/1_47_0/libs/system/doc/index.html)
+ - [CppUnit] (http://sourceforge.net/apps/mediawiki/cppunit/) (for tests)
   
-We have built this library against boost 1.46.
+We have built this library against boost 1.46, but it's known to work with boost 1.47 as well.
+
+The following ubuntu packages should suffice for the dependices: [libboost1.46-all-dev](http://packages.ubuntu.com/oneiric/libboost1.46-all-dev) and [libcppunit-dev](http://packages.ubuntu.com/oneiric/libcppunit-dev). 
+
+If you dont wan't all the boost libs, try: 
+
+ - [libboost-system1.46-dev](http://packages.ubuntu.com/oneiric/libboost-system1.46-dev)
+ - [libboost-filesystem1.46-dev](http://packages.ubuntu.com/oneiric/libboost-filesystem1.46-dev)
+ - [libboost-regex1.46-dev](http://packages.ubuntu.com/oneiric/libboost-regex1.46-dev)
+ - [libboost-date-time1.46-dev](http://packages.ubuntu.com/oneiric/libboost-date-time1.46-dev)
 
 Installation
 ----
 ``` sh
 git clone git@github.com:onlinecity/cpp-smpp.git 
 cd cpp-smpp/src
+cmake .
 make
 su 
 make install
 ```
+
+There is both an offline unit test (./test/unittest) and an online unit test (./test/livetest). If you run ```make test``` you'll run them both via CTest. They can be run individually, which also allows you to view the results from CppUnit. The connection settings for the online test is found in [test/connectionsetting.h](https://github.com/onlinecity/cpp-smpp/blob/master/test/connectionsetting.h).
 
 Sending a SMS:
 ----
@@ -68,9 +81,8 @@ int main(int argc, char** argv)
 
 	SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
 	SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
-	GsmEncoder encoder;
 	string message = "message to send";
-	string smscId = client.sendSms(from, to, encoder.getGsm0338(message));
+	string smscId = client.sendSms(from, to, GsmEncoder::getGsm0338(message));
 	
 	cout << smscId << endl;
 	client.unbind();
