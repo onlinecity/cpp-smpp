@@ -25,7 +25,7 @@ SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) 
 				smDefaultMsgId(0),
 				nullTerminateOctetStrings(true),
 				useMsgPayload(false),
-				msgRefCallback(boost::bind(&SmppClient::defaultMessageRef, this)),
+				msgRefCallback(&SmppClient::defaultMessageRef),
 				state(OPEN),
 				socket(_socket),
 				seqNo(0),
@@ -469,7 +469,7 @@ void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, si
 		throw TransportException(boost::system::system_error(error).what());
 	}
 
-	uint32_t i = smpp::getPduLength(pduLength);
+	uint32_t i = PDU::getPduLength(pduLength);
 	shared_array<uint8_t> pduBuffer(new uint8_t[i]);
 
 	// start reading after the size mark of the pdu
@@ -493,7 +493,7 @@ void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::err
 
 	opt->reset(error);
 
-	uint32_t i = smpp::getPduLength(pduLength);
+	uint32_t i = PDU::getPduLength(pduLength);
 	shared_array<uint8_t> pduBuffer(new uint8_t[i - 4]);
 
 	// start reading after the size mark of the pdu
@@ -572,4 +572,10 @@ void SmppClient::checkConnection()
 void SmppClient::checkState(int state)
 {
 	if (this->state != state) throw smpp::SmppException("Client in wrong state");
+}
+
+uint16_t SmppClient::defaultMessageRef()
+{
+	static int ref = 0;
+	return (ref++ % 0xffff);
 }

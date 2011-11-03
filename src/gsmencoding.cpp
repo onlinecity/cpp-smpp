@@ -71,6 +71,9 @@ string GsmEncoder::getGsm0338(const string &input)
 	GsmDictionay dict = GsmEncoder::getDictionary();
 
 	string out;
+	// GSM 03.38 encoding will always result in equal or less chars, so resize to input length
+	out.reserve(input.length());
+
 	GsmDictionay::left_const_iterator it;
 
 	for (unsigned int i = 0 ; i < input.length() ; i++) {
@@ -139,6 +142,9 @@ string GsmEncoder::getUtf8(const string &input)
 {
 	GsmDictionay dict = GsmEncoder::getDictionary();
 	string out;
+
+	// Most UTF-8 sequences are two-byte, with ASCII chars still one-byte, so double size should suffice.
+	out.reserve(input.length()*2);
 
 	GsmDictionay::right_const_iterator it;
 
