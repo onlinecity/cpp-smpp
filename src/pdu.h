@@ -20,7 +20,6 @@
 
 namespace smpp {
 
-uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader);
 const int HEADERFIELD_SIZE = 4;
 const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
 
@@ -143,6 +142,8 @@ public:
 	bool hasMoreData();
 
 	friend std::ostream &smpp::operator<<(std::ostream&, smpp::PDU&);
+
+	static uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader);
 };
 // PDU
 std::ostream& operator<<(std::ostream&, smpp::PDU&);

@@ -34,7 +34,7 @@ PDU::PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_se
 PDU::PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_array<uint8_t> &pduBuffer) :
 		sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false)
 {
-	uint32_t bufSize = getPduLength(pduLength);
+	uint32_t bufSize = PDU::getPduLength(pduLength);
 
 	buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);
 	if (buf.fail()) throw smpp::SmppException("PDU failed to write length");
@@ -247,7 +247,15 @@ bool PDU::hasMoreData()
 	buf.peek(); // peek sets eof, it's not set until you try to read or peek at the data
 	return !buf.eof();
 }
+
+uint32_t PDU::getPduLength(boost::shared_array<uint8_t> pduHeader)
+{
+	uint32_t* i = reinterpret_cast<uint32_t*>(pduHeader.get());
+
+	return ntohl(*i);
 }
+
+} // namespace smpp
 
 std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
 {
@@ -272,11 +280,3 @@ std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
 	return out;
 }
 
-namespace smpp {
-uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader)
-{
-	uint32_t* i = reinterpret_cast<uint32_t*>(pduHeader.get());
-
-	return ntohl(*i);
-}
-}

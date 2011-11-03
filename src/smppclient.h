@@ -505,11 +505,7 @@ private:
 	 * Returns a modulo 0xffff int.
 	 * @return
 	 */
-	uint16_t defaultMessageRef()
-	{
-		static int ref = 0;
-		return (ref++ % 0xffff);
-	}
+	static uint16_t defaultMessageRef();
 
 	/**
 	 * Calls io_service or get_io_service on the current socket depending on the Boost.Asio version
