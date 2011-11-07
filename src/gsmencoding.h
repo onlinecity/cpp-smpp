@@ -12,7 +12,7 @@
 
 namespace smpp {
 
-typedef boost::bimaps::bimap<std::string, std::string> GsmDictionay;
+typedef boost::bimaps::bimap<std::string, std::string> GsmDictionary;
 
 /**
  * Class for encoding strings in GSM 0338.
@@ -38,7 +38,7 @@ public:
 
 private:
 
-	static GsmDictionay& getDictionary();
+	static GsmDictionary& getDictionary();
 
 };
 }
