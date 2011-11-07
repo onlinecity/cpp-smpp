@@ -8,73 +8,73 @@
 using namespace std;
 using namespace smpp;
 
-GsmDictionay& GsmEncoder::getDictionary()
+GsmDictionary& GsmEncoder::getDictionary()
 {
-	static GsmDictionay dict;
+	static GsmDictionary dict;
 	if (!dict.empty()) return dict;
 
-	dict.insert(GsmDictionay::value_type("@", "\x00"));
-	dict.insert(GsmDictionay::value_type("£", "\x01"));
-	dict.insert(GsmDictionay::value_type("$", "\x02"));
-	dict.insert(GsmDictionay::value_type("¥", "\x03"));
-	dict.insert(GsmDictionay::value_type("è", "\x04"));
-	dict.insert(GsmDictionay::value_type("é", "\x05"));
-	dict.insert(GsmDictionay::value_type("ù", "\x06"));
-	dict.insert(GsmDictionay::value_type("ì", "\x07"));
-	dict.insert(GsmDictionay::value_type("ò", "\x08"));
-	dict.insert(GsmDictionay::value_type("Ç", "\x09"));
-	dict.insert(GsmDictionay::value_type("Ø", "\x0B"));
-	dict.insert(GsmDictionay::value_type("ø", "\x0C"));
-	dict.insert(GsmDictionay::value_type("Å", "\x0E"));
-	dict.insert(GsmDictionay::value_type("å", "\x0F"));
-	dict.insert(GsmDictionay::value_type("Δ", "\x10"));
-	dict.insert(GsmDictionay::value_type("_", "\x11"));
-	dict.insert(GsmDictionay::value_type("Φ", "\x12"));
-	dict.insert(GsmDictionay::value_type("Γ", "\x13"));
-	dict.insert(GsmDictionay::value_type("Λ", "\x14"));
-	dict.insert(GsmDictionay::value_type("Ω", "\x15"));
-	dict.insert(GsmDictionay::value_type("Π", "\x16"));
-	dict.insert(GsmDictionay::value_type("Ψ", "\x17"));
-	dict.insert(GsmDictionay::value_type("Σ", "\x18"));
-	dict.insert(GsmDictionay::value_type("Θ", "\x19"));
-	dict.insert(GsmDictionay::value_type("Ξ", "\x1A"));
-	dict.insert(GsmDictionay::value_type("Æ", "\x1C"));
-	dict.insert(GsmDictionay::value_type("æ", "\x1D"));
-	dict.insert(GsmDictionay::value_type("ß", "\x1E"));
-	dict.insert(GsmDictionay::value_type("É", "\x1F"));
-	dict.insert(GsmDictionay::value_type("¤", "\x24"));
-	dict.insert(GsmDictionay::value_type("Ä", "\x5B"));
-	dict.insert(GsmDictionay::value_type("Ö", "\x5C"));
-	dict.insert(GsmDictionay::value_type("Ñ", "\x5D"));
-	dict.insert(GsmDictionay::value_type("Ü", "\x5E"));
-	dict.insert(GsmDictionay::value_type("§", "\x5F"));
-	dict.insert(GsmDictionay::value_type("¿", "\x60"));
-	dict.insert(GsmDictionay::value_type("ä", "\x7B"));
-	dict.insert(GsmDictionay::value_type("ö", "\x7C"));
-	dict.insert(GsmDictionay::value_type("ñ", "\x7D"));
-	dict.insert(GsmDictionay::value_type("ü", "\x7E"));
-	dict.insert(GsmDictionay::value_type("à", "\x7F"));
-	dict.insert(GsmDictionay::value_type("^", "\x1B\x14"));
-	dict.insert(GsmDictionay::value_type("{", "\x1B\x28"));
-	dict.insert(GsmDictionay::value_type("}", "\x1B\x29"));
-	dict.insert(GsmDictionay::value_type("\\", "\x1B\x2F"));
-	dict.insert(GsmDictionay::value_type("[", "\x1B\x3C"));
-	dict.insert(GsmDictionay::value_type("~", "\x1B\x3D"));
-	dict.insert(GsmDictionay::value_type("]", "\x1B\x3E"));
-	dict.insert(GsmDictionay::value_type("|", "\x1B\x40"));
-	dict.insert(GsmDictionay::value_type("€", "\x1B\x65"));
+	dict.insert(GsmDictionary::value_type("@", "\x00"));
+	dict.insert(GsmDictionary::value_type("£", "\x01"));
+	dict.insert(GsmDictionary::value_type("$", "\x02"));
+	dict.insert(GsmDictionary::value_type("¥", "\x03"));
+	dict.insert(GsmDictionary::value_type("è", "\x04"));
+	dict.insert(GsmDictionary::value_type("é", "\x05"));
+	dict.insert(GsmDictionary::value_type("ù", "\x06"));
+	dict.insert(GsmDictionary::value_type("ì", "\x07"));
+	dict.insert(GsmDictionary::value_type("ò", "\x08"));
+	dict.insert(GsmDictionary::value_type("Ç", "\x09"));
+	dict.insert(GsmDictionary::value_type("Ø", "\x0B"));
+	dict.insert(GsmDictionary::value_type("ø", "\x0C"));
+	dict.insert(GsmDictionary::value_type("Å", "\x0E"));
+	dict.insert(GsmDictionary::value_type("å", "\x0F"));
+	dict.insert(GsmDictionary::value_type("Δ", "\x10"));
+	dict.insert(GsmDictionary::value_type("_", "\x11"));
+	dict.insert(GsmDictionary::value_type("Φ", "\x12"));
+	dict.insert(GsmDictionary::value_type("Γ", "\x13"));
+	dict.insert(GsmDictionary::value_type("Λ", "\x14"));
+	dict.insert(GsmDictionary::value_type("Ω", "\x15"));
+	dict.insert(GsmDictionary::value_type("Π", "\x16"));
+	dict.insert(GsmDictionary::value_type("Ψ", "\x17"));
+	dict.insert(GsmDictionary::value_type("Σ", "\x18"));
+	dict.insert(GsmDictionary::value_type("Θ", "\x19"));
+	dict.insert(GsmDictionary::value_type("Ξ", "\x1A"));
+	dict.insert(GsmDictionary::value_type("Æ", "\x1C"));
+	dict.insert(GsmDictionary::value_type("æ", "\x1D"));
+	dict.insert(GsmDictionary::value_type("ß", "\x1E"));
+	dict.insert(GsmDictionary::value_type("É", "\x1F"));
+	dict.insert(GsmDictionary::value_type("¤", "\x24"));
+	dict.insert(GsmDictionary::value_type("Ä", "\x5B"));
+	dict.insert(GsmDictionary::value_type("Ö", "\x5C"));
+	dict.insert(GsmDictionary::value_type("Ñ", "\x5D"));
+	dict.insert(GsmDictionary::value_type("Ü", "\x5E"));
+	dict.insert(GsmDictionary::value_type("§", "\x5F"));
+	dict.insert(GsmDictionary::value_type("¿", "\x60"));
+	dict.insert(GsmDictionary::value_type("ä", "\x7B"));
+	dict.insert(GsmDictionary::value_type("ö", "\x7C"));
+	dict.insert(GsmDictionary::value_type("ñ", "\x7D"));
+	dict.insert(GsmDictionary::value_type("ü", "\x7E"));
+	dict.insert(GsmDictionary::value_type("à", "\x7F"));
+	dict.insert(GsmDictionary::value_type("^", "\x1B\x14"));
+	dict.insert(GsmDictionary::value_type("{", "\x1B\x28"));
+	dict.insert(GsmDictionary::value_type("}", "\x1B\x29"));
+	dict.insert(GsmDictionary::value_type("\\", "\x1B\x2F"));
+	dict.insert(GsmDictionary::value_type("[", "\x1B\x3C"));
+	dict.insert(GsmDictionary::value_type("~", "\x1B\x3D"));
+	dict.insert(GsmDictionary::value_type("]", "\x1B\x3E"));
+	dict.insert(GsmDictionary::value_type("|", "\x1B\x40"));
+	dict.insert(GsmDictionary::value_type("€", "\x1B\x65"));
 	return dict;
 }
 
 string GsmEncoder::getGsm0338(const string &input)
 {
-	GsmDictionay& dict = GsmEncoder::getDictionary();
+	GsmDictionary& dict = GsmEncoder::getDictionary();
 
 	string out;
 	// GSM 03.38 encoding will always result in equal or less chars, so resize to input length
 	out.reserve(input.length());
 
-	GsmDictionay::left_const_iterator it;
+	GsmDictionary::left_const_iterator it;
 
 	for (unsigned int i = 0 ; i < input.length() ; i++) {
 		uint8_t code = static_cast<uint8_t>(input[i]);
@@ -140,13 +140,13 @@ string GsmEncoder::getGsm0338(const string &input)
 
 string GsmEncoder::getUtf8(const string &input)
 {
-	GsmDictionay& dict = GsmEncoder::getDictionary();
+	GsmDictionary& dict = GsmEncoder::getDictionary();
 	string out;
 
 	// Most UTF-8 sequences are two-byte, with ASCII chars still one-byte, so double size should suffice.
 	out.reserve(input.length()*2);
 
-	GsmDictionay::right_const_iterator it;
+	GsmDictionary::right_const_iterator it;
 
 	for (unsigned int i = 0 ; i < input.length() ; i++) {
 		uint8_t code = static_cast<uint8_t>(input[i]);
