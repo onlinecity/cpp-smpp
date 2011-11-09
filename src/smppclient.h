@@ -82,6 +82,8 @@ private:
 
 	bool verbose;
 
+	std::ostream *out;
+
 public:
 	/**
 	 * Constructs a new SmppClient object.
@@ -350,6 +352,11 @@ public:
 	void setMsgRefCallback(boost::function<uint16_t()> cb)
 	{
 		msgRefCallback = cb;
+	}
+
+	void setOutputStream(std::ostream* os=&std::cout)
+	{
+		out = os;
 	}
 
 private:
