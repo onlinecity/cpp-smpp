@@ -12,9 +12,6 @@ void oc::tools::hexdump(std::ostream &out, const boost::shared_array<uint8_t> &b
 
 	if (length == 0) return;
 
-	// Turn off implicit flushing
-	out << nounitbuf;
-
 	// Print bytes
 	size_t pos = 0;
 	char asciibytes[16];
@@ -26,7 +23,7 @@ void oc::tools::hexdump(std::ostream &out, const boost::shared_array<uint8_t> &b
 				for (int n = 0 ; n < 16 ; n++) {
 					out << asciibytes[n];
 				}
-				out << '|' << endl;
+				out << '|' << '\n';
 			}
 
 			// Print position
@@ -52,6 +49,6 @@ void oc::tools::hexdump(std::ostream &out, const boost::shared_array<uint8_t> &b
 	}
 	out << '|' << endl;
 
-	// Flush, turn on implicit flushing and reset basefield
-	out << flush << unitbuf << resetiosflags(ios_base::basefield);
+	// Reset basefield
+	out << resetiosflags(ios_base::basefield);
 }
