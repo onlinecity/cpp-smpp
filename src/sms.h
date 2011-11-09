@@ -70,8 +70,6 @@ public:
 
 	SMS(const SMS &sms);
 
-	friend std::ostream &smpp::operator<<(std::ostream&, smpp::SMS&);
-
 };
 std::ostream& operator<<(std::ostream&, smpp::SMS&);
 // SMS class

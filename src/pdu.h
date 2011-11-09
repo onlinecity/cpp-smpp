@@ -141,8 +141,6 @@ public:
 	 */
 	bool hasMoreData();
 
-	friend std::ostream &smpp::operator<<(std::ostream&, smpp::PDU&);
-
 	static uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader);
 };
 // PDU
