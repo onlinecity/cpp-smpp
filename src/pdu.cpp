@@ -266,17 +266,13 @@ std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
 
 	int size = pdu.getSize();
 
-	out << "size      :" << pdu.getSize() << std::endl;
-	out << "sequence  :" << pdu.getSequenceNo() << std::endl;
-	out << "cmd id    :0x" << hex << pdu.getCommandId() << dec << std::endl;
-	out << "cmd status:0x" << hex << pdu.getCommandStatus() << dec << " : " << smpp::getEsmeStatus(pdu.getCommandStatus()) << std::endl;
+	out << "size      :" << pdu.getSize() << std::endl
+		<< "sequence  :" << pdu.getSequenceNo() << std::endl
+		<< "cmd id    :0x" << hex << pdu.getCommandId() << dec << std::endl
+		<< "cmd status:0x" << hex << pdu.getCommandStatus() << dec << " : " << smpp::getEsmeStatus(pdu.getCommandStatus()) << std::endl;
 
-	shared_array<uint8_t> octets = pdu.getOctets();
-	for (int i = 0 ; i < size ; i++) {
-		out << std::setw(2) << std::setfill('0') << std::hex << boost::numeric_cast<int>(octets[i]) << " ";
-	}
+	oc::tools::hexdump(out, pdu.getOctets(), static_cast<size_t>(size));
 
-	out << dec << std::endl;
 	return out;
 }
 
