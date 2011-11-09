@@ -6,17 +6,19 @@
 
 #ifndef PDU_H_
 #define PDU_H_
-#include <boost/numeric/conversion/cast.hpp>
-#include "smpp.h"
-#include "tlv.h"
-#include "exceptions.h"
+
 #include <stdint.h> // types
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/shared_array.hpp>
 #include <netinet/in.h>
+#include "smpp.h"
+#include "tlv.h"
+#include "exceptions.h"
+#include "hexdump.h"
 
 namespace smpp {
 

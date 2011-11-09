@@ -7,6 +7,7 @@ SET(headers
 	sms.h
 	timeformat.h
 	tlv.h
+	hexdump.h
 )
 
 SET(sources
@@ -16,6 +17,7 @@ SET(sources
 	smpp.cpp
 	sms.cpp
 	timeformat.cpp
+	hexdump.cpp
 )	
 
 SET(Boost_USE_STATIC_LIBS OFF) # Or we get errors with -fPIC
