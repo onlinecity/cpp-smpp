@@ -1,6 +1,8 @@
 #ifndef CLIENTTEST_H_
 #define CLIENTTEST_H_
 
+
+#include <fstream>
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -228,6 +230,26 @@ public:
 		SMS sms = client->readSms();
 	}
 
+	void testOutputStream()
+	{
+		ostringstream ss;
+		client->setOutputStream(&ss);
+		bool verbose = client->isVerbose();
+		client->setVerbose(true);
+
+		socket->connect(endpoint);
+		client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+		client->unbind();
+		socket->close();
+
+		CPPUNIT_ASSERT(!ss.fail());
+		CPPUNIT_ASSERT(ss.tellp() != -1);
+		CPPUNIT_ASSERT(ss.tellp() > 0);
+
+		client->setVerbose(verbose);
+		client->setOutputStream();
+	}
+
 	CPPUNIT_TEST_SUITE( ClientTest );
 	CPPUNIT_TEST(testLogin);
 	CPPUNIT_TEST(testSubmit);
@@ -235,6 +257,7 @@ public:
 	CPPUNIT_TEST(testCsms);
 	CPPUNIT_TEST(testTlv);
 	CPPUNIT_TEST(testTlvExtended);
+	CPPUNIT_TEST(testOutputStream);
 //	CPPUNIT_TEST(testReceive);
 	CPPUNIT_TEST_SUITE_END();
 
