@@ -38,7 +38,7 @@ public:
 
 private:
 
-	static GsmDictionary& getDictionary();
+//	static GsmDictionary& getDictionary();
 
 };
 }
