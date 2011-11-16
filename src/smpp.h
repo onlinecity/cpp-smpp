@@ -181,7 +181,7 @@ public:
 	uint8_t ton; // type-of-number
 	uint8_t npi; // numbering-plan-indicator
 
-	SmppAddress(std::string _value, uint8_t _ton = smpp::TON_UNKNOWN, uint8_t _npi = smpp::NPI_UNKNOWN) :
+	SmppAddress(const std::string &_value, const uint8_t &_ton = smpp::TON_UNKNOWN, const uint8_t &_npi = smpp::NPI_UNKNOWN) :
 			value(_value), ton(_ton), npi(_npi)
 	{
 	}
