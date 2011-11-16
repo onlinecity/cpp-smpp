@@ -56,19 +56,19 @@ public:
 		smpp::PDU pdu(head, data);
 		smpp::SMS sms(pdu);
 		smpp::SMS sms2(sms);
-		CPPUNIT_ASSERT(sms.is_null == sms2.is_null);
+		CPPUNIT_ASSERT_EQUAL(sms.is_null, sms2.is_null);
 		CPPUNIT_ASSERT(!sms2.is_null);
 
 		// Compare TLVs
-		CPPUNIT_ASSERT(sms.tlvs.size() == sms2.tlvs.size());
+		CPPUNIT_ASSERT_EQUAL(sms.tlvs.size(), sms2.tlvs.size());
 		list<smpp::TLV>::iterator it;
 		list<smpp::TLV>::iterator it2;
 		it = sms.tlvs.begin();
 		it2 = sms2.tlvs.begin();
 		while (it != sms.tlvs.end()) {
-			CPPUNIT_ASSERT((*it).getTag() == (*it2).getTag());
-			CPPUNIT_ASSERT((*it).getLen() == (*it2).getLen());
-			CPPUNIT_ASSERT((*it).getOctets() == (*it2).getOctets());
+			CPPUNIT_ASSERT_EQUAL((*it).getTag(), (*it2).getTag());
+			CPPUNIT_ASSERT_EQUAL((*it).getLen(), (*it2).getLen());
+			CPPUNIT_ASSERT_EQUAL((*it).getOctets(), (*it2).getOctets());
 			it++;
 			it2++;
 		}
@@ -111,34 +111,34 @@ public:
 		smpp::DeliveryReport dlr(sms);
 
 		// Assertions for SMS
-		CPPUNIT_ASSERT(sms.source_addr == "4526159917");
-		CPPUNIT_ASSERT(sms.source_addr_ton == 1);
-		CPPUNIT_ASSERT(sms.source_addr_npi == 1);
-		CPPUNIT_ASSERT(sms.dest_addr == "default");
-		CPPUNIT_ASSERT(sms.dest_addr_ton == 5);
-		CPPUNIT_ASSERT(sms.dest_addr_npi == 0);
-		CPPUNIT_ASSERT(sms.esm_class == smpp::ESM_DELIVER_SMSC_RECEIPT);
+		CPPUNIT_ASSERT_EQUAL(sms.source_addr, string("4526159917"));
+		CPPUNIT_ASSERT_EQUAL(sms.source_addr_ton, 1);
+		CPPUNIT_ASSERT_EQUAL(sms.source_addr_npi, 1);
+		CPPUNIT_ASSERT_EQUAL(sms.dest_addr, string("default"));
+		CPPUNIT_ASSERT_EQUAL(sms.dest_addr_ton, 5);
+		CPPUNIT_ASSERT_EQUAL(sms.dest_addr_npi, 0);
+		CPPUNIT_ASSERT_EQUAL(sms.esm_class, smpp::ESM_DELIVER_SMSC_RECEIPT);
 		CPPUNIT_ASSERT(!sms.is_null);
-		CPPUNIT_ASSERT(sms.data_coding == smpp::DATA_CODING_ISO8859_1);
+		CPPUNIT_ASSERT_EQUAL(sms.data_coding, smpp::DATA_CODING_ISO8859_1);
 
 		// Assertions for TLV fields
-		CPPUNIT_ASSERT(static_cast<int>(sms.tlvs.size()) == 2);
+		CPPUNIT_ASSERT_EQUAL(static_cast<int>(sms.tlvs.size()), 2);
 		list<smpp::TLV>::iterator it;
 		it = sms.tlvs.begin();
-		CPPUNIT_ASSERT(it->getTag() == smpp::tags::MESSAGE_STATE);
-		CPPUNIT_ASSERT(it->getOctets()[0] == smpp::STATE_DELIVERED);
+		CPPUNIT_ASSERT_EQUAL(it->getTag(), smpp::tags::MESSAGE_STATE);
+		CPPUNIT_ASSERT_EQUAL(it->getOctets()[0], smpp::STATE_DELIVERED);
 		it++;
-		CPPUNIT_ASSERT(it->getTag() == smpp::tags::RECEIPTED_MESSAGE_ID);
-		CPPUNIT_ASSERT(string(reinterpret_cast<char*>(it->getOctets().get())) == "dc0dc8ec67e16082483f9e8cd1b135dd");
+		CPPUNIT_ASSERT_EQUAL(it->getTag(), smpp::tags::RECEIPTED_MESSAGE_ID);
+		CPPUNIT_ASSERT_EQUAL(string(reinterpret_cast<char*>(it->getOctets().get())), string("dc0dc8ec67e16082483f9e8cd1b135dd"));
 
 		// Assertions for DLR part of SMS
-		CPPUNIT_ASSERT(dlr.id == "dc0dc8ec67e16082483f9e8cd1b135dd");
-		CPPUNIT_ASSERT(dlr.sub == 1);
-		CPPUNIT_ASSERT(dlr.dlvrd == 1);
-		CPPUNIT_ASSERT(dlr.submitDate == ptime(date(2011,Oct,26),time_duration(16,46,0)));
-		CPPUNIT_ASSERT(dlr.doneDate == ptime(date(2011,Oct,26),time_duration(16,47,0)));
-		CPPUNIT_ASSERT(dlr.stat == "DELIVRD");
-		CPPUNIT_ASSERT(dlr.err == "000");
+		CPPUNIT_ASSERT_EQUAL(dlr.id, string("dc0dc8ec67e16082483f9e8cd1b135dd"));
+		CPPUNIT_ASSERT_EQUAL(dlr.sub, uint32_t(1));
+		CPPUNIT_ASSERT_EQUAL(dlr.dlvrd, uint32_t(1));
+		CPPUNIT_ASSERT_EQUAL(dlr.submitDate, ptime(date(2011,Oct,26),time_duration(16,46,0)));
+		CPPUNIT_ASSERT_EQUAL(dlr.doneDate, ptime(date(2011,Oct,26),time_duration(16,47,0)));
+		CPPUNIT_ASSERT_EQUAL(dlr.stat, string("DELIVRD"));
+		CPPUNIT_ASSERT_EQUAL(dlr.err, string("000"));
 	}
 
 

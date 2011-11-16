@@ -50,13 +50,13 @@ public:
 		uint8_t o8;
 
 		pdu >> s;
-		CPPUNIT_ASSERT(str == s);
+		CPPUNIT_ASSERT_EQUAL(str, s);
 		pdu >> o32;
-		CPPUNIT_ASSERT(o32 == i32);
+		CPPUNIT_ASSERT_EQUAL(o32, i32);
 		pdu >> o16;
-		CPPUNIT_ASSERT(o16 == i16);
+		CPPUNIT_ASSERT_EQUAL(o16, i16);
 		pdu >> o8;
-		CPPUNIT_ASSERT(o8 == i8);
+		CPPUNIT_ASSERT_EQUAL(o8, i8);
 	}
 
 	void testBinary()
@@ -86,13 +86,13 @@ public:
 		uint8_t o8;
 
 		pdu >> s;
-		CPPUNIT_ASSERT(s == "test");
+		CPPUNIT_ASSERT_EQUAL(s, string("test"));
 		pdu >> o32;
-		CPPUNIT_ASSERT(o32 == 0xdeadbeef);
+		CPPUNIT_ASSERT_EQUAL(o32, uint32_t(0xdeadbeef));
 		pdu >> o16;
-		CPPUNIT_ASSERT(o16 == 0x1337);
+		CPPUNIT_ASSERT_EQUAL(o16, uint16_t(0x1337));
 		pdu >> o8;
-		CPPUNIT_ASSERT(o8 == 0x80);
+		CPPUNIT_ASSERT_EQUAL(o8, uint8_t(0x80));
 	}
 
 	CPPUNIT_TEST_SUITE(PduTest);
