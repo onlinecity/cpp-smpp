@@ -271,7 +271,7 @@ std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu)
 		<< "cmd id    :0x" << hex << pdu.getCommandId() << dec << std::endl
 		<< "cmd status:0x" << hex << pdu.getCommandStatus() << dec << " : " << smpp::getEsmeStatus(pdu.getCommandStatus()) << std::endl;
 
-	oc::tools::hexdump(out, pdu.getOctets(), static_cast<size_t>(size));
+	out << oc::tools::hexdump(pdu.getOctets().get(), static_cast<size_t>(size));
 
 	return out;
 }
