@@ -37,14 +37,13 @@ public:
 		string i1(
 				"Jari i høje @£$¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉÄÖÑÜ§¿äöñüà^{}\\[~]| Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, ");
 
-		string o1 = smpp::GsmEncoder::getGsm0338(i1);
-		string o3 = smpp::GsmEncoder::getUtf8(o1);
+		string o1 = oc::tools::GsmEncoder::getGsm0338(i1);
+		string o3 = oc::tools::GsmEncoder::getUtf8(o1);
 		CPPUNIT_ASSERT_EQUAL(i1, o3);
-		CPPUNIT_ASSERT(i1 == o3);
 	}
 
-	CPPUNIT_TEST_SUITE(EncoderTest);
-	CPPUNIT_TEST(testEncodeDecode);
+CPPUNIT_TEST_SUITE(EncoderTest);
+		CPPUNIT_TEST(testEncodeDecode);
 	CPPUNIT_TEST_SUITE_END();
 
 };
