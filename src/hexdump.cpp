@@ -19,7 +19,7 @@ std::string oc::tools::hexdump(uint8_t *bytes, size_t length)
 	char asciibytes[16];
 	for (; pos < length ; pos++) {
 		if (pos % 16 == 0) {
-			// Print ascii chars + endl
+			// Print ascii chars + newline
 			if (pos > 0) {
 				out << '|';
 				for (int n = 0 ; n < 16 ; n++) {
