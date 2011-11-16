@@ -13,10 +13,15 @@
 
 namespace oc {
 namespace tools {
-
+/**
+ * Returns a string, of the input byte array, that resembles the output of the GNU hexdump program.
+ * @param bytes Byte array to be printed.
+ * @param length Length of the byte array.
+ * @return
+ */
 std::string hexdump(uint8_t *bytes, size_t length);
 
-} // ns: tools
-} // ns: oc
+} // namespace tools
+} // namespace oc
 
 #endif /* HEXDUMP_H_ */
