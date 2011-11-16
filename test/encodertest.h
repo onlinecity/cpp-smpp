@@ -39,6 +39,7 @@ public:
 
 		string o1 = smpp::GsmEncoder::getGsm0338(i1);
 		string o3 = smpp::GsmEncoder::getUtf8(o1);
+		CPPUNIT_ASSERT_EQUAL(i1, o3);
 		CPPUNIT_ASSERT(i1 == o3);
 	}
 
