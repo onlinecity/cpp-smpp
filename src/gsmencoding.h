@@ -35,11 +35,6 @@ public:
 	 * @return UTF8-encoded string.
 	 */
 	static std::string getUtf8(const std::string &input);
-
-private:
-
-//	static GsmDictionary& getDictionary();
-
 };
 }
 
