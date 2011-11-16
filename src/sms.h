@@ -39,7 +39,7 @@ public:
 	int dest_addr_npi;
 	std::string dest_addr;
 
-	int esm_class;
+	uint8_t esm_class;
 	int protocol_id;
 	int priority_flag;
 
@@ -49,7 +49,7 @@ public:
 	int registered_delivery;
 	int replace_if_present_flag;
 
-	int data_coding;
+	uint8_t data_coding;
 	int sm_default_msg_id;
 	int sm_length;
 
