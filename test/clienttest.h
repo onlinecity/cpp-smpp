@@ -105,7 +105,7 @@ public:
 		string message = "message to send";
 		string smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message));
 		smpp::QuerySmResult result = client->querySm(smscId, from);
-		CPPUNIT_ASSERT(result.get<0>() == smscId);
+		CPPUNIT_ASSERT_EQUAL(result.get<0>(),smscId);
 		client->unbind();
 		socket->close();
 	}

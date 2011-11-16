@@ -37,29 +37,29 @@ public:
 
 		DatePair pair1 = parseSmppTimestamp("111019080000002+");
 		local_date_time ldt1(ptime(date(2011, Oct, 19), time_duration(8, 30, 0)), gmt);
-		CPPUNIT_ASSERT(pair1.first == local_date_time(ptime(date(2011, Oct, 19), time_duration(7, 30, 0)), gmt));
-		CPPUNIT_ASSERT(pair1.first.zone()->base_utc_offset() == time_duration(0, 30, 0));
+		CPPUNIT_ASSERT_EQUAL(pair1.first, local_date_time(ptime(date(2011, Oct, 19), time_duration(7, 30, 0)), gmt));
+		CPPUNIT_ASSERT_EQUAL(pair1.first.zone()->base_utc_offset(), time_duration(0, 30, 0));
 		CPPUNIT_ASSERT(!pair1.second.is_not_a_date_time());
 
 		DatePair pair2 = parseSmppTimestamp("111019080000017+");
-		CPPUNIT_ASSERT(pair2.first == local_date_time(ptime(date(2011, Oct, 19), time_duration(3, 45, 0)), gmt));
-		CPPUNIT_ASSERT(pair2.first.zone()->base_utc_offset() == time_duration(4, 15, 0));
+		CPPUNIT_ASSERT_EQUAL(pair2.first, local_date_time(ptime(date(2011, Oct, 19), time_duration(3, 45, 0)), gmt));
+		CPPUNIT_ASSERT_EQUAL(pair2.first.zone()->base_utc_offset(), time_duration(4, 15, 0));
 		CPPUNIT_ASSERT(!pair2.second.is_not_a_date_time());
 
 		DatePair pair3 = parseSmppTimestamp("111019080000004-");
-		CPPUNIT_ASSERT(pair3.first == local_date_time(ptime(date(2011, Oct, 19), time_duration(9, 00, 0)), gmt));
-		CPPUNIT_ASSERT(pair3.first.zone()->base_utc_offset() == time_duration(-1, 0, 0));
+		CPPUNIT_ASSERT_EQUAL(pair3.first, local_date_time(ptime(date(2011, Oct, 19), time_duration(9, 00, 0)), gmt));
+		CPPUNIT_ASSERT_EQUAL(pair3.first.zone()->base_utc_offset(), time_duration(-1, 0, 0));
 		CPPUNIT_ASSERT(!pair3.second.is_not_a_date_time());
 	}
 
 	void testRelative()
 	{
 		DatePair pair1 = parseSmppTimestamp("000002000000000R");
-		CPPUNIT_ASSERT(pair1.second == time_duration(48,0,0));
+		CPPUNIT_ASSERT_EQUAL(pair1.second, time_duration(48,0,0));
 		CPPUNIT_ASSERT(!pair1.first.is_not_a_date_time());
 
 		DatePair pair2 = parseSmppTimestamp("991210233429000R");
-		CPPUNIT_ASSERT(pair2.second == time_duration(876143,34,29));
+		CPPUNIT_ASSERT_EQUAL(pair2.second, time_duration(876143,34,29));
 		CPPUNIT_ASSERT(!pair2.first.is_not_a_date_time());
 	}
 
@@ -76,23 +76,23 @@ public:
 	void testDlr()
 	{
 		ptime pt1 = parseDlrTimestamp("1102031337");
-		CPPUNIT_ASSERT(pt1 == ptime(date(2011,Feb,3),time_duration(13,37,0)));
+		CPPUNIT_ASSERT_EQUAL(pt1, ptime(date(2011,Feb,3),time_duration(13,37,0)));
 
 		ptime pt2 = parseDlrTimestamp("110203133755");
-		CPPUNIT_ASSERT(pt2 == ptime(date(2011,Feb,3),time_duration(13,37,55)));
+		CPPUNIT_ASSERT_EQUAL(pt2, ptime(date(2011,Feb,3),time_duration(13,37,55)));
 	}
 
 	void testFormatAbsolute()
 	{
 		time_zone_ptr copenhagen(new posix_time_zone("CET+1CEST,M3.5.0,M10.5.0/3")); // From /usr/share/zoneinfo/Europe/Copenhagen
 		local_date_time ldt1 (ptime(date(2011, Oct, 19), time_duration(7, 30, 0)), copenhagen);
-		CPPUNIT_ASSERT(getTimeString(ldt1) == "111019093000008+");
+		CPPUNIT_ASSERT_EQUAL(getTimeString(ldt1), string("111019093000008+"));
 	}
 
 	void testFormatRelative()
 	{
-		CPPUNIT_ASSERT(getTimeString(time_duration(48,0,0)) == "000002000000000R");
-		CPPUNIT_ASSERT(getTimeString(time_duration(875043,34,29)) == "991025033429000R");
+		CPPUNIT_ASSERT_EQUAL(getTimeString(time_duration(48,0,0)), string("000002000000000R"));
+		CPPUNIT_ASSERT_EQUAL(getTimeString(time_duration(875043,34,29)), string("991025033429000R"));
 
 		/*
 		 * 876143 would overflow 99 years, but can technically be represented by using more than 11 months as the next field
