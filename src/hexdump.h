@@ -7,17 +7,14 @@
 #ifndef HEXDUMP_H_
 #define HEXDUMP_H_
 
-#include <iostream>
+#include <sstream>
 #include <iomanip>
 #include <stdint.h>
-#include <boost/smart_ptr.hpp>
 
-namespace oc
-{
-namespace tools
-{
+namespace oc {
+namespace tools {
 
-	void hexdump(std::ostream &out, const boost::shared_array<uint8_t> &bytes, size_t length);
+std::string hexdump(uint8_t *bytes, size_t length);
 
 } // ns: tools
 } // ns: oc

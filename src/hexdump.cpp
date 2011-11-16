@@ -6,11 +6,13 @@
 
 #include "hexdump.h"
 
-void oc::tools::hexdump(std::ostream &out, const boost::shared_array<uint8_t> &bytes, size_t length)
+std::string oc::tools::hexdump(uint8_t *bytes, size_t length)
 {
 	using namespace std;
 
-	if (length == 0) return;
+	stringstream out;
+
+	if (length == 0) return out.str();
 
 	// Print bytes
 	size_t pos = 0;
@@ -49,6 +51,5 @@ void oc::tools::hexdump(std::ostream &out, const boost::shared_array<uint8_t> &b
 	}
 	out << '|' << endl;
 
-	// Reset basefield
-	out << resetiosflags(ios_base::basefield);
+	return out.str();
 }
