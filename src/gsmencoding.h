@@ -10,7 +10,8 @@
 #include <boost/bimap/bimap.hpp>
 #include <string>
 
-namespace smpp {
+namespace oc {
+namespace tools {
 
 typedef boost::bimaps::bimap<std::string, std::string> GsmDictionary;
 
@@ -36,6 +37,7 @@ public:
 	 */
 	static std::string getUtf8(const std::string &input);
 };
+}
 }
 
 #endif /* GSMENCODING_H_ */

@@ -6,9 +6,12 @@
 
 #include "gsmencoding.h"
 using namespace std;
-using namespace smpp;
+//using namespace smpp;
 
-static smpp::GsmDictionary& getDictionary()
+namespace oc {
+namespace tools {
+
+static GsmDictionary& getDictionary()
 {
 	static GsmDictionary dict;
 	if (!dict.empty()) return dict;
@@ -68,7 +71,7 @@ static smpp::GsmDictionary& getDictionary()
 
 string GsmEncoder::getGsm0338(const string &input)
 {
-	GsmDictionary& dict = getDictionary();
+	GsmDictionary & dict = getDictionary();
 
 	string out;
 	// GSM 03.38 encoding will always result in equal or less chars, so resize to input length
@@ -140,7 +143,7 @@ string GsmEncoder::getGsm0338(const string &input)
 
 string GsmEncoder::getUtf8(const string &input)
 {
-	GsmDictionary& dict = getDictionary();
+	GsmDictionary & dict = getDictionary();
 	string out;
 
 	// Most UTF-8 sequences are two-byte, with ASCII chars still one-byte, so double size should suffice.
@@ -172,3 +175,6 @@ string GsmEncoder::getUtf8(const string &input)
 
 	return out;
 }
+}
+}
+
