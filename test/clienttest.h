@@ -17,6 +17,8 @@
 #include "tlv.h"
 #include "timeformat.h"
 #include "connectionsetting.h"
+#include "log.h"
+#include <oclog/Log.h>
 
 using namespace std;
 using namespace smpp;
@@ -61,6 +63,7 @@ public:
 	 */
 	void testLogin()
 	{
+
 		socket->connect(endpoint);
 		CPPUNIT_ASSERT(socket->is_open());
 		client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
@@ -105,7 +108,7 @@ public:
 		string message = "message to send";
 		string smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message));
 		smpp::QuerySmResult result = client->querySm(smscId, from);
-		CPPUNIT_ASSERT_EQUAL(result.get<0>(),smscId);
+		CPPUNIT_ASSERT_EQUAL(result.get<0>(), smscId);
 		client->unbind();
 		socket->close();
 	}
@@ -227,39 +230,40 @@ public:
 	{
 		socket->connect(endpoint);
 		client->bindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
-
 		SMS sms = client->readSms();
 	}
 
-	void testOutputStream()
+	void testLogging()
 	{
-		ostringstream ss;
-		client->setOutputStream(&ss);
-		bool verbose = client->isVerbose();
+
+		class OcLogTest: public SmppLog
+		{
+		public:
+			SmppLog &operator<<(PDU &pdu)
+			{
+				oc::log::Log<oc::log::FileSink>("test", oc::log::LOG_DEBUG).get() << endl << pdu;
+				return *this;
+			}
+		};
+
+		client->setLog(boost::shared_ptr<smpp::SmppLog>(new OcLogTest()));
 		client->setVerbose(true);
 
 		socket->connect(endpoint);
 		client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
 		client->unbind();
 		socket->close();
-
-		CPPUNIT_ASSERT(!ss.fail());
-		CPPUNIT_ASSERT(ss.tellp() != -1);
-		CPPUNIT_ASSERT(ss.tellp() > 0);
-
-		client->setVerbose(verbose);
-		client->setOutputStream();
 	}
 
-CPPUNIT_TEST_SUITE( ClientTest );
-		CPPUNIT_TEST(testLogin);
-		CPPUNIT_TEST(testSubmit);
-		CPPUNIT_TEST(testQuerySm);
-		CPPUNIT_TEST(testCsms);
-		CPPUNIT_TEST(testTlv);
-		CPPUNIT_TEST(testTlvExtended);
-		CPPUNIT_TEST(testOutputStream);
-//	CPPUNIT_TEST(testReceive);
+	CPPUNIT_TEST_SUITE( ClientTest );
+	CPPUNIT_TEST(testLogin);
+	CPPUNIT_TEST(testSubmit);
+	CPPUNIT_TEST(testQuerySm);
+	CPPUNIT_TEST(testCsms);
+	CPPUNIT_TEST(testTlv);
+	CPPUNIT_TEST(testTlvExtended);
+	CPPUNIT_TEST(testReceive);
+	CPPUNIT_TEST(testLogging);
 	CPPUNIT_TEST_SUITE_END();
 
 };
