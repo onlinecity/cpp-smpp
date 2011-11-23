@@ -32,6 +32,7 @@
 #include "sms.h"
 #include "exceptions.h"
 #include "timeformat.h"
+#include "log.h"
 
 namespace smpp {
 
@@ -83,6 +84,9 @@ private:
 	bool verbose;
 
 	std::ostream *out;
+	boost::shared_ptr<smpp::SmppLog> log;
+
+//	smpp::SmppLog *log;
 
 public:
 	/**
@@ -127,8 +131,8 @@ public:
 	 */
 	std::string sendSms(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
 			std::list<TLV> tags = std::list<TLV>(), const uint8_t priority_flag = 0,
-			const std::string &schedule_delivery_time = "", const std::string &validity_period = "",
-			const int dataCoding = smpp::DATA_CODING_DEFAULT);
+			const std::string &schedule_delivery_time = "", const std::string &validity_period = "", const int dataCoding =
+					smpp::DATA_CODING_DEFAULT);
 	/**
 	 * Returns the first SMS in the PDU queue,
 	 * or does a blocking read on the socket until we receive an SMS from the SMSC.
@@ -354,9 +358,9 @@ public:
 		msgRefCallback = cb;
 	}
 
-	void setOutputStream(std::ostream* os=&std::cout)
+	void setLog(boost::shared_ptr<smpp::SmppLog> log_)
 	{
-		out = os;
+		log.swap(log_);
 	}
 
 private:
