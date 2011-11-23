@@ -6,6 +6,7 @@ set(unitheaders
 )
 
 set(liveheaders
+    clienttest.h
 	connectionsetting.h
 )
 
@@ -20,10 +21,23 @@ FIND_LIBRARY(cppunitpath cppunit)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
+# oclog
+FIND_PATH(OCLOG_INCLUDE_DIR Log.h PATH_SUFFIXES oclog)
+INCLUDE_DIRECTORIES(${OCLOG_INCLUDE_DIR})
+FIND_LIBRARY(OCLOG_LIB oclog)
+
+# LibEvent
+FIND_PATH(EVENT_INCLUDE_DIR event.h)
+INCLUDE_DIRECTORIES(${EVENT_INCLUDE_DIR})
+
+# Thrift
+FIND_PATH(THRIFT_INCLUDE_DIR Thrift.h PATH_SUFFIXES thrift)
+INCLUDE_DIRECTORIES(${THRIFT_INCLUDE_DIR})
+
 add_executable(unittest ${unitheaders} testrun.cpp)
-target_link_libraries(unittest ${cppunitpath} smpp ${Boost_LIBRARIES})
+target_link_libraries(unittest ${cppunitpath} smpp ${Boost_LIBRARIES} oclog)
 add_test(cpp-unit-test unittest)
 
 add_executable(livetest ${liveheaders} livetest.cpp)
-target_link_libraries(livetest ${cppunitpath} smpp ${Boost_LIBRARIES})
+target_link_libraries(livetest ${cppunitpath} smpp ${Boost_LIBRARIES} oclog)
 add_test(live-test livetest)
