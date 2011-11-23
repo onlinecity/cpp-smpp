@@ -236,7 +236,7 @@ public:
 	void testLogging()
 	{
 
-		class OcLogTest: public SmppLog
+		class OcLogTest: public smpp::SmppLog
 		{
 		public:
 			SmppLog &operator<<(PDU &pdu)
