@@ -129,9 +129,9 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	vector<string> parts = split(shortMessage, csmsSplit);
 	vector<string>::iterator itr = parts.begin();
 
-	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
+	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));tags
+	.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
 
-tags	.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
 	int segment = 0;
 
 	string smsId;
@@ -339,11 +339,7 @@ void SmppClient::sendPdu(PDU &pdu)
 	boost::optional<boost::system::error_code> timerResult;
 
 	if (verbose) {
-		string s = "send pdu";
-//		*log << s; // << endl;
 		*log << pdu;
-
-//		*out << "===>" << endl << pdu << endl;
 	}
 
 	deadline_timer timer(getIoService());
@@ -391,10 +387,6 @@ PDU SmppClient::readPdu(const bool &isBlocking)
 	pdu_queue.pop_back();
 
 	if (verbose) {
-//		*out << "<===" << endl << pdu;
-//		log.get() << pdu << endl;
-
-//		string s = "read pdu";
 		*log << pdu;
 	}
 
