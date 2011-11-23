@@ -33,7 +33,7 @@ SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) 
 				socketWriteTimeout(5000),
 				socketReadTimeout(30000),
 				verbose(false),
-				out(&std::cout)
+				log(boost::shared_ptr<smpp::SmppLog>(new SmppLog()))
 {
 }
 
@@ -339,7 +339,11 @@ void SmppClient::sendPdu(PDU &pdu)
 	boost::optional<boost::system::error_code> timerResult;
 
 	if (verbose) {
-		*out << "===>" << endl << pdu << endl;
+		string s = "send pdu";
+//		*log << s; // << endl;
+		*log << pdu;
+
+//		*out << "===>" << endl << pdu << endl;
 	}
 
 	deadline_timer timer(getIoService());
@@ -387,7 +391,11 @@ PDU SmppClient::readPdu(const bool &isBlocking)
 	pdu_queue.pop_back();
 
 	if (verbose) {
-		*out << "<===" << endl << pdu;
+//		*out << "<===" << endl << pdu;
+//		log.get() << pdu << endl;
+
+//		string s = "read pdu";
+		*log << pdu;
 	}
 
 	return pdu;
