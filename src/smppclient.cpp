@@ -366,6 +366,15 @@ PDU SmppClient::sendCommand(PDU &pdu)
 
 	PDU resp = readPduResponse(pdu.getSequenceNo(), pdu.getCommandId());
 
+	switch (resp.getCommandStatus()) {
+		case smpp::ESME_RINVPASWD:
+			throw smpp::InvalidPasswordException();
+			break;
+		case smpp::ESME_RINVSYSID:
+			throw smpp::InvalidSystemIdException();
+			break;
+	}
+
 	if (resp.getCommandStatus() != smpp::ESME_ROK) throw smpp::SmppException(
 			smpp::getEsmeStatus(resp.getCommandStatus()));
 
