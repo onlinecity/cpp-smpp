@@ -27,6 +27,16 @@ using namespace boost;
 using namespace boost::asio;
 using namespace boost::asio::ip;
 
+class OcLogTest: public smpp::SmppLog
+{
+public:
+	SmppLog &operator<<(PDU &pdu)
+	{
+		oc::log::Log<oc::log::FileSink>("test", oc::log::LOG_DEBUG).get() << endl << pdu;
+		return *this;
+	}
+};
+
 class ClientTest: public CppUnit::TestFixture
 {
 
@@ -235,16 +245,6 @@ public:
 
 	void testLogging()
 	{
-
-		class OcLogTest: public smpp::SmppLog
-		{
-		public:
-			SmppLog &operator<<(PDU &pdu)
-			{
-				oc::log::Log<oc::log::FileSink>("test", oc::log::LOG_DEBUG).get() << endl << pdu;
-				return *this;
-			}
-		};
 
 		client->setLog(boost::shared_ptr<smpp::SmppLog>(new OcLogTest()));
 		client->setVerbose(true);
