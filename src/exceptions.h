@@ -26,6 +26,33 @@ public:
 	}
 };
 
+class InvalidSystemIdException: public SmppException
+{
+public:
+	InvalidSystemIdException() :
+			SmppException()
+	{
+	}
+
+	InvalidSystemIdException(const std::string &message) :
+			SmppException(message)
+	{
+	}
+};
+
+class InvalidPasswordException: public SmppException
+{
+public:
+	InvalidPasswordException() :
+			SmppException()
+	{
+	}
+	InvalidPasswordException(const std::string &message) :
+			SmppException(message)
+	{
+	}
+};
+
 /**
  * Exception thrown when there is transport/connection related issues.
  */
