@@ -83,10 +83,7 @@ private:
 
 	bool verbose;
 
-	std::ostream *out;
 	boost::shared_ptr<smpp::SmppLog> log;
-
-//	smpp::SmppLog *log;
 
 public:
 	/**
