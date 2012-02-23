@@ -46,6 +46,12 @@ typedef boost::tuple<std::string, boost::local_time::local_date_time, int, int> 
  */
 class SmppClient
 {
+public:
+	enum
+	{
+		CSMS_PAYLOAD, CSMS_16BIT_TAGS, CSMS_8BIT_UDH
+	};
+
 private:
 	enum
 	{
@@ -68,7 +74,10 @@ private:
 
 	// Extra options;
 	bool nullTerminateOctetStrings;
-	bool useMsgPayload;
+//	bool useMsgPayload;
+
+	//
+	int csmsMethod;
 
 	boost::function<uint16_t()> msgRefCallback;
 
@@ -128,8 +137,8 @@ public:
 	 */
 	std::string sendSms(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
 			std::list<TLV> tags = std::list<TLV>(), const uint8_t priority_flag = 0,
-			const std::string &schedule_delivery_time = "", const std::string &validity_period = "", const int dataCoding =
-					smpp::DATA_CODING_DEFAULT);
+			const std::string &schedule_delivery_time = "", const std::string &validity_period = "",
+			const int dataCoding = smpp::DATA_CODING_DEFAULT);
 	/**
 	 * Returns the first SMS in the PDU queue,
 	 * or does a blocking read on the socket until we receive an SMS from the SMSC.
@@ -289,14 +298,14 @@ public:
 		return nullTerminateOctetStrings;
 	}
 
-	void setUseMsgPayload(const bool b)
+	void setCsmsMethod(const int &method)
 	{
-		useMsgPayload = b;
+		csmsMethod = method;
 	}
 
-	bool getUseMsgPayload() const
+	int getCsmsMethod() const
 	{
-		return useMsgPayload;
+		return csmsMethod;
 	}
 
 	/**

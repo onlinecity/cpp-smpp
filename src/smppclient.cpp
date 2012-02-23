@@ -24,7 +24,8 @@ SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) 
 				replaceIfPresentFlag(0),
 				smDefaultMsgId(0),
 				nullTerminateOctetStrings(true),
-				useMsgPayload(false),
+				csmsMethod(SmppClient::CSMS_16BIT_TAGS),
+//				useMsgPayload(false),
 				msgRefCallback(&SmppClient::defaultMessageRef),
 				state(OPEN),
 				socket(_socket),
@@ -39,7 +40,7 @@ SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) 
 
 SmppClient::~SmppClient()
 {
-	if (socket->is_open()) unbind();
+//	if (socket->is_open()) unbind();
 }
 
 void SmppClient::bindTransmitter(const string &login, const string &pass)
@@ -102,8 +103,8 @@ void SmppClient::unbind()
  * Send an sms to the smsc.
  */
 string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
-		const int dataCoding)
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
+		const string& validity_period, const int dataCoding)
 {
 
 	int messageLen = shortMessage.length();
@@ -122,15 +123,16 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	}
 
 	// submit_sm if the short message could fit into one pdu.
-	if (messageLen <= singleSmsOctetLimit || useMsgPayload) return submitSm(sender, receiver, shortMessage, tags,
-			priority_flag, schedule_delivery_time, validity_period, dataCoding);
+	if (messageLen <= singleSmsOctetLimit || csmsMethod == CSMS_PAYLOAD) return submitSm(sender, receiver, shortMessage,
+			tags, priority_flag, schedule_delivery_time, validity_period, dataCoding);
 
 	// split message
 	vector<string> parts = split(shortMessage, csmsSplit);
 	vector<string>::iterator itr = parts.begin();
 
-	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));tags
-	.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
+	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
+
+tags	.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
 
 	int segment = 0;
 
@@ -180,6 +182,7 @@ SMS SmppClient::readSms()
 			b = pdu.getCommandId() == DELIVER_SM;
 		}
 	} catch (std::exception &e) {
+		cout << "SmppClient::readSms() TransportException" << endl;
 		throw smpp::TransportException(e.what());
 	}
 
@@ -278,8 +281,8 @@ vector<string> SmppClient::split(const string& shortMessage, const int split)
 }
 
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
-		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time, const string& validity_period,
-		const int dataCoding)
+		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
+		const string& validity_period, const int dataCoding)
 {
 
 	checkState(BOUND_TX);
@@ -302,7 +305,7 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 	pdu << dataCoding;
 	pdu << smDefaultMsgId;
 
-	if (useMsgPayload) {
+	if (csmsMethod == CSMS_PAYLOAD) {
 		pdu << 0; // sm_length = 0
 		pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, shortMessage);
 	} else {
@@ -540,7 +543,8 @@ PDU SmppClient::readPduResponse(const uint32_t &sequence, const uint32_t &comman
 	while (true) {
 		PDU pdu = readPdu(true);
 		if (!pdu.null) {
-			if ((pdu.getSequenceNo() == sequence && (pdu.getCommandId() == response || pdu.getCommandId() == GENERIC_NACK))
+			if ((pdu.getSequenceNo() == sequence
+					&& (pdu.getCommandId() == response || pdu.getCommandId() == GENERIC_NACK))
 					|| (pdu.getSequenceNo() == 0 && pdu.getCommandId() == GENERIC_NACK)) return pdu;
 		}
 	}
