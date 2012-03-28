@@ -140,14 +140,19 @@ public:
 			message += "lorem ipsum ";
 		}
 
-		bool usePL = client->getUseMsgPayload();
+		int csmsMethod = client->getCsmsMethod();
 		string smscId;
-		client->setUseMsgPayload(false);
-		smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message));
-		client->setUseMsgPayload(true);
-		smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message));
-		client->setUseMsgPayload(usePL);
 
+		client->setCsmsMethod(SmppClient::CSMS_PAYLOAD);
+		smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message));
+
+		client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
+		smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message));
+
+//		client->setCsmsMethod(SmppClient::CSMS_8BIT_UDH);
+//		smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message));
+
+		client->setCsmsMethod(csmsMethod);
 		client->unbind();
 		socket->close();
 	}
@@ -191,11 +196,11 @@ public:
 		list<TLV> taglist;
 		taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT, static_cast<uint8_t>(0x01)));
 		taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
-		bool usePL = client->getUseMsgPayload();
-		client->setUseMsgPayload(false);
-		string smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message), taglist);
-		client->setUseMsgPayload(usePL);
 
+		int csmsMethod = client->getCsmsMethod();
+		client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
+		string smscId = client->sendSms(from, to, GsmEncoder::getGsm0338(message), taglist);
+		client->setCsmsMethod(csmsMethod);
 		client->unbind();
 		socket->close();
 	}
@@ -255,15 +260,15 @@ public:
 		socket->close();
 	}
 
-	CPPUNIT_TEST_SUITE( ClientTest );
-	CPPUNIT_TEST(testLogin);
-	CPPUNIT_TEST(testSubmit);
-	CPPUNIT_TEST(testQuerySm);
-	CPPUNIT_TEST(testCsms);
-	CPPUNIT_TEST(testTlv);
-	CPPUNIT_TEST(testTlvExtended);
-	CPPUNIT_TEST(testReceive);
-	CPPUNIT_TEST(testLogging);
+CPPUNIT_TEST_SUITE( ClientTest );
+		CPPUNIT_TEST(testLogin);
+		CPPUNIT_TEST(testSubmit);
+		CPPUNIT_TEST(testQuerySm);
+		CPPUNIT_TEST(testCsms);
+		CPPUNIT_TEST(testTlv);
+		CPPUNIT_TEST(testTlvExtended);
+		CPPUNIT_TEST(testReceive);
+		CPPUNIT_TEST(testLogging);
 	CPPUNIT_TEST_SUITE_END();
 
 };

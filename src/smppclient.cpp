@@ -25,7 +25,6 @@ SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) 
 				smDefaultMsgId(0),
 				nullTerminateOctetStrings(true),
 				csmsMethod(SmppClient::CSMS_16BIT_TAGS),
-//				useMsgPayload(false),
 				msgRefCallback(&SmppClient::defaultMessageRef),
 				state(OPEN),
 				socket(_socket),
@@ -126,32 +125,56 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	if (messageLen <= singleSmsOctetLimit || csmsMethod == CSMS_PAYLOAD) return submitSm(sender, receiver, shortMessage,
 			tags, priority_flag, schedule_delivery_time, validity_period, dataCoding);
 
-	// split message
+	// CSMS -> split message
 	vector<string> parts = split(shortMessage, csmsSplit);
 	vector<string>::iterator itr = parts.begin();
 
-	tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
+	if (csmsMethod == CSMS_8BIT_UDH) {
+		// encode an udh with an 8bit csms reference
+		uint8_t segment = 0;
+		uint8_t segments = numeric_cast<uint8_t>(parts.size());
+		string smsId;
 
-tags	.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
+		for (; itr < parts.end() ; itr++) {
+			// encode udh
+			int partSize = (*itr).size();
+			int size = 6 + partSize;
+			boost::scoped_array<uint8_t> udh(new uint8_t[size]);
+			udh[0] = 0x05; // length of udh excluding first byte
+			udh[1] = 0x00; //
+			udh[2] = 0x03; // length of the header
+			udh[3] = static_cast<uint8_t>(msgRefCallback()) & 0xff;
+			udh[4] = segments;
+			udh[5] = ++segment;
+			// concatenate with message part
+			copy((*itr).begin(), (*itr).end(), &udh[6]);
+			smsId = submitSm(sender, receiver, string(reinterpret_cast<char*>(udh.get(), size)), tags, priority_flag,
+					schedule_delivery_time, validity_period, esmClass | 0x40);
+		}
 
-	int segment = 0;
+		return smsId;
 
-	string smsId;
+	} else { // csmsMethod == CSMS_16BIT_TAGS)
+		tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast <uint8_t> (parts.size())));
 
-	for (; itr < parts.end() ; itr++) {
-		tags.push_back(TLV(smpp::tags::SAR_SEGMENT_SEQNUM, ++segment));
-		smsId = submitSm(sender, receiver, (*itr), tags, priority_flag, schedule_delivery_time, validity_period);
-		// pop SAR_SEGMENT_SEQNUM tag
+		int segment = 0;
+		string smsId;
+
+		for (; itr < parts.end() ; itr++) {
+			tags.push_back(TLV(smpp::tags::SAR_SEGMENT_SEQNUM, ++segment));
+			smsId = submitSm(sender, receiver, (*itr), tags, priority_flag, schedule_delivery_time, validity_period, esmClass);
+			// pop SAR_SEGMENT_SEQNUM tag
+			tags.pop_back();
+		}
+
+		// pop SAR_TOTAL_SEGMENTS tag
 		tags.pop_back();
+		// pop SAR_MSG_REF_NUM tag
+		tags.pop_back();
+
+		return smsId;
 	}
-
-	// pop SAR_TOTAL_SEGMENTS tag
-	tags.pop_back();
-	// pop SAR_MSG_REF_NUM tag
-	tags.pop_back();
-
-	return smsId;
-}
+	}
 
 SMS SmppClient::readSms()
 {
@@ -282,7 +305,7 @@ vector<string> SmppClient::split(const string& shortMessage, const int split)
 
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
 		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
-		const string& validity_period, const int dataCoding)
+		const string& validity_period, const int dataCoding, const int esmClassOpt)
 {
 
 	checkState(BOUND_TX);
@@ -293,6 +316,7 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 	pdu << sender;
 	pdu << receiver;
 
+	//pdu << (esmClassOpt == -1 ? esmClass : esmClassOpt);
 	pdu << esmClass;
 	pdu << protocolId;
 
