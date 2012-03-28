@@ -8,6 +8,7 @@
 #define SMPPCLIENT_H_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_array.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/version.hpp>
 #include <boost/bind.hpp>
@@ -25,6 +26,7 @@
 #include <list>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #include "smpp.h"
 #include "tlv.h"
@@ -74,9 +76,7 @@ private:
 
 	// Extra options;
 	bool nullTerminateOctetStrings;
-//	bool useMsgPayload;
-
-	//
+	// Method to use when dealing with concatenated messages.
 	int csmsMethod;
 
 	boost::function<uint16_t()> msgRefCallback;
@@ -416,11 +416,13 @@ private:
 	 * @param priority_flag
 	 * @param schedule_delivery_time
 	 * @param validity_period
+	 * @param esmClassOpts;
 	 * @return SMSC sms id.
 	 */
 	std::string submitSm(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
 			std::list<TLV> tags, const uint8_t priority_flag, const std::string &schedule_delivery_time,
-			const std::string& validity_period, const int dataCoding = smpp::DATA_CODING_DEFAULT);
+			const std::string& validity_period, const int esmClassOpts, const int dataCoding =
+					smpp::DATA_CODING_DEFAULT);
 
 	/**
 	 * @return Returns the next sequence number.
