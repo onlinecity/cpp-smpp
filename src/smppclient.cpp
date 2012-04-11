@@ -98,6 +98,8 @@ void SmppClient::unbind()
 	state = OPEN;
 }
 
+#include "hexdump.h"
+
 /**
  * Send an sms to the smsc.
  */
@@ -122,8 +124,10 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 	}
 
 	// submit_sm if the short message could fit into one pdu.
-	if (messageLen <= singleSmsOctetLimit || csmsMethod == CSMS_PAYLOAD) return submitSm(sender, receiver, shortMessage,
-			tags, priority_flag, schedule_delivery_time, validity_period, dataCoding);
+	if (messageLen <= singleSmsOctetLimit || csmsMethod == CSMS_PAYLOAD) {
+		return submitSm(sender, receiver, shortMessage, tags, priority_flag, schedule_delivery_time, validity_period,
+				esmClass, dataCoding);
+	}
 
 	// CSMS -> split message
 	vector<string> parts = split(shortMessage, csmsSplit);
@@ -134,6 +138,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 		uint8_t segment = 0;
 		uint8_t segments = numeric_cast<uint8_t>(parts.size());
 		string smsId;
+		uint8_t csmsRef = static_cast<uint8_t>(msgRefCallback()) & 0xff;
 
 		for (; itr < parts.end() ; itr++) {
 			// encode udh
@@ -143,13 +148,15 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 			udh[0] = 0x05; // length of udh excluding first byte
 			udh[1] = 0x00; //
 			udh[2] = 0x03; // length of the header
-			udh[3] = static_cast<uint8_t>(msgRefCallback()) & 0xff;
+			udh[3] = csmsRef;
 			udh[4] = segments;
 			udh[5] = ++segment;
 			// concatenate with message part
 			copy((*itr).begin(), (*itr).end(), &udh[6]);
-			smsId = submitSm(sender, receiver, string(reinterpret_cast<char*>(udh.get(), size)), tags, priority_flag,
-					schedule_delivery_time, validity_period, esmClass | 0x40);
+			string message(reinterpret_cast<char*>(udh.get()), size);
+
+			smsId = submitSm(sender, receiver, message, tags, priority_flag, schedule_delivery_time, validity_period,
+					esmClass | 0x40, dataCoding);
 		}
 
 		return smsId;
@@ -162,7 +169,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 
 		for (; itr < parts.end() ; itr++) {
 			tags.push_back(TLV(smpp::tags::SAR_SEGMENT_SEQNUM, ++segment));
-			smsId = submitSm(sender, receiver, (*itr), tags, priority_flag, schedule_delivery_time, validity_period, esmClass);
+			smsId = submitSm(sender, receiver, (*itr), tags, priority_flag, schedule_delivery_time, validity_period, esmClass, dataCoding);
 			// pop SAR_SEGMENT_SEQNUM tag
 			tags.pop_back();
 		}
@@ -205,7 +212,6 @@ SMS SmppClient::readSms()
 			b = pdu.getCommandId() == DELIVER_SM;
 		}
 	} catch (std::exception &e) {
-		cout << "SmppClient::readSms() TransportException" << endl;
 		throw smpp::TransportException(e.what());
 	}
 
@@ -305,7 +311,7 @@ vector<string> SmppClient::split(const string& shortMessage, const int split)
 
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
 		list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
-		const string& validity_period, const int dataCoding, const int esmClassOpt)
+		const string& validity_period, const int esmClassOpt, const int dataCoding)
 {
 
 	checkState(BOUND_TX);
@@ -316,8 +322,7 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 	pdu << sender;
 	pdu << receiver;
 
-	//pdu << (esmClassOpt == -1 ? esmClass : esmClassOpt);
-	pdu << esmClass;
+	pdu << esmClassOpt;
 	pdu << protocolId;
 
 	pdu << priority_flag;
@@ -344,7 +349,6 @@ string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiv
 		pdu << *itr;
 
 	PDU resp = sendCommand(pdu);
-
 	string messageid;
 	resp >> messageid;
 
