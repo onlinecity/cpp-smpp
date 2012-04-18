@@ -98,8 +98,6 @@ void SmppClient::unbind()
 	state = OPEN;
 }
 
-#include "hexdump.h"
-
 /**
  * Send an sms to the smsc.
  */
