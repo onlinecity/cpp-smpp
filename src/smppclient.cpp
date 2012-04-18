@@ -39,7 +39,8 @@ SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) 
 
 SmppClient::~SmppClient()
 {
-//	if (socket->is_open()) unbind();
+
+	if (state != OPEN) unbind();
 }
 
 void SmppClient::bindTransmitter(const string &login, const string &pass)
@@ -136,16 +137,16 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 		uint8_t segment = 0;
 		uint8_t segments = numeric_cast<uint8_t>(parts.size());
 		string smsId;
-		uint8_t csmsRef = static_cast<uint8_t>(msgRefCallback()) & 0xff;
+		uint8_t csmsRef = static_cast<uint8_t>(msgRefCallback() & 0xff );
 
-		for (; itr < parts.end() ; itr++) {
+for(		; itr < parts.end(); itr++) {
 			// encode udh
 			int partSize = (*itr).size();
 			int size = 6 + partSize;
 			boost::scoped_array<uint8_t> udh(new uint8_t[size]);
-			udh[0] = 0x05; // length of udh excluding first byte
-			udh[1] = 0x00; //
-			udh[2] = 0x03; // length of the header
+			udh[0] = 0x05;// length of udh excluding first byte
+			udh[1] = 0x00;//
+			udh[2] = 0x03;// length of the header
 			udh[3] = csmsRef;
 			udh[4] = segments;
 			udh[5] = ++segment;
@@ -154,7 +155,7 @@ string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receive
 			string message(reinterpret_cast<char*>(udh.get()), size);
 
 			smsId = submitSm(sender, receiver, message, tags, priority_flag, schedule_delivery_time, validity_period,
-					esmClass | 0x40, dataCoding);
+			esmClass | 0x40, dataCoding);
 		}
 
 		return smsId;

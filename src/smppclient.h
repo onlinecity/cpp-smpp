@@ -49,6 +49,7 @@ typedef boost::tuple<std::string, boost::local_time::local_date_time, int, int> 
 class SmppClient
 {
 public:
+	// CSMS types
 	enum
 	{
 		CSMS_PAYLOAD, CSMS_16BIT_TAGS, CSMS_8BIT_UDH
