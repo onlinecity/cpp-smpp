@@ -11,6 +11,7 @@
 #include <iostream>
 #include <sstream>
 #include <locale>
+#include <string>
 #include <boost/regex.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/date_time.hpp>
@@ -66,7 +67,7 @@ public:
 
 	}
 
-	SMS(PDU &pdu);
+	explicit SMS(PDU &pdu);
 
 	SMS(const SMS &sms);
 
@@ -96,7 +97,7 @@ public:
 	 * Constructs a delivery report from an SMS.
 	 * @param sms SMS to construct delivery report from.
 	 */
-	DeliveryReport(const smpp::SMS &sms);
+	explicit DeliveryReport(const smpp::SMS &sms);
 
 	DeliveryReport(const DeliveryReport &rhs);
 };

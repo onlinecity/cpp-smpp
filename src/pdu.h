@@ -8,13 +8,16 @@
 #define PDU_H_
 
 #include <stdint.h> // types
+#include <netinet/in.h>
+
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <sstream>
+
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/shared_array.hpp>
-#include <netinet/in.h>
+
 #include "smpp.h"
 #include "tlv.h"
 #include "exceptions.h"
@@ -110,6 +113,7 @@ public:
 	PDU& operator<<(const uint16_t &i);
 	PDU& operator<<(const uint32_t &i);
 	PDU& operator<<(const std::basic_string<char> &s);
+
 	PDU& operator<<(const smpp::SmppAddress);
 	PDU& operator<<(const smpp::TLV);
 	PDU& addOctets(const boost::shared_array<uint8_t> &octets, const std::streamsize &len);

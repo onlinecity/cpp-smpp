@@ -7,8 +7,8 @@
 #ifndef GSMENCODING_H_
 #define GSMENCODING_H_
 
-#include <boost/bimap/bimap.hpp>
 #include <string>
+#include <boost/bimap/bimap.hpp>
 
 namespace oc {
 namespace tools {

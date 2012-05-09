@@ -7,8 +7,8 @@
 #ifndef SMPPLOG_H_
 #define SMPPLOG_H_
 
-#include "pdu.h"
 #include <iostream>
+#include "pdu.h"
 
 /**
  * Simple wrapper for logging to standard output (std::cout).

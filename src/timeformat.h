@@ -7,12 +7,12 @@
 #ifndef TIMEFORMAT_H_
 #define TIMEFORMAT_H_
 
-#include "exceptions.h"
 #include <boost/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/lexical_cast.hpp>
+#include "exceptions.h"
 
 namespace smpp {
 namespace timeformat {
