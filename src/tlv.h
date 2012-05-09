@@ -75,7 +75,7 @@ public:
 	 * Constructs a TLV with only the tag.
 	 * @param _tag TLV tag.
 	 */
-	TLV(const uint16_t &_tag) :
+	explicit TLV(const uint16_t &_tag) :
 			tag(_tag), len(0), octets()
 	{
 	}

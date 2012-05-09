@@ -7,6 +7,14 @@
 #ifndef SMPPCLIENT_H_
 #define SMPPCLIENT_H_
 
+#include <string>
+#include <stdint.h>
+#include <vector>
+#include <list>
+#include <iostream>
+#include <sstream>
+#include <string>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/asio.hpp>
@@ -19,14 +27,6 @@
 #include <boost/function.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-
-#include <string>
-#include <stdint.h>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <sstream>
-#include <string>
 
 #include "smpp.h"
 #include "tlv.h"
@@ -99,7 +99,7 @@ public:
 	/**
 	 * Constructs a new SmppClient object.
 	 */
-	SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket>);
+	explicit SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket>);
 
 	~SmppClient();
 

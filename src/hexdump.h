@@ -7,9 +7,9 @@
 #ifndef HEXDUMP_H_
 #define HEXDUMP_H_
 
+#include <stdint.h>
 #include <sstream>
 #include <iomanip>
-#include <stdint.h>
 
 namespace oc {
 namespace tools {

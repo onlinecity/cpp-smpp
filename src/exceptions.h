@@ -20,7 +20,7 @@ public:
 			std::runtime_error("Default SmppException.")
 	{
 	}
-	SmppException(const std::string &message) :
+	explicit SmppException(const std::string &message) :
 			std::runtime_error(message)
 	{
 	}
@@ -34,7 +34,7 @@ public:
 	{
 	}
 
-	InvalidSystemIdException(const std::string &message) :
+	explicit InvalidSystemIdException(const std::string &message) :
 			SmppException(message)
 	{
 	}
@@ -47,7 +47,7 @@ public:
 			SmppException()
 	{
 	}
-	InvalidPasswordException(const std::string &message) :
+	explicit InvalidPasswordException(const std::string &message) :
 			SmppException(message)
 	{
 	}
@@ -63,7 +63,7 @@ public:
 			std::runtime_error("Default TransportException.")
 	{
 	}
-	TransportException(const std::string &message) :
+	explicit TransportException(const std::string &message) :
 			std::runtime_error(message)
 	{
 	}
