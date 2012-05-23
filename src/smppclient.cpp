@@ -39,8 +39,10 @@ SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) 
 
 SmppClient::~SmppClient()
 {
-
-	if (state != OPEN) unbind();
+	try {
+		if (state != OPEN) unbind();
+	} catch (std::exception &e) {
+	}
 }
 
 void SmppClient::bindTransmitter(const string &login, const string &pass)
