@@ -114,6 +114,7 @@ const uint8_t NPI_INTERNET = 0x0e;
 const uint8_t NPI_WAPCLIENT = 0x12;
 
 // ESM bits 1-0 - SMPP v3.4 - 5.2.12 page 121-122
+const uint8_t ESM_SUBMIT_MODE_SMSC_DEFAULT = 0x00;
 const uint8_t ESM_SUBMIT_MODE_DATAGRAM = 0x01;
 const uint8_t ESM_SUBMIT_MODE_FORWARD = 0x02;
 const uint8_t ESM_SUBMIT_MODE_STOREANDFORWARD = 0x03;
