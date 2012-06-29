@@ -131,6 +131,20 @@ const uint8_t ESM_DELIVER_IDN = 0x20; // Intermediate delivery notification
 const uint8_t ESM_UHDI = 0x40;
 const uint8_t ESM_REPLYPATH = 0x80;
 
+// SMPP v3.4 - 5.2.14 page 123 - priority_flag
+const uint8_t PRIORITY_GSM_NON_PRIORITY = 0x0;
+const uint8_t PRIORITY_GSM_PRIORITY = 0x1;
+
+const uint8_t PRIORITY_ANSI_136_BULK = 0x0;
+const uint8_t PRIORITY_ANSI_136_NORMAL = 0x1;
+const uint8_t PRIORITY_ANSI_136_URGENT = 0x2;
+const uint8_t PRIORITY_ANSI_136_VERY_URGENT = 0x3;
+
+const uint8_t PRIORITY_IS_95_NORMAL = 0x0;
+const uint8_t PRIORITY_IS_95_INTERACTIVE = 0x1;
+const uint8_t PRIORITY_IS_95_URGENT = 0x2;
+const uint8_t PRIORITY_IS_95_EMERGENCY = 0x3;
+
 // SMPP v3.4 - 5.2.17 page 124
 const uint8_t REG_DELIVERY_NO = 0x00;
 const uint8_t REG_DELIVERY_SMSC_BOTH = 0x01; // both success and failure
