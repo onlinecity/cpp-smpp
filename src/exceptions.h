@@ -53,6 +53,32 @@ public:
 	}
 };
 
+class InvalidSourceAddressException: public SmppException
+{
+public:
+	InvalidSourceAddressException() :
+			SmppException()
+	{
+	}
+	InvalidSourceAddressException(const std::string &message) :
+			SmppException(message)
+	{
+	}
+};
+
+class InvalidDestinationAddressException: public SmppException
+{
+public:
+	InvalidDestinationAddressException() :
+			SmppException()
+	{
+	}
+	InvalidDestinationAddressException(const std::string &message) :
+			SmppException(message)
+	{
+	}
+};
+
 /**
  * Exception thrown when there is transport/connection related issues.
  */
