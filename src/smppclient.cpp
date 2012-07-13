@@ -400,10 +400,16 @@ PDU SmppClient::sendCommand(PDU &pdu)
 
 	switch (resp.getCommandStatus()) {
 		case smpp::ESME_RINVPASWD:
-			throw smpp::InvalidPasswordException();
+			throw smpp::InvalidPasswordException(smpp::getEsmeStatus(resp.getCommandStatus()));
 			break;
 		case smpp::ESME_RINVSYSID:
-			throw smpp::InvalidSystemIdException();
+			throw smpp::InvalidSystemIdException(smpp::getEsmeStatus(resp.getCommandStatus()));
+			break;
+		case smpp::ESME_RINVSRCADR:
+			throw smpp::InvalidSourceAddressException(smpp::getEsmeStatus(resp.getCommandStatus()));
+			break;
+		case smpp::ESME_RINVDSTADR:
+			throw smpp::InvalidDestinationAddressException(smpp::getEsmeStatus(resp.getCommandStatus()));
 			break;
 	}
 
