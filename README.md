@@ -67,6 +67,7 @@ using namespace boost;
 using namespace boost::asio;
 using namespace boost::asio::ip;
 using namespace smpp;
+using namespace oc::tools;
 using namespace std;
 
 int main(int argc, char** argv) 
