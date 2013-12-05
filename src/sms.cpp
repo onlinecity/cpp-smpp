@@ -143,9 +143,7 @@ DeliveryReport::DeliveryReport(const SMS &sms) :
 		SMS(sms), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("")
 {
 	using namespace boost;
-	regex expression(
-			"^id:([^ ]+) sub:(\\d{1,3}) dlvrd:(\\d{3}) submit date:(\\d{10}) done date:(\\d{10}) stat:([A-Z]{7}) err:(\\d{3}) text:(.*)$",
-			regex_constants::perl);
+	regex expression("^id:([^ ]+)\\s+sub:(\\d{1,3})\\s+dlvrd:(\\d{1,3})\\s+submit\\s+date:(\\d{1,10})\\s+done\\s+date:(\\d{1,10})\\s+stat:([A-Z]{7})\\s+err:(\\d{1,3})\\s+text:(.*)$", regex_constants::perl);
 	smatch what;
 
 	if (regex_match(short_message, what, expression)) {
