@@ -21,6 +21,7 @@ To build this library you need:
  - [Boost.Tuple](http://www.boost.org/doc/libs/1_47_0/libs/tuple/doc/tuple_users_guide.html)
  - [Boost.System](http://www.boost.org/doc/libs/1_47_0/libs/system/doc/index.html)
  - [CppUnit] (http://sourceforge.net/apps/mediawiki/cppunit/) (for tests)
+ - [OcLog](https://github.com/onlinecity/oclog) (for logging)
   
 We have built this library against boost 1.46, but it's known to work with boost 1.47 as well.
 
@@ -66,6 +67,7 @@ using namespace boost;
 using namespace boost::asio;
 using namespace boost::asio::ip;
 using namespace smpp;
+using namespace oc::tools;
 using namespace std;
 
 int main(int argc, char** argv) 
