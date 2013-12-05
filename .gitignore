@@ -1,0 +1,22 @@
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.so
+.project
+.cproject
+CMakeFiles/
+CTestTestfile.cmake
+src/stateservice
+Debug/
+Testing/
+.settings/
+.DS_Store
+bin/
+Debug - GCC 4.9/
+
+debug.log
+ext/gtest/
+lib/
+*.log
+
+*.log
