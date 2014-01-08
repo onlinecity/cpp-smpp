@@ -20,6 +20,3 @@ lib/
 *.log
 
 *.log
-install_manifest.txt
-src/Headers
-test/unittest
