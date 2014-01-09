@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-project (cpp-smpp) 
+project (cpp-smpp)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -24,7 +24,7 @@ find_library(EVENT_LIB event)
 
 # Find Thrift
 find_path(THRIFT_INCLUDE_DIR Thrift.h PATH_SUFFIXES thrift)
-include_directories(${THRIFT_INCLUDE_DIR}) 
+include_directories(${THRIFT_INCLUDE_DIR})
 find_library(THRIFT_LIB thrift)
 find_library(THRIFT_NB_LIB thriftnb)
 
@@ -46,9 +46,9 @@ set(link_libs
 	${Boost_LIBRARIES}
 	${GLOG_LIB}
 	${GFLAGS}
-)	
+)
 
-add_subdirectory (src) 
+add_subdirectory (src)
 
 option (ENABLE_TEST "Compile unit testing and CTest target" OFF)
 

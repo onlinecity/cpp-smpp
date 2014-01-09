@@ -4,10 +4,11 @@
  * @author hd@onlinecity.dk & td@onlinecity.dk
  */
 
-#ifndef HEXDUMP_H_
-#define HEXDUMP_H_
+#ifndef SMPP_HEXDUMP_H_
+#define SMPP_HEXDUMP_H_
 
 #include <stdint.h>
+#include <string>
 #include <sstream>
 #include <iomanip>
 
@@ -21,7 +22,7 @@ namespace tools {
  */
 std::string hexdump(uint8_t *bytes, size_t length);
 
-} // namespace tools
-} // namespace oc
+}  // namespace tools
+}  // namespace oc
 
-#endif /* HEXDUMP_H_ */
+#endif  // SMPP_HEXDUMP_H_
