@@ -4,30 +4,27 @@
  * @author hd@onlinecity.dk & td@onlinecity.dk
  */
 
-#ifndef SMPPLOG_H_
-#define SMPPLOG_H_
+#ifndef SMPP_LOG_H_
+#define SMPP_LOG_H_
 
 #include <iostream>
-#include "pdu.h"
+#include "smpp/pdu.h"
 
 /**
  * Simple wrapper for logging to standard output (std::cout).
  * Override the << operator for custom logging.
  */
 namespace smpp {
-class SmppLog
-{
+class SmppLog {
 public:
-	virtual SmppLog & operator<<(PDU &pdu)
-	{
-		std::cout << pdu;
-		return *this;
-	}
-	virtual ~SmppLog()
-	{
-	}
+    virtual SmppLog & operator<<(PDU &pdu) {
+        std::cout << pdu;
+        return *this;
+    }
+    virtual ~SmppLog() {
+    }
 };
 
-} // smpp
+}  // namespace smpp
 
-#endif /* LOG_H_ */
+#endif  // SMPP_LOG_H_
