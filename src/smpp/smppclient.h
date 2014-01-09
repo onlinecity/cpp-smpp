@@ -28,13 +28,14 @@
 #include <stdexcept>
 #include <sstream>
 
+#include <glog/logging.h>
+
 #include "smpp/smpp.h"
 #include "smpp/tlv.h"
 #include "smpp/pdu.h"
 #include "smpp/sms.h"
 #include "smpp/exceptions.h"
 #include "smpp/timeformat.h"
-#include "smpp/log.h"
 
 namespace smpp {
 
@@ -89,8 +90,6 @@ private:
     int socketReadTimeout;
 
     bool verbose;
-
-    boost::shared_ptr<smpp::SmppLog> log;
 
 public:
     /**
@@ -328,9 +327,11 @@ public:
         msgRefCallback = cb;
     }
 
-    void setLog(boost::shared_ptr<smpp::SmppLog> log_) {
-        log.swap(log_);
-    }
+    /*
+     void setLog(boost::shared_ptr<smpp::SmppLog> log_) {
+     log.swap(log_);
+     }
+     */
 
 private:
     /**

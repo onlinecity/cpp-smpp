@@ -15,8 +15,9 @@ SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) 
         systemType("WWW"), interfaceVersion(0x34), addrTon(0), addrNpi(0), addrRange(""), serviceType(""), esmClass(0), protocolId(
                 0), registeredDelivery(0), replaceIfPresentFlag(0), smDefaultMsgId(0), nullTerminateOctetStrings(true), csmsMethod(
                 SmppClient::CSMS_16BIT_TAGS), msgRefCallback(&SmppClient::defaultMessageRef), state(OPEN), socket(
-                _socket), seqNo(0), pdu_queue(), socketWriteTimeout(5000), socketReadTimeout(30000), verbose(false), log(
-                boost::shared_ptr<smpp::SmppLog>(new SmppLog())) {
+                _socket), seqNo(0), pdu_queue(), socketWriteTimeout(5000), socketReadTimeout(30000), verbose(false)
+
+{
 }
 
 SmppClient::~SmppClient() {
@@ -346,7 +347,7 @@ void SmppClient::sendPdu(PDU &pdu) {
     boost::optional<boost::system::error_code> timerResult;
 
     if (verbose) {
-        *log << pdu;
+        LOG(INFO) << pdu;
     }
 
     deadline_timer timer(getIoService());
@@ -409,9 +410,8 @@ PDU SmppClient::readPdu(const bool &isBlocking) {
     pdu_queue.pop_back();
 
     if (verbose) {
-        *log << pdu;
+        LOG(INFO) << pdu;
     }
-
     return pdu;
 }
 

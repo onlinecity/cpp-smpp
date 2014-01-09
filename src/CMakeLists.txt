@@ -8,7 +8,6 @@ SET(headers
 	smpp/timeformat.h
 	smpp/tlv.h
 	smpp/hexdump.h
-    smpp/log.h
 )
 
 SET(sources
