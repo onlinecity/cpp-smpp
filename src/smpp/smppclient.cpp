@@ -39,7 +39,6 @@ void SmppClient::bindReceiver(const string &login, const string &pass) {
 void SmppClient::bind(uint32_t mode, const string &login, const string &password) {
     checkConnection();
     checkState(OPEN);
-
     PDU pdu = setupBindPdu(mode, login, password);
 
     sendCommand(pdu);

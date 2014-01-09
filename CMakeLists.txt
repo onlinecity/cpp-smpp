@@ -16,7 +16,6 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.41 COMPONENTS date_time system filesystem regex REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
-
 # Find LibEvent
 find_path(EVENT_INCLUDE_DIR event.h)
 include_directories(${EVENT_INCLUDE_DIR})
@@ -48,6 +47,7 @@ set(link_libs
 	${GFLAGS}
 )
 
+include_directories(src)
 add_subdirectory (src)
 
 option (ENABLE_TEST "Compile unit testing and CTest target" OFF)

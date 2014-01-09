@@ -6,7 +6,6 @@
 
 #include "smpp/gsmencoding.h"
 using namespace std;
-//using namespace smpp;
 
 namespace oc {
 namespace tools {
