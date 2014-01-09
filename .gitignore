@@ -20,3 +20,5 @@ lib/
 *.log
 
 *.log
+
+install_manifest.txt
