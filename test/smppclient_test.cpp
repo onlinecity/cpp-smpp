@@ -1,17 +1,19 @@
-#include <glog/logging.h>
 #include <gflags/gflags.h>
+#include <glog/logging.h>
+#include <list>
+#include <string>
 #include "gtest/gtest.h"
-#include "smppclient_test.h"
 #include "smpp/gsmencoding.h"
 #include "smpp/timeformat.h"
+#include "smppclient_test.h"
 
-using smpp::SmppAddress;
-using smpp::timeformat::getTimeString;
-using std::string;
 using oc::tools::GsmEncoder;
+using smpp::SmppAddress;
 using smpp::SmppClient;
-using std::list;
 using smpp::TLV;
+using smpp::timeformat::getTimeString;
+using std::list;
+using std::string;
 
 //  Test login of either transmitter or receiver
 TEST_F(SmppClientTest, login) {
