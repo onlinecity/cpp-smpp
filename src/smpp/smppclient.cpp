@@ -5,19 +5,47 @@
  */
 
 #include "smpp/smppclient.h"
-using namespace std;
-using namespace smpp;
-using namespace boost;
-using namespace boost::asio;
+#include <algorithm>
+#include <list>
+#include <string>
+#include <vector>
+
+using std::string;
+using std::vector;
+using std::list;
+using boost::shared_ptr;
+using boost::shared_array;
+using boost::numeric_cast;
 using boost::asio::ip::tcp;
+using boost::asio::deadline_timer;
+using boost::asio::async_write;
+using boost::asio::buffer;
+using boost::local_time::local_date_time;
+using boost::local_time::not_a_date_time;
 
-SmppClient::SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket> _socket) :
-        systemType("WWW"), interfaceVersion(0x34), addrTon(0), addrNpi(0), addrRange(""), serviceType(""), esmClass(0), protocolId(
-                0), registeredDelivery(0), replaceIfPresentFlag(0), smDefaultMsgId(0), nullTerminateOctetStrings(true), csmsMethod(
-                SmppClient::CSMS_16BIT_TAGS), msgRefCallback(&SmppClient::defaultMessageRef), state(OPEN), socket(
-                _socket), seqNo(0), pdu_queue(), socketWriteTimeout(5000), socketReadTimeout(30000), verbose(false)
-
-{
+namespace smpp {
+SmppClient::SmppClient(shared_ptr<tcp::socket> _socket) :
+        systemType("WWW"), /**/
+        interfaceVersion(0x34), /**/
+        addrTon(0), /**/
+        addrNpi(0), /**/
+        addrRange(""), /**/
+        serviceType(""), /**/
+        esmClass(0), /**/
+        protocolId(0), /**/
+        registeredDelivery(0), /**/
+        replaceIfPresentFlag(0), /**/
+        smDefaultMsgId(0), /**/
+        nullTerminateOctetStrings(true), /**/
+        csmsMethod(SmppClient::CSMS_16BIT_TAGS), /**/
+        msgRefCallback(&SmppClient::defaultMessageRef), /**/
+        state(OPEN), /**/
+        socket(_socket), /**/
+        seqNo(0), /**/
+        pdu_queue(), /**/
+        socketWriteTimeout(5000), /**/
+        socketReadTimeout(30000), /**/
+        verbose(false) {
 }
 
 SmppClient::~SmppClient() {
@@ -29,7 +57,6 @@ SmppClient::~SmppClient() {
 }
 
 void SmppClient::bindTransmitter(const string &login, const string &pass) {
-
     bind(smpp::BIND_TRANSMITTER, login, pass);
 }
 
@@ -85,7 +112,6 @@ void SmppClient::unbind() {
 string SmppClient::sendSms(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
                            list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
                            const string& validity_period, const int dataCoding) {
-
     int messageLen = shortMessage.length();
     int singleSmsOctetLimit = 254;  // Default SMPP standard
     int csmsSplit = -1;  // where to split
@@ -200,7 +226,6 @@ SMS SmppClient::readSms() {
 }
 
 QuerySmResult SmppClient::querySm(std::string messageid, SmppAddress source) {
-    using namespace boost::local_time;
     PDU pdu = PDU(QUERY_SM, 0, nextSequenceNumber());
     pdu << messageid;
     pdu << source.ton;
@@ -291,7 +316,6 @@ vector<string> SmppClient::split(const string& shortMessage, const int split) {
 string SmppClient::submitSm(const SmppAddress& sender, const SmppAddress& receiver, const string& shortMessage,
                             list<TLV> tags, const uint8_t priority_flag, const string& schedule_delivery_time,
                             const string& validity_period, const int esmClassOpt, const int dataCoding) {
-
     checkState(BOUND_TX);
 
     PDU pdu(smpp::SUBMIT_SM, 0, nextSequenceNumber());
@@ -420,19 +444,15 @@ bool SmppClient::socketPeek() {
     shared_array<uint8_t> pduHeader(new uint8_t[4]);
     async_read(*socket, buffer(pduHeader.get(), 4),
                boost::bind(&smpp::SmppClient::readPduHeaderHandler, this, _1, _2, pduHeader));
-
     size_t handlersCalled = getIoService().poll_one();
     getIoService().reset();
-
     socket->cancel();
-
     socketExecute();
 
     return handlersCalled != 0;
 }
 
 void SmppClient::readPduBlocking() {
-    using namespace boost;
     boost::optional<boost::system::error_code> ioResult;
     boost::optional<boost::system::error_code> timerResult;
 
@@ -590,3 +610,5 @@ uint16_t SmppClient::defaultMessageRef() {
     static int ref = 0;
     return (ref++ % 0xffff);
 }
+
+}  // namespace smpp

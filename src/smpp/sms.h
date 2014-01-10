@@ -15,7 +15,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <list>
-#include <iostream>
 #include <sstream>
 #include <locale>
 #include <string>

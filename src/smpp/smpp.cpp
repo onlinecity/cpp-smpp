@@ -5,7 +5,9 @@
  */
 
 #include "smpp/smpp.h"
-using namespace std;
+#include <string>
+
+using std::string;
 
 namespace smpp {
 string getEsmeStatus(uint32_t i) {
@@ -111,4 +113,4 @@ string getEsmeStatus(uint32_t i) {
         return "Unknown";
     }
 }
-}
+}  // namespace smpp

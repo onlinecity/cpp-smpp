@@ -3,13 +3,14 @@
  * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
  * @author hd@onlinecity.dk & td@onlinecity.dk
  */
-
 #include "smpp/gsmencoding.h"
-using namespace std;
+#include <string>
+
+using std::string;
+using oc::tools::GsmDictionary;
 
 namespace oc {
 namespace tools {
-
 static GsmDictionary& getDictionary() {
     static GsmDictionary dict;
     if (!dict.empty())
@@ -132,8 +133,6 @@ string GsmEncoder::getGsm0338(const string &input) {
                 out += '?';
             }
             /* Unprintable char: ignore */
-        } else {
-
         }
     }
     return out;
@@ -172,6 +171,6 @@ string GsmEncoder::getUtf8(const string &input) {
 
     return out;
 }
-}
-}
+}  // namespace tools
+}  // namespace oc
 
