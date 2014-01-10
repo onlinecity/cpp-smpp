@@ -30,3 +30,8 @@ set(TEST2 encoder_test)
 add_executable(${TEST2} $<TARGET_OBJECTS:source_files> encoder_test.cpp)
 target_link_libraries(${TEST2} ${link_libs} ${test_libs})
 add_test(${TEST2} ${testbin}/${TEST2})
+
+set(TEST3 smppclient_test)
+add_executable(${TEST3} $<TARGET_OBJECTS:source_files> smppclient_test.cpp smppclient_test.h)
+target_link_libraries(${TEST3} ${link_libs} ${test_libs})
+add_test(${TEST3} ${testbin}/${TEST3})
