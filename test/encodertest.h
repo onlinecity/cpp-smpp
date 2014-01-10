@@ -11,40 +11,36 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestSuite.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "gsmencoding.h"
+#include "smpp/gsmencoding.h"
 #include <string>
 
 using namespace std;
 
-class EncoderTest: public CppUnit::TestFixture
-{
+class EncoderTest: public CppUnit::TestFixture {
 
 public:
 
-	void setUp()
-	{
+    void setUp() {
 
-	}
+    }
 
-	void tearDown()
-	{
+    void tearDown() {
 
-	}
+    }
 
-	void testEncodeDecode()
-	{
+    void testEncodeDecode() {
 
-		string i1(
-				"Jari i høje @£$¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉÄÖÑÜ§¿äöñüà^{}\\[~]| Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, ");
+        string i1(
+                "Jari i høje @£$¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉÄÖÑÜ§¿äöñüà^{}\\[~]| Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, ");
 
-		string o1 = oc::tools::GsmEncoder::getGsm0338(i1);
-		string o3 = oc::tools::GsmEncoder::getUtf8(o1);
-		CPPUNIT_ASSERT_EQUAL(i1, o3);
-	}
+        string o1 = oc::tools::GsmEncoder::getGsm0338(i1);
+        string o3 = oc::tools::GsmEncoder::getUtf8(o1);
+        CPPUNIT_ASSERT_EQUAL(i1, o3);
+    }
 
 CPPUNIT_TEST_SUITE(EncoderTest);
-		CPPUNIT_TEST(testEncodeDecode);
-	CPPUNIT_TEST_SUITE_END();
+    CPPUNIT_TEST(testEncodeDecode);CPPUNIT_TEST_SUITE_END()
+    ;
 
 };
 

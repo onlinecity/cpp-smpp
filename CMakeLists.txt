@@ -50,7 +50,7 @@ set(link_libs
 include_directories(src)
 add_subdirectory (src)
 
-option (ENABLE_TEST "Compile unit testing and CTest target" OFF)
+option (ENABLE_TEST "Compile unit testing and CTest target" ON)
 
 if (ENABLE_TEST)
 	ENABLE_TESTING()
