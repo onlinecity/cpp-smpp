@@ -35,3 +35,13 @@ set(TEST3 smppclient_test)
 add_executable(${TEST3} $<TARGET_OBJECTS:source_files> smppclient_test.cpp smppclient_test.h)
 target_link_libraries(${TEST3} ${link_libs} ${test_libs})
 add_test(${TEST3} ${testbin}/${TEST3})
+
+set(TEST4 sms_test)
+add_executable(${TEST4} $<TARGET_OBJECTS:source_files> sms_test.cpp)
+target_link_libraries(${TEST4} ${link_libs} ${test_libs})
+add_test(${TEST4} ${testbin}/${TEST4})
+
+set(TEST5 time_test)
+add_executable(${TEST5} $<TARGET_OBJECTS:source_files> time_test.cpp)
+target_link_libraries(${TEST5} ${link_libs} ${test_libs})
+add_test(${TEST5} ${testbin}/${TEST5})

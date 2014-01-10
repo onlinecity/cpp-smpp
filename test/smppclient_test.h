@@ -19,9 +19,7 @@ public:
     SmppClientTest() :
             endpoint(boost::asio::ip::address_v4::from_string(SMPP_HOST), SMPP_PORT), ios(), socket(
                     boost::shared_ptr<boost::asio::ip::tcp::socket>(new boost::asio::ip::tcp::socket(ios))), client(
-                    boost::shared_ptr<smpp::SmppClient>(new smpp::SmppClient(socket)))
-
-    {
+                    boost::shared_ptr<smpp::SmppClient>(new smpp::SmppClient(socket))) {
     }
 
     virtual void SetUp() {
@@ -34,5 +32,4 @@ public:
         socket->close();
     }
 };
-
 #endif  // SMPPCLIENT_TEST_H_
