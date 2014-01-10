@@ -23,7 +23,7 @@ SET(sources
 
 ADD_LIBRARY(smpp SHARED ${headers} ${sources})
 SET_TARGET_PROPERTIES(smpp PROPERTIES VERSION 1.0.0 SOVERSION 1 PUBLIC_HEADER "${headers}")
-TARGET_LINK_LIBRARIES(smpp ${link_libs} oclog)
+TARGET_LINK_LIBRARIES(smpp ${link_libs})
 
 SET(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output directory for libraries")
 SET(CMAKE_INSTALL_HEADERDIR include CACHE PATH "Output directory for headers")

@@ -17,19 +17,9 @@ find_package(Boost 1.41 COMPONENTS date_time system filesystem regex REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 # Find LibEvent
-find_path(EVENT_INCLUDE_DIR event.h)
-include_directories(${EVENT_INCLUDE_DIR})
-find_library(EVENT_LIB event)
-
-# Find Thrift
-find_path(THRIFT_INCLUDE_DIR Thrift.h PATH_SUFFIXES thrift)
-include_directories(${THRIFT_INCLUDE_DIR})
-find_library(THRIFT_LIB thrift)
-find_library(THRIFT_NB_LIB thriftnb)
-
-# Find oclog
-find_path(OCLOG_INCLUDE_DIR Log.h PATH_SUFFIXES oclog)
-include_directories(${OCLOG_INCLUDE_DIR})
+#find_path(EVENT_INCLUDE_DIR event.h)
+#include_directories(${EVENT_INCLUDE_DIR})
+#find_library(EVENT_LIB event)
 
 # Google flags
 find_library(GFLAGS_LIB gflags REQUIRED)
@@ -44,7 +34,7 @@ include_directories(${GLOG_INCLUDE})
 set(link_libs
 	${Boost_LIBRARIES}
 	${GLOG_LIB}
-	${GFLAGS}
+	${GFLAGS_LIB}
 )
 
 include_directories(src)
@@ -53,6 +43,9 @@ add_subdirectory (src)
 option (ENABLE_TEST "Compile unit testing and CTest target" ON)
 
 if (ENABLE_TEST)
-	ENABLE_TESTING()
+    enable_testing()
+    set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
+    add_subdirectory(${EXT_PROJECTS_DIR}/gtest-1.7.0)
+    include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 	add_subdirectory (test)
 endif (ENABLE_TEST)
