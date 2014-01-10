@@ -1,11 +1,17 @@
+/*
+ * Copyright (C) 2014 OnlineCity
+ * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+ */
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include "gtest/gtest.h"
-
-#include <list>
-#include <string>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+
+#include <algorithm>
+#include <list>
+#include <string>
+
+#include "gtest/gtest.h"
 #include "smpp/sms.h"
 #include "smpp/smpp.h"
 #include "smpp/tlv.h"
@@ -52,8 +58,8 @@ TEST(SmsTest, copy) {
 }
 
 TEST(SmsTest, dlr) {
-    using namespace boost::posix_time;
-    using namespace boost::gregorian;
+    using boost::posix_time::ptime;
+    using boost::posix_time::time_duration;
     uint8_t testheader[] = { 0x00, 0x00, 0x00, 0xe4 };
     uint8_t testdata[] = {
             0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x34, 0x35, 0x32,
@@ -104,8 +110,8 @@ TEST(SmsTest, dlr) {
     EXPECT_EQ(dlr.id, string("dc0dc8ec67e16082483f9e8cd1b135dd"));
     EXPECT_EQ(dlr.sub, uint32_t(1));
     EXPECT_EQ(dlr.dlvrd, uint32_t(1));
-    EXPECT_EQ(dlr.submitDate, ptime(date(2011, Oct, 26), time_duration(16, 46, 0)));
-    EXPECT_EQ(dlr.doneDate, ptime(date(2011, Oct, 26), time_duration(16, 47, 0)));
+    EXPECT_EQ(dlr.submitDate, ptime(date(2011, boost::gregorian::Oct, 26), time_duration(16, 46, 0)));
+    EXPECT_EQ(dlr.doneDate, ptime(date(2011, boost::gregorian::Oct, 26), time_duration(16, 47, 0)));
     EXPECT_EQ(dlr.stat, string("DELIVRD"));
     EXPECT_EQ(dlr.err, string("000"));
 }
