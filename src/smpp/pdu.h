@@ -13,7 +13,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/shared_array.hpp>
 
-#include <iostream>
 #include <iomanip>
 #include <string>
 #include <sstream>

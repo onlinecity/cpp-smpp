@@ -22,20 +22,20 @@
 #include <boost/bind/bind.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-#include <string>
-#include <vector>
-#include <list>
-#include <stdexcept>
-#include <sstream>
-
 #include <glog/logging.h>
 
-#include "smpp/smpp.h"
-#include "smpp/tlv.h"
-#include "smpp/pdu.h"
-#include "smpp/sms.h"
+#include <list>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
 #include "smpp/exceptions.h"
+#include "smpp/pdu.h"
+#include "smpp/smpp.h"
+#include "smpp/sms.h"
 #include "smpp/timeformat.h"
+#include "smpp/tlv.h"
 
 namespace smpp {
 

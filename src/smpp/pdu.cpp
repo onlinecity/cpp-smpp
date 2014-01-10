@@ -5,9 +5,16 @@
  */
 
 #include "smpp/pdu.h"
+#include <string>
 
-using namespace std;
-using namespace boost;
+using std::ios;
+using std::ios_base;
+using std::ends;
+using std::streamsize;
+using std::dec;
+using std::hex;
+using std::endl;
+using boost::shared_array;
 
 namespace smpp {
 
@@ -45,8 +52,13 @@ PDU::PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_arra
 }
 
 PDU::PDU(const PDU &rhs) :
-        sb(rhs.sb.str()), buf(&sb), cmdId(rhs.cmdId), cmdStatus(rhs.cmdStatus), seqNo(rhs.seqNo), nullTerminateOctetStrings(
-                rhs.nullTerminateOctetStrings), null(rhs.null) {
+        sb(rhs.sb.str()), /**/
+        buf(&sb), /**/
+        cmdId(rhs.cmdId), /**/
+        cmdStatus(rhs.cmdStatus), /**/
+        seqNo(rhs.seqNo), /**/
+        nullTerminateOctetStrings(rhs.nullTerminateOctetStrings), /**/
+        null(rhs.null) {
     resetMarker();  // remember to reset the marker after copying.
 }
 
@@ -76,7 +88,6 @@ const shared_array<uint8_t> PDU::getOctets() {
 int PDU::getSize() {
     buf.seekp(0, ios_base::end);
     int s = buf.tellp();
-
     return s;
 }
 
@@ -154,7 +165,6 @@ PDU& PDU::operator <<(smpp::TLV tlv) {
     (*this) << tlv.getTag();
     (*this) << tlv.getLen();
     if (tlv.getLen() != 0) {
-
         (*this).addOctets(tlv.getOctets(), (uint32_t) tlv.getLen());
     }
     return *this;
@@ -241,15 +251,11 @@ std::ostream &smpp::operator<<(std::ostream& out, smpp::PDU& pdu) {
         out << "PDU IS NULL" << std::endl;
         return out;
     }
-
     int size = pdu.getSize();
-
-    out << "size      :" << pdu.getSize() << std::endl << "sequence  :" << pdu.getSequenceNo() << std::endl
-        << "cmd id    :0x" << hex << pdu.getCommandId() << dec << std::endl << "cmd status:0x" << hex
-        << pdu.getCommandStatus() << dec << " : " << smpp::getEsmeStatus(pdu.getCommandStatus()) << std::endl;
-
+    out << "size      :" << pdu.getSize() << endl << "sequence  :" << pdu.getSequenceNo() << endl << "cmd id    :0x"
+        << hex << pdu.getCommandId() << dec << endl << "cmd status:0x" << hex << pdu.getCommandStatus() << dec << " : "
+        << smpp::getEsmeStatus(pdu.getCommandStatus()) << endl;
     out << oc::tools::hexdump(pdu.getOctets().get(), static_cast<size_t>(size));
-
     return out;
 }
 
