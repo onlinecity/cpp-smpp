@@ -1,35 +1,46 @@
+/*
+ * Copyright (C) 2014 OnlineCity
+ * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+ */
+
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include "gtest/gtest.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include "smpp/timeformat.h"
-#include <string>
 
-using namespace std;
-using namespace smpp::timeformat;
-using namespace boost::local_time;
-using namespace boost::gregorian;
-using namespace boost::posix_time;
+#include <string>
+#include "gtest/gtest.h"
+#include "smpp/timeformat.h"
+
+using std::string;
+using smpp::timeformat::DatePair;
+using smpp::timeformat::parseSmppTimestamp;
+using smpp::timeformat::parseDlrTimestamp;
+using smpp::timeformat::getTimeString;
+using boost::local_time::local_date_time;
+using boost::local_time::time_zone_ptr;
+using boost::local_time::posix_time_zone;
+using boost::posix_time::time_duration;
+using boost::posix_time::ptime;
 
 TEST(TimeTest, absolute) {
     time_zone_ptr gmt(new posix_time_zone("GMT"));
 
     DatePair pair1 = parseSmppTimestamp("111019080000002+");
-    local_date_time ldt1(ptime(date(2011, Oct, 19), time_duration(8, 30, 0)), gmt);
-    ASSERT_EQ(pair1.first, local_date_time(ptime(date(2011, Oct, 19), time_duration(7, 30, 0)), gmt));
+    local_date_time ldt1(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(8, 30, 0)), gmt);
+    ASSERT_EQ(pair1.first, local_date_time(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(7, 30, 0)), gmt));
     ASSERT_EQ(pair1.first.zone()->base_utc_offset(), time_duration(0, 30, 0));
     ASSERT_TRUE(!pair1.second.is_not_a_date_time());
 
     DatePair pair2 = parseSmppTimestamp("111019080000017+");
-    ASSERT_EQ(pair2.first, local_date_time(ptime(date(2011, Oct, 19), time_duration(3, 45, 0)), gmt));
+    ASSERT_EQ(pair2.first, local_date_time(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(3, 45, 0)), gmt));
     ASSERT_EQ(pair2.first.zone()->base_utc_offset(), time_duration(4, 15, 0));
     ASSERT_TRUE(!pair2.second.is_not_a_date_time());
 
     DatePair pair3 = parseSmppTimestamp("111019080000004-");
-    ASSERT_EQ(pair3.first, local_date_time(ptime(date(2011, Oct, 19), time_duration(9, 00, 0)), gmt));
+    ASSERT_EQ(pair3.first, local_date_time(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(9, 00, 0)), gmt));
     ASSERT_EQ(pair3.first.zone()->base_utc_offset(), time_duration(-1, 0, 0));
     ASSERT_TRUE(!pair3.second.is_not_a_date_time());
 }
@@ -45,7 +56,6 @@ TEST(TimeTest, relative) {
 }
 
 TEST(TimeTest, formats) {
-
     EXPECT_NO_THROW(parseSmppTimestamp("111019103011100+"));
     EXPECT_NO_THROW(parseSmppTimestamp("000002000000000R"));
     EXPECT_THROW(parseSmppTimestamp("11101910301110+"), smpp::SmppException);
@@ -56,14 +66,14 @@ TEST(TimeTest, formats) {
 
 TEST(TimeTest, dlr) {
     ptime pt1 = parseDlrTimestamp("1102031337");
-    ASSERT_EQ(pt1, ptime(date(2011, Feb, 3), time_duration(13, 37, 0)));
+    ASSERT_EQ(pt1, ptime(date(2011, boost::gregorian::Feb, 3), time_duration(13, 37, 0)));
     ptime pt2 = parseDlrTimestamp("110203133755");
-    ASSERT_EQ(pt2, ptime(date(2011, Feb, 3), time_duration(13, 37, 55)));
+    ASSERT_EQ(pt2, ptime(date(2011, boost::gregorian::Feb, 3), time_duration(13, 37, 55)));
 }
 
 TEST(TimeTest, formatAbsolute) {
     time_zone_ptr copenhagen(new posix_time_zone("CET+1CEST,M3.5.0,M10.5.0/3"));  // From /usr/share/zoneinfo/Europe/Copenhagen
-    local_date_time ldt1(ptime(date(2011, Oct, 19), time_duration(7, 30, 0)), copenhagen);
+    local_date_time ldt1(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(7, 30, 0)), copenhagen);
     ASSERT_EQ(getTimeString(ldt1), string("111019093000008+"));
 }
 

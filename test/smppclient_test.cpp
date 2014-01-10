@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2014 OnlineCity
+ * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+ */
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <list>
@@ -135,9 +139,10 @@ TEST_F(SmppClientTest, tlvExtended) {
 
 // Test sending all params to sendSms(). Also sets registered delivery
 TEST_F(SmppClientTest, submitExtended) {
-    using namespace boost::posix_time;
-    using namespace boost::gregorian;
-    using namespace boost::local_time;
+    using boost::posix_time::time_duration;
+    using boost::local_time::time_zone_ptr;
+    using boost::local_time::posix_time_zone;
+    using boost::local_time::local_date_time;
 
     socket->connect(endpoint);
     client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
@@ -150,7 +155,7 @@ TEST_F(SmppClientTest, submitExtended) {
     taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
 
     time_zone_ptr gmt(new posix_time_zone("GMT"));
-    local_date_time ldt(local_sec_clock::local_time(gmt));
+    local_date_time ldt(boost::local_time::local_sec_clock::local_time(gmt));
     ldt += time_duration(0, 5, 0);
     string sdt = getTimeString(ldt);  // send in five minutes
     string vt = getTimeString(time_duration(1, 0, 0));  // valid for one hour
