@@ -65,7 +65,8 @@ const uint32_t ESME_RINVSERTYP = 0x00000015;  // Invalid Service Type
 const uint32_t ESME_RINVNUMDESTS = 0x00000033;  // Invalid number of destinations
 const uint32_t ESME_RINVDLNAME = 0x00000034;  // Invalid Distribution List name
 const uint32_t ESME_RINVDESTFLAG = 0x00000040;  // Destination flag (submit_multi)
-const uint32_t ESME_RINVSUBREP = 0x00000042;  // Invalid ‘submit with replace’ request (i.e. submit_sm with replace_if_present_flag set)
+const uint32_t ESME_RINVSUBREP =
+    0x00000042;  // Invalid ‘submit with replace’ request (i.e. submit_sm with replace_if_present_flag set)
 const uint32_t ESME_RINVESMSUBMIT = 0x00000043;  // Invalid esm_SUBMIT field data
 const uint32_t ESME_RCNTSUBDL = 0x00000044;  // Cannot Submit to Distribution List
 const uint32_t ESME_RSUBMITFAIL = 0x00000045;  // submit_sm or submit_multi failed
@@ -190,14 +191,14 @@ const uint8_t STATE_REJECTED = 8;
 std::string getEsmeStatus(uint32_t);
 
 class SmppAddress {
-public:
+  public:
     std::string value;
     uint8_t ton;  // type-of-number
     uint8_t npi;  // numbering-plan-indicator
 
     SmppAddress(const std::string &_value, const uint8_t &_ton = smpp::TON_UNKNOWN, const uint8_t &_npi =
-            smpp::NPI_UNKNOWN) :
-            value(_value), ton(_ton), npi(_npi) {
+                    smpp::NPI_UNKNOWN) :
+        value(_value), ton(_ton), npi(_npi) {
     }
 };
 }  // namespace smpp

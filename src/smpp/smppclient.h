@@ -25,6 +25,7 @@
 #include <glog/logging.h>
 
 #include <list>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -48,13 +49,13 @@ typedef boost::tuple<std::string, boost::local_time::local_date_time, int, int> 
  * implemented.
  */
 class SmppClient {
-public:
+  public:
     // CSMS types
     enum {
         CSMS_PAYLOAD, CSMS_16BIT_TAGS, CSMS_8BIT_UDH
     };
 
-private:
+  private:
     enum {
         OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
     };
@@ -91,7 +92,7 @@ private:
 
     bool verbose;
 
-public:
+  public:
     /**
      * Constructs a new SmppClient object.
      */
@@ -333,7 +334,7 @@ public:
      }
      */
 
-private:
+  private:
     /**
      * Binds the client to be in the mode specified in the mode parameter.
      * @param mode Mode to bind client in.
@@ -384,8 +385,8 @@ private:
      */
     std::string submitSm(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
                          std::list<TLV> tags, const uint8_t priority_flag, const std::string &schedule_delivery_time,
-                         const std::string& validity_period, const int esmClassOpts, const int dataCoding =
-                                 smpp::DATA_CODING_DEFAULT);
+                         const std::string &validity_period, const int esmClassOpts, const int dataCoding =
+                             smpp::DATA_CODING_DEFAULT);
 
     /**
      * @return Returns the next sequence number.
@@ -408,7 +409,7 @@ private:
     /**
      * Returns one PDU from SMSC.
      */
-    PDU readPdu(const bool&);
+    PDU readPdu(const bool &);
 
     void readPduBlocking();
 
@@ -494,7 +495,7 @@ private:
      * Calls io_service or get_io_service on the current socket depending on the Boost.Asio version
      * In Boost ASIO 1.6.0+/Boost 1.47 io_service is renamed to get_io_service
      */
-    boost::asio::io_service& getIoService() const {
+    boost::asio::io_service &getIoService() const {
 #if defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
         return socket->get_io_service();
 #else
