@@ -15,54 +15,54 @@ namespace smpp {
  * Exception thrown when there is SMPP protocol related issues.
  */
 class SmppException: public std::runtime_error {
-public:
+  public:
     SmppException() :
-            std::runtime_error("Default SmppException.") {
+        std::runtime_error("Default SmppException.") {
     }
     explicit SmppException(const std::string &message) :
-            std::runtime_error(message) {
+        std::runtime_error(message) {
     }
 };
 
 class InvalidSystemIdException: public SmppException {
-public:
+  public:
     InvalidSystemIdException() :
-            SmppException() {
+        SmppException() {
     }
 
     explicit InvalidSystemIdException(const std::string &message) :
-            SmppException(message) {
+        SmppException(message) {
     }
 };
 
 class InvalidPasswordException: public SmppException {
-public:
+  public:
     InvalidPasswordException() :
-            SmppException() {
+        SmppException() {
     }
     explicit InvalidPasswordException(const std::string &message) :
-            SmppException(message) {
+        SmppException(message) {
     }
 };
 
 class InvalidSourceAddressException: public SmppException {
-public:
+  public:
     InvalidSourceAddressException() :
-            SmppException() {
+        SmppException() {
     }
 
     explicit InvalidSourceAddressException(const std::string &message) :
-            SmppException(message) {
+        SmppException(message) {
     }
 };
 
 class InvalidDestinationAddressException: public SmppException {
-public:
+  public:
     InvalidDestinationAddressException() :
-            SmppException() {
+        SmppException() {
     }
     explicit InvalidDestinationAddressException(const std::string &message) :
-            SmppException(message) {
+        SmppException(message) {
     }
 };
 
@@ -70,12 +70,12 @@ public:
  * Exception thrown when there is transport/connection related issues.
  */
 class TransportException: public std::runtime_error {
-public:
+  public:
     TransportException() :
-            std::runtime_error("Default TransportException.") {
+        std::runtime_error("Default TransportException.") {
     }
     explicit TransportException(const std::string &message) :
-            std::runtime_error(message) {
+        std::runtime_error(message) {
     }
 };
 }  // namespace smpp

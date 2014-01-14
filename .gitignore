@@ -24,3 +24,4 @@ lib/
 install_manifest.txt
 ext/gtest-*/
 ext/gtest-*
+*.orig
