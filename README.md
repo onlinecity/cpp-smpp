@@ -30,7 +30,6 @@ If you dont wan't all the boost libs, try:
 
  - [libboost-system1.46-dev](http://packages.ubuntu.com/oneiric/libboost-system1.46-dev)
  - [libboost-filesystem1.46-dev](http://packages.ubuntu.com/oneiric/libboost-filesystem1.46-dev)
- - [libboost-regex1.46-dev](http://packages.ubuntu.com/oneiric/libboost-regex1.46-dev)
  - [libboost-date-time1.46-dev](http://packages.ubuntu.com/oneiric/libboost-date-time1.46-dev)
 
 Installation
