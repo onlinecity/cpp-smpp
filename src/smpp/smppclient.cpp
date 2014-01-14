@@ -370,8 +370,8 @@ uint32_t SmppClient::nextSequenceNumber() {
 
 void SmppClient::sendPdu(PDU &pdu) {
     checkConnection();
-    boost::optional<boost::system::error_code> ioResult;
-    boost::optional<boost::system::error_code> timerResult;
+    optional<error_code> ioResult;
+    optional<error_code> timerResult;
 
     if (verbose) {
         LOG(INFO) << pdu;
@@ -459,8 +459,8 @@ bool SmppClient::socketPeek() {
 }
 
 void SmppClient::readPduBlocking() {
-    boost::optional<boost::system::error_code> ioResult;
-    boost::optional<boost::system::error_code> timerResult;
+    optional<error_code> ioResult;
+    optional<error_code> timerResult;
     shared_array<uint8_t> pduHeader(new uint8_t[4]);
     async_read(*socket, boost::asio::buffer(pduHeader.get(), 4),
                boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1, _2, pduHeader));
