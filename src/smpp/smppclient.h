@@ -9,7 +9,6 @@
 
 #include <stdint.h>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/version.hpp>
@@ -82,7 +81,7 @@ class SmppClient {
     boost::function<uint16_t()> msgRefCallback;
 
     int state;
-    boost::shared_ptr<boost::asio::ip::tcp::socket> socket;
+    std::shared_ptr<boost::asio::ip::tcp::socket> socket;
     uint32_t seqNo;
     std::list<PDU> pdu_queue;
     // Socket write timeout in milliseconds. Default is 5000 milliseconds.
@@ -96,7 +95,7 @@ class SmppClient {
     /**
      * Constructs a new SmppClient object.
      */
-    explicit SmppClient(boost::shared_ptr<boost::asio::ip::tcp::socket>);
+    explicit SmppClient(std::shared_ptr<boost::asio::ip::tcp::socket>);
 
     ~SmppClient();
 
@@ -329,7 +328,7 @@ class SmppClient {
     }
 
     /*
-     void setLog(boost::shared_ptr<smpp::SmppLog> log_) {
+     void setLog(std::shared_ptr<smpp::SmppLog> log_) {
      log.swap(log_);
      }
      */
