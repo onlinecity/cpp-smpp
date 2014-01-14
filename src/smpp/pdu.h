@@ -30,7 +30,7 @@ const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
  * Class for representing a PDU.
  */
 class PDU {
-private:
+  private:
     std::stringbuf sb;
     std::iostream buf;
     uint32_t cmdId;
@@ -38,7 +38,7 @@ private:
     uint32_t seqNo;
     bool nullTerminateOctetStrings;
 
-public:
+  public:
     bool null;
 
     /**
@@ -101,18 +101,18 @@ public:
      * Turns null termination on or off.
      * @param True if null termination is on.
      */
-    void setNullTerminateOctetStrings(const bool&);
+    void setNullTerminateOctetStrings(const bool &);
 
     /** Adds an integer as an unsigned 8 bit. */
-    PDU& operator<<(const int &);
-    PDU& operator<<(const uint8_t &i);
-    PDU& operator<<(const uint16_t &i);
-    PDU& operator<<(const uint32_t &i);
-    PDU& operator<<(const std::basic_string<char> &s);
+    PDU &operator<<(const int &);
+    PDU &operator<<(const uint8_t &i);
+    PDU &operator<<(const uint16_t &i);
+    PDU &operator<<(const uint32_t &i);
+    PDU &operator<<(const std::basic_string<char> &s);
 
-    PDU& operator<<(const smpp::SmppAddress);
-    PDU& operator<<(const smpp::TLV);
-    PDU& addOctets(const boost::shared_array<uint8_t> &octets, const std::streamsize &len);
+    PDU &operator<<(const smpp::SmppAddress);
+    PDU &operator<<(const smpp::TLV);
+    PDU &addOctets(const boost::shared_array<uint8_t> &octets, const std::streamsize &len);
 
     /**
      * Skips n octets.
@@ -125,11 +125,11 @@ public:
      */
     void resetMarker();
 
-    PDU& operator>>(int &);
-    PDU& operator>>(uint8_t &i);
-    PDU& operator>>(uint16_t &i);
-    PDU& operator>>(uint32_t &i);
-    PDU& operator>>(std::basic_string<char> &s);
+    PDU &operator>>(int &);
+    PDU &operator>>(uint8_t &i);
+    PDU &operator>>(uint16_t &i);
+    PDU &operator>>(uint32_t &i);
+    PDU &operator>>(std::basic_string<char> &s);
 
     /**
      * Copy n octet into an array.
@@ -146,7 +146,7 @@ public:
     static uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader);
 };
 // PDU
-std::ostream& operator<<(std::ostream&, smpp::PDU&);
+std::ostream &operator<<(std::ostream &, smpp::PDU &);
 }  // namespace smpp
 
 #endif  // SMPP_PDU_H_
