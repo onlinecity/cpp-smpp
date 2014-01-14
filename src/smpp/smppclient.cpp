@@ -481,6 +481,7 @@ void SmppClient::handleTimeout(boost::optional<boost::system::error_code>* opt,
 
 void SmppClient::writeHandler(boost::optional<boost::system::error_code>* opt, const boost::system::error_code &error) {
     opt->reset(error);
+
     if (error) {
         throw TransportException(boost::system::system_error(error).what());
     }
