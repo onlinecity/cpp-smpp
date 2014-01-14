@@ -13,7 +13,8 @@
 using std::string;
 using std::vector;
 using std::list;
-using boost::shared_ptr;
+//using boost::shared_ptr;
+using std::shared_ptr;
 using boost::shared_array;
 using boost::numeric_cast;
 using boost::asio::ip::tcp;
