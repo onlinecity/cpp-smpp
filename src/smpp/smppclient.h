@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-//#include <boost/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/version.hpp>

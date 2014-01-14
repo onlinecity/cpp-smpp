@@ -57,9 +57,9 @@ DatePair parseSmppTimestamp(const string &time) {
                                boost::regex_constants::perl);
     smatch match;
 
-    if(regex_match(time.begin(), time.end(), match, pattern)) {
+    if (regex_match(time.begin(), time.end(), match, pattern)) {
         // relative
-        if(match[match.size() - 1] == "R") {
+        if (match[match.size() - 1] == "R") {
             // parse the relative timestamp
             time_duration td = parseRelativeTimestamp(match);
             // construct a absolute timestamp based on the relative timestamp
@@ -67,7 +67,6 @@ DatePair parseSmppTimestamp(const string &time) {
             local_date_time ldt = boost::local_time::local_sec_clock::local_time(zone);
             ldt += td;
             return DatePair(ldt, td);
-
         } else {
             // parse the absolute timestamp
             boost::local_time::local_date_time ldt = parseAbsoluteTimestamp(match);
@@ -99,7 +98,7 @@ string getTimeString(const local_date_time &ldt) {
     stringstream output;
     time_duration offset = zone->base_utc_offset();
 
-    if(ldt.is_dst()) {
+    if (ldt.is_dst()) {
         offset += zone->dst_offset();
     }
 
@@ -120,7 +119,7 @@ string getTimeString(const time_duration &td) {
     int dd = totalHours / 24;
     totalHours -= (dd * 24);
 
-    if(yy > 99) {
+    if (yy > 99) {
         throw SmppException("Time duration overflows");
     }
 

@@ -11,7 +11,7 @@ using std::string;
 
 namespace smpp {
 string getEsmeStatus(uint32_t i) {
-    switch(i) {
+    switch (i) {
     case ESME_ROK:
         return "No Error";
 

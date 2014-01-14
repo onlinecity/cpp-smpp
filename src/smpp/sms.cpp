@@ -84,15 +84,15 @@ SMS::SMS(PDU &pdu) :
     uint16_t len = 0;
     uint16_t tag = 0;
 
-    while(pdu.hasMoreData()) {
+    while (pdu.hasMoreData()) {
         pdu >> tag;
         pdu >> len;
 
-        if(tag == 0) {
+        if (tag == 0) {
             break;
         }
 
-        if(len == 0) {
+        if (len == 0) {
             tlvs.push_back(TLV(tag));
             continue;
         }
@@ -124,7 +124,7 @@ SMS::SMS(const SMS &rhs) :
     short_message(rhs.short_message), /**/
     tlvs(), /**/
     is_null(rhs.is_null) {
-    if(!is_null) {
+    if (!is_null) {
         tlvs.assign(rhs.tlvs.begin(), rhs.tlvs.end());
     }
 }
@@ -148,7 +148,7 @@ DeliveryReport::DeliveryReport(const SMS &sms) :
         boost::regex_constants::perl);
     smatch what;
 
-    if(regex_match(short_message, what, expression)) {
+    if (regex_match(short_message, what, expression)) {
         id = what[1];
         sub = boost::lexical_cast<uint32_t>(what[2]);
         dlvrd = boost::lexical_cast<uint32_t>(what[3]);
@@ -174,7 +174,7 @@ DeliveryReport::DeliveryReport(const DeliveryReport &rhs) :
 }  // namespace smpp
 
 std::ostream &smpp::operator<<(std::ostream &out, smpp::SMS &sms) {
-    if(sms.is_null) {
+    if (sms.is_null) {
         out << "sms values: NULL" << endl;
         return out;
     }
