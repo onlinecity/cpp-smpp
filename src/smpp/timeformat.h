@@ -4,15 +4,19 @@
  * @author hd@onlinecity.dk & td@onlinecity.dk
  */
 
-#ifndef TIMEFORMAT_H_
-#define TIMEFORMAT_H_
+#ifndef SMPP_TIMEFORMAT_H_
+#define SMPP_TIMEFORMAT_H_
 
 #include <boost/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/lexical_cast.hpp>
-#include "exceptions.h"
+
+#include <utility>
+#include <string>
+
+#include "smpp/exceptions.h"
 
 namespace smpp {
 namespace timeformat {
@@ -64,7 +68,7 @@ std::string getTimeString(const boost::local_time::local_date_time &ldt);
  */
 std::string getTimeString(const boost::posix_time::time_duration &td);
 
-} // timeformat
-} // smpp
+}  // namespace timeformat
+}  // namespace smpp
 
-#endif /* TIMEFORMAT_H_ */
+#endif  // SMPP_TIMEFORMAT_H_

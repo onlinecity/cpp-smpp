@@ -20,8 +20,9 @@ To build this library you need:
  - [Boost.Thread](http://www.boost.org/doc/libs/1_47_0/doc/html/thread.html)
  - [Boost.Tuple](http://www.boost.org/doc/libs/1_47_0/libs/tuple/doc/tuple_users_guide.html)
  - [Boost.System](http://www.boost.org/doc/libs/1_47_0/libs/system/doc/index.html)
- - [CppUnit] (http://sourceforge.net/apps/mediawiki/cppunit/) (for tests)
- - [OcLog](https://github.com/onlinecity/oclog) (for logging)
+ - [Google gflags] (https://code.google.com/p/gflags)
+ - [Google gtest] (https://code.google.com/p/googletest) (Download the latest version and unzip it the ext folder)
+ - [Google glog](https://code.google.com/p/google-glog)
   
 We have built this library against boost 1.46, but it's known to work with boost 1.47 as well.
 
@@ -38,7 +39,7 @@ Installation
 ----
 ``` sh
 git clone git@github.com:onlinecity/cpp-smpp.git 
-cd cpp-smpp/src
+cd cpp-smpp
 cmake .
 make
 su 
