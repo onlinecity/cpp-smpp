@@ -13,8 +13,8 @@
 using std::string;
 using std::vector;
 using std::list;
-//using boost::shared_ptr;
 using std::shared_ptr;
+
 using boost::shared_array;
 using boost::numeric_cast;
 using boost::asio::ip::tcp;
@@ -302,7 +302,7 @@ vector<string> SmppClient::split(const string &shortMessage, const int split) {
     int n = split;
 
     while (pos < len) {
-        if (static_cast<int>(shortMessage[pos + n - 1]) == 0x1b) { // do not split at escape char
+        if (static_cast<int>(shortMessage[pos + n - 1]) == 0x1b) {  // do not split at escape char
             n--;
         }
 
@@ -314,7 +314,6 @@ vector<string> SmppClient::split(const string &shortMessage, const int split) {
             n = len - pos;
         }
     }
-
     return parts;
 }
 
