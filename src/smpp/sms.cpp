@@ -5,14 +5,13 @@
  */
 
 #include "smpp/sms.h"
+#include <regex>
 #include <string>
 
 using std::endl;
 using std::streamsize;
+using std::stoi;
 using std::string;
-
-using boost::regex;
-using boost::smatch;
 
 namespace smpp {
 SMS::SMS() :
@@ -143,15 +142,14 @@ DeliveryReport::DeliveryReport(const SMS &sms) :
     stat(""), /**/
     err(""), /**/
     text("") {
-    regex expression(
-        "^id:([^ ]+)\\s+sub:(\\d{1,3})\\s+dlvrd:(\\d{1,3})\\s+submit\\s+date:(\\d{1,10})\\s+done\\s+date:(\\d{1,10})\\s+stat:([A-Z]{7})\\s+err:(\\d{1,3})\\s+text:(.*)$",
-        boost::regex_constants::perl);
-    smatch what;
+        std::regex expression(
+        "^id:([^ ]+)\\s+sub:(\\d{1,3})\\s+dlvrd:(\\d{1,3})\\s+submit\\s+date:(\\d{1,10})\\s+done\\s+date:(\\d{1,10})\\s+stat:([A-Z]{7})\\s+err:(\\d{1,3})\\s+text:(.*)$");
+        std::smatch what;
 
-    if (regex_match(short_message, what, expression)) {
+    if (std::regex_match(short_message, what, expression)) {
         id = what[1];
-        sub = boost::lexical_cast<uint32_t>(what[2]);
-        dlvrd = boost::lexical_cast<uint32_t>(what[3]);
+        sub = stoi(what[2]);
+        dlvrd = stoi(what[3]);
         submitDate = smpp::timeformat::parseDlrTimestamp(what[4]);
         doneDate = smpp::timeformat::parseDlrTimestamp(what[5]);
         stat = what[6];
