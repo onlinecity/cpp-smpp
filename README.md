@@ -19,7 +19,7 @@ To build this library you need and a c++11 compatible compiler:
  - [Boost.Tuple](http://www.boost.org/doc/libs/1_47_0/libs/tuple/doc/tuple_users_guide.html)
  - [Boost.System](http://www.boost.org/doc/libs/1_47_0/libs/system/doc/index.html)
  - [Google gflags] (https://code.google.com/p/gflags)
- - [Google gtest] (https://code.google.com/p/googletest) (Download the latest version and unzip it the ext folder)
+ - [Google gtest] (https://code.google.com/p/googletest)
  - [Google glog](https://code.google.com/p/google-glog)
 
 We have built this library against boost 1.46, but it's known to work with boost 1.47 as well.
