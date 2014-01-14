@@ -39,7 +39,7 @@ Installation
 ----
 ``` sh
 git clone git@github.com:onlinecity/cpp-smpp.git 
-cd cpp-smpp/src
+cd cpp-smpp
 cmake .
 make
 su 
