@@ -327,12 +327,6 @@ class SmppClient {
         msgRefCallback = cb;
     }
 
-    /*
-     void setLog(std::shared_ptr<smpp::SmppLog> log_) {
-     log.swap(log_);
-     }
-     */
-
   private:
     /**
      * Binds the client to be in the mode specified in the mode parameter.
