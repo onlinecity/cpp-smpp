@@ -9,10 +9,9 @@ set(liveheaders
 	connectionsetting.h
 )
 
-set(test_libs 
-	gtest
-	gtest_main
-)	
+set(test_libs
+    ${GTEST_LIBRARY}
+)
 
 set(testbin ${CMAKE_BINARY_DIR}/bin)
 
