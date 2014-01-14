@@ -7,16 +7,12 @@
 #ifndef SMPP_SMS_H_
 #define SMPP_SMS_H_
 
-#include <boost/regex.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/date_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <list>
-#include <sstream>
-#include <locale>
 #include <string>
 
 #include "smpp/smpp.h"
@@ -54,18 +50,14 @@ class SMS {
     int sm_length;
 
     std::string short_message;
-
     std::list<TLV> tlvs;
 
     bool is_null;
 
     SMS();
-
     virtual ~SMS() {
     }
-
     explicit SMS(PDU &pdu);
-
     SMS(const SMS &sms);
 };
 std::ostream &operator<<(std::ostream &, smpp::SMS &);
@@ -95,7 +87,5 @@ class DeliveryReport: public SMS {
 
     DeliveryReport(const DeliveryReport &rhs);
 };
-
 }  // namespace smpp
-
 #endif  // SMPP_SMS_H_

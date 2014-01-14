@@ -7,13 +7,13 @@
 #ifndef SMPP_TIMEFORMAT_H_
 #define SMPP_TIMEFORMAT_H_
 
-#include <boost/regex.hpp>
+//#include <boost/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <utility>
+#include <regex>
 #include <string>
 
 #include "smpp/exceptions.h"
@@ -25,17 +25,17 @@ typedef std::pair<boost::local_time::local_date_time, boost::posix_time::time_du
 
 /**
  * Parses a relative timestamp and returns it as a time_duration.
- * @param match Relative timestamp on the form of a boost::regex::smatch
+ * @param match Relative timestamp on the form of a std::smatch
  * @return time_duration representation of the timestamp.
  */
-boost::posix_time::time_duration parseRelativeTimestamp(const boost::smatch &match);
+boost::posix_time::time_duration parseRelativeTimestamp(const std::smatch &match);
 
 /**
  * Parses an absolute timestamp and returns it as a local_date_time.
- * @param match Absolute timestmp on the form of a boost::regex::smatch
+ * @param match Absolute timestmp on the form of a std::smatch
  * @return local_date_time representation of the timestamp.
  */
-boost::local_time::local_date_time parseAbsoluteTimestamp(const boost::smatch &match);
+boost::local_time::local_date_time parseAbsoluteTimestamp(const std::smatch &match);
 
 /**
  * Parses a smpp timestamp and returns a DatePair representation of the timestamp.

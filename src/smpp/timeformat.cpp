@@ -10,9 +10,9 @@
 using std::setfill;
 using std::setw;
 using std::string;
+using std::stoi;
 using std::stringstream;
 
-using boost::lexical_cast;
 using boost::local_time::local_date_time;
 using boost::local_time::posix_time_zone;
 using boost::local_time::time_zone_ptr;
@@ -20,26 +20,33 @@ using boost::posix_time::from_iso_string;
 using boost::posix_time::ptime;
 using boost::posix_time::time_duration;
 using boost::posix_time::time_input_facet;
-using boost::regex;
-using boost::smatch;
+
+using std::regex;
+using std::smatch;
 
 namespace smpp {
 namespace timeformat {
 time_duration parseRelativeTimestamp(const smatch &match) {
-    int yy = boost::lexical_cast<int>(match[1]);
-    int mon = boost::lexical_cast<int>(match[2]);
-    int dd = boost::lexical_cast<int>(match[3]);
-    int hh = boost::lexical_cast<int>(match[4]);
-    int min = boost::lexical_cast<int>(match[5]);
-    int sec = boost::lexical_cast<int>(match[6]);
+    int yy = stoi(match[1]);
+    int mon = stoi(match[2]);
+    int dd = stoi(match[3]);
+    int hh = stoi(match[4]);
+    int min = stoi(match[5]);
+    int sec = stoi(match[6]);
     int totalHours = (yy * 365 * 24) + (mon * 30 * 24) + (dd * 24) + hh;
     time_duration td(totalHours, min, sec);
     return td;
 }
 
 local_date_time parseAbsoluteTimestamp(const smatch &match) {
-    ptime ts(from_iso_string(string("20") + match[1] + match[2] + match[3] + "T" + match[4] + match[5] + match[6]));
-    int n = boost::lexical_cast<int>(match[8]);
+    string yy = match[1];
+    string mon = match[2];
+    string dd = match[3];
+    string hh = match[4];
+    string min = match[5];
+    string sec = match[6];
+    ptime ts(from_iso_string(string("20") + yy + mon + dd + "T" + hh + min + sec));
+    int n = stoi(match[8]);
     int offsetHours = (n >> 2);
     int offsetMinutes = (n % 4) * 15;
     // construct timezone
@@ -53,8 +60,7 @@ local_date_time parseAbsoluteTimestamp(const smatch &match) {
 
 DatePair parseSmppTimestamp(const string &time) {
     // Matches the pattern “YYMMDDhhmmsstnnp”
-    static const regex pattern("^(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1})(\\d{2})([R+-])$",
-                               boost::regex_constants::perl);
+    static const regex pattern("^(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1})(\\d{2})([R+-])$");
     smatch match;
 
     if (regex_match(time.begin(), time.end(), match, pattern)) {
