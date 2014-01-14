@@ -13,13 +13,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-long-long -Wno-variadic-macros") # 
 set(Boost_USE_STATIC_LIBS OFF) # Or we get errors with -fPIC
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.41 COMPONENTS date_time system filesystem regex REQUIRED)
+find_package(Boost 1.41 COMPONENTS date_time system filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
-
-# Find LibEvent
-#find_path(EVENT_INCLUDE_DIR event.h)
-#include_directories(${EVENT_INCLUDE_DIR})
-#find_library(EVENT_LIB event)
 
 # Google flags
 find_library(GFLAGS_LIB gflags REQUIRED)
@@ -45,9 +40,6 @@ option (ENABLE_TEST "Compile unit testing and CTest target" ON)
 if (ENABLE_TEST)
     enable_testing()
     include(gtest.cmake)
-    #set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
-    #    add_subdirectory(${EXT_PROJECTS_DIR}/gtest-1.7.0)
-    #include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
     include_directories(${GTEST_INCLUDE_DIR})
 	add_subdirectory (test)
 endif (ENABLE_TEST)
