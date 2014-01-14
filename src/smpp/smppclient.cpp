@@ -15,6 +15,9 @@ using std::vector;
 using std::list;
 using std::shared_ptr;
 
+using boost::optional;
+using boost::system::system_error;
+using boost::system::error_code;
 using boost::shared_array;
 using boost::numeric_cast;
 using boost::asio::ip::tcp;
@@ -314,6 +317,7 @@ vector<string> SmppClient::split(const string &shortMessage, const int split) {
             n = len - pos;
         }
     }
+
     return parts;
 }
 
@@ -474,16 +478,15 @@ void SmppClient::readPduBlocking() {
     socketExecute();
 }
 
-void SmppClient::handleTimeout(boost::optional<boost::system::error_code>* opt,
-                               const boost::system::error_code &error) {
+void SmppClient::handleTimeout(optional<error_code>* opt, const error_code &error) {
     opt->reset(error);
 }
 
-void SmppClient::writeHandler(boost::optional<boost::system::error_code>* opt, const boost::system::error_code &error) {
+void SmppClient::writeHandler(optional<error_code>* opt, const error_code &error) {
     opt->reset(error);
 
     if (error) {
-        throw TransportException(boost::system::system_error(error).what());
+        throw TransportException(system_error(error).what());
     }
 }
 
@@ -492,15 +495,14 @@ void SmppClient::socketExecute() {
     getIoService().reset();
 }
 
-void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, size_t len,
-                                      const shared_array<uint8_t> &pduLength) {
+void SmppClient::readPduHeaderHandler(const error_code &error, size_t len, const shared_array<uint8_t> &pduLength) {
     if (error) {
         if (error == boost::asio::error::operation_aborted) {
             // Not treated as an error
             return;
         }
 
-        throw TransportException(boost::system::system_error(error).what());
+        throw TransportException(system_error(error).what());
     }
 
     uint32_t i = PDU::getPduLength(pduLength);
@@ -511,8 +513,7 @@ void SmppClient::readPduHeaderHandler(const boost::system::error_code &error, si
     socketExecute();
 }
 
-void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::error_code>* opt,
-        const boost::system::error_code &error, size_t read,
+void SmppClient::readPduHeaderHandlerBlocking(optional<error_code>* opt, const error_code &error, size_t read,
         shared_array<uint8_t> pduLength) {
     if (error) {
         if (error == boost::asio::error::operation_aborted) {
@@ -520,7 +521,7 @@ void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::err
             return;
         }
 
-        throw TransportException(boost::system::system_error(error).what());
+        throw TransportException(system_error(error).what());
     }
 
     opt->reset(error);
@@ -532,10 +533,10 @@ void SmppClient::readPduHeaderHandlerBlocking(boost::optional<boost::system::err
     socketExecute();
 }
 
-void SmppClient::readPduBodyHandler(const boost::system::error_code &error, size_t len, shared_array<uint8_t> pduLength,
+void SmppClient::readPduBodyHandler(const error_code &error, size_t len, shared_array<uint8_t> pduLength,
                                     shared_array<uint8_t> pduBuffer) {
     if (error) {
-        throw TransportException(boost::system::system_error(error).what());
+        throw TransportException(system_error(error).what());
     }
 
     PDU pdu(pduLength, pduBuffer);
