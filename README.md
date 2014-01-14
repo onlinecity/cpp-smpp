@@ -6,16 +6,14 @@ It only implements a handful of the SMPP features.
 
 Dependencies
 ----
-To build this library you need:
- 
+To build this library you need and a c++11 compatible compiler:
+
  - [Boost.Asio](http://www.boost.org/doc/libs/1_47_0/doc/html/boost_asio.html)
  - [Boost.Bimap](http://www.boost.org/doc/libs/1_47_0/libs/bimap/doc/html/index.html)
  - [Boost.Bind](http://www.boost.org/doc/libs/1_47_0/libs/bind/bind.html)
  - [Boost.Date_time](http://www.boost.org/doc/libs/1_47_0/doc/html/date_time.html)
  - [Boost.Function](http://www.boost.org/doc/libs/1_47_0/doc/html/function.html)
- - [Boost.Conversion](http://www.boost.org/doc/libs/1_47_0/libs/conversion/lexical_cast.htm)
  - [Boost.NumericConversion](http://www.boost.org/doc/libs/1_47_0/libs/numeric/conversion/doc/html/index.html)
- - [Boost.Regex](http://www.boost.org/doc/libs/1_47_0/libs/regex/doc/html/index.html)
  - [Boost.SmartPointers](http://www.boost.org/doc/libs/1_47_0/libs/smart_ptr/smart_ptr.htm)
  - [Boost.Thread](http://www.boost.org/doc/libs/1_47_0/doc/html/thread.html)
  - [Boost.Tuple](http://www.boost.org/doc/libs/1_47_0/libs/tuple/doc/tuple_users_guide.html)
@@ -23,12 +21,12 @@ To build this library you need:
  - [Google gflags] (https://code.google.com/p/gflags)
  - [Google gtest] (https://code.google.com/p/googletest) (Download the latest version and unzip it the ext folder)
  - [Google glog](https://code.google.com/p/google-glog)
-  
+
 We have built this library against boost 1.46, but it's known to work with boost 1.47 as well.
 
-The following ubuntu packages should suffice for the dependices: [libboost1.46-all-dev](http://packages.ubuntu.com/oneiric/libboost1.46-all-dev) and [libcppunit-dev](http://packages.ubuntu.com/oneiric/libcppunit-dev). 
+The following ubuntu packages should suffice for the dependices: [libboost1.46-all-dev](http://packages.ubuntu.com/oneiric/libboost1.46-all-dev) and [libcppunit-dev](http://packages.ubuntu.com/oneiric/libcppunit-dev).
 
-If you dont wan't all the boost libs, try: 
+If you dont wan't all the boost libs, try:
 
  - [libboost-system1.46-dev](http://packages.ubuntu.com/oneiric/libboost-system1.46-dev)
  - [libboost-filesystem1.46-dev](http://packages.ubuntu.com/oneiric/libboost-filesystem1.46-dev)
@@ -38,11 +36,11 @@ If you dont wan't all the boost libs, try:
 Installation
 ----
 ``` sh
-git clone git@github.com:onlinecity/cpp-smpp.git 
+git clone git@github.com:onlinecity/cpp-smpp.git
 cd cpp-smpp
 cmake .
 make
-su 
+su
 make install
 ```
 
@@ -71,7 +69,7 @@ using namespace smpp;
 using namespace oc::tools;
 using namespace std;
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
 	boost::asio::io_service io_service;
 	tcp::endpoint endpoint(ip::address_v4::from_string("127.0.0.1"), 2775);
@@ -86,7 +84,7 @@ int main(int argc, char** argv)
 	SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
 	string message = "message to send";
 	string smscId = client.sendSms(from, to, GsmEncoder::getGsm0338(message));
-	
+
 	cout << smscId << endl;
 	client.unbind();
 
@@ -116,7 +114,7 @@ using namespace boost::asio::ip;
 using namespace smpp;
 using namespace std;
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
 	boost::asio::io_service io_service;
 	tcp::endpoint endpoint(ip::address_v4::from_string("127.0.0.1"), 2775);
@@ -150,15 +148,15 @@ int main(int argc, char** argv)
 F.A.Q.
 ----
 
-**How do I enable delivery reports?**  
+**How do I enable delivery reports?**
 You must set the registered delivery flag: ```client.setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);```
 
-**Why do I get 'Failed to read reply to command: 0x4', 'Message Length is invalid' or 'Error in optional part' errors?**  
-Most likely your SMPP provider doesn't support NULL-terminating the message field. The specs aren't clear on this issue, so there is a toggle. Set ```client.setNullTerminateOctetStrings(false);``` and try again. 
+**Why do I get 'Failed to read reply to command: 0x4', 'Message Length is invalid' or 'Error in optional part' errors?**
+Most likely your SMPP provider doesn't support NULL-terminating the message field. The specs aren't clear on this issue, so there is a toggle. Set ```client.setNullTerminateOctetStrings(false);``` and try again.
 
-**Can I test the client library without a SMPP server?**  
+**Can I test the client library without a SMPP server?**
 Many service providers can give you a demo account, but you can also use the [logica opensmpp simulator](http://opensmpp.logica.com/CommonPart/Introduction/Introduction.htm#simulator) (java) or [smsforum client test tool](http://www.smsforum.net/sctt_v1.0.Linux.tar.gz) (linux binary). In addition to a number of real-life SMPP servers this library is tested against these simulators.
 
-**How do I set socket timeouts?**  
-You cannot modify the connect timeout since it uses the default boost::asio::ip::tcp socket. You can set the socket read/write timeouts by calling ```client.setSocketWriteTimeout(1000)``` and ```client.setSocketReadTimeout(1000)```. All timeouts are in milliseconds.  
+**How do I set socket timeouts?**
+You cannot modify the connect timeout since it uses the default boost::asio::ip::tcp socket. You can set the socket read/write timeouts by calling ```client.setSocketWriteTimeout(1000)``` and ```client.setSocketReadTimeout(1000)```. All timeouts are in milliseconds.
 
