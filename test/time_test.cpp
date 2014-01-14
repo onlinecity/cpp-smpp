@@ -22,6 +22,7 @@ using smpp::timeformat::getTimeString;
 using boost::local_time::local_date_time;
 using boost::local_time::time_zone_ptr;
 using boost::local_time::posix_time_zone;
+using boost::gregorian::date;
 using boost::posix_time::time_duration;
 using boost::posix_time::ptime;
 

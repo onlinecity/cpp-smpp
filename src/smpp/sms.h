@@ -29,7 +29,7 @@ namespace smpp {
  * Class representing an SMS.
  */
 class SMS {
-public:
+  public:
     std::string service_type;
     int source_addr_ton;
     int source_addr_npi;
@@ -68,14 +68,14 @@ public:
 
     SMS(const SMS &sms);
 };
-std::ostream& operator<<(std::ostream&, smpp::SMS&);
+std::ostream &operator<<(std::ostream &, smpp::SMS &);
 // SMS class
 
 /**
  * Class representing a Delivery Report.
  */
 class DeliveryReport: public SMS {
-public:
+  public:
     std::string id;
     uint32_t sub;
     uint32_t dlvrd;

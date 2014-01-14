@@ -58,6 +58,7 @@ TEST(SmsTest, copy) {
 }
 
 TEST(SmsTest, dlr) {
+    using boost::gregorian::date;
     using boost::posix_time::ptime;
     using boost::posix_time::time_duration;
     uint8_t testheader[] = { 0x00, 0x00, 0x00, 0xe4 };

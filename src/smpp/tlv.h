@@ -64,18 +64,18 @@ const uint16_t ITS_SESSION_INFO = 0x1383;
  * TLV container class.
  */
 class TLV {
-private:
+  private:
     uint16_t tag;
     uint16_t len;
     boost::shared_array<uint8_t> octets;
 
-public:
+  public:
     /**
      * Constructs a TLV with only the tag.
      * @param _tag TLV tag.
      */
     explicit TLV(const uint16_t &_tag) :
-            tag(_tag), len(0), octets() {
+        tag(_tag), len(0), octets() {
     }
 
     /**
@@ -84,7 +84,7 @@ public:
      * @param value TLV value.
      */
     TLV(const uint16_t &_tag, int value) :
-            tag(_tag), len(1), octets(new uint8_t[len]) {
+        tag(_tag), len(1), octets(new uint8_t[len]) {
         octets[0] = value & 0xff;
     }
 
@@ -94,7 +94,7 @@ public:
      * @param value TLV value.
      */
     TLV(const uint16_t &_tag, uint8_t value) :
-            tag(_tag), len(1), octets(new uint8_t[len]) {
+        tag(_tag), len(1), octets(new uint8_t[len]) {
         octets[0] = value & 0xff;
     }
 
@@ -104,7 +104,7 @@ public:
      * @param value TLV value.
      */
     TLV(const uint16_t &_tag, uint16_t value) :
-            tag(_tag), len(2), octets(new uint8_t[len]) {
+        tag(_tag), len(2), octets(new uint8_t[len]) {
         octets[0] = (value >> 8) & 0xff;
         octets[1] = value & 0xff;
     }
@@ -115,7 +115,7 @@ public:
      * @param value TLV value.
      */
     TLV(const uint16_t &_tag, uint32_t value) :
-            tag(_tag), len(4), octets(new uint8_t[len]) {
+        tag(_tag), len(4), octets(new uint8_t[len]) {
         octets[0] = (value >> 24) & 0xff;
         octets[1] = (value >> 16) & 0xff;
         octets[2] = (value >> 8) & 0xff;
@@ -128,7 +128,7 @@ public:
      * @param value TLV value.
      */
     TLV(const uint16_t &_tag, std::basic_string<char> s) :
-            tag(_tag), len(s.length()), octets(new uint8_t[len]) {
+        tag(_tag), len(s.length()), octets(new uint8_t[len]) {
         std::copy(s.begin(), s.end(), octets.get());
     }
 
@@ -139,7 +139,7 @@ public:
      * @param _octets Array of octets.
      */
     TLV(const uint16_t &_tag, const uint16_t &_len, const boost::shared_array<uint8_t> &_octets) :
-            tag(_tag), len(_len), octets(_octets) {
+        tag(_tag), len(_len), octets(_octets) {
     }
 
     uint16_t getTag() const {
