@@ -31,7 +31,7 @@ PDU::PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_se
     (*this) << seqNo;
 }
 
-PDU::PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_array<uint8_t> &pduBuffer) :
+PDU::PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer) :
     sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false) {
     uint32_t bufSize = PDU::getPduLength(pduLength);
     buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);

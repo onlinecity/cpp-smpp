@@ -129,7 +129,15 @@ SMS::SMS(const SMS &rhs) :
 }
 
 DeliveryReport::DeliveryReport() :
-    SMS(), id(""), sub(0), dlvrd(0), submitDate(), doneDate(), stat(""), err(""), text("") {
+    SMS(),
+    id(""),
+    sub(0),
+    dlvrd(0),
+    submitDate(),
+    doneDate(),
+    stat(""),
+    err(""),
+    text("") {
 }
 
 DeliveryReport::DeliveryReport(const SMS &sms) :
