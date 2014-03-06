@@ -9,10 +9,12 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <utility>
 
 using std::string;
 using std::vector;
 using std::list;
+using std::pair;
 using std::shared_ptr;
 
 using boost::optional;
@@ -114,7 +116,7 @@ void SmppClient::unbind() {
 /**
  * Send an sms to the smsc.
  */
-string SmppClient::sendSms(const SmppAddress &sender, const SmppAddress &receiver, const string &shortMessage,
+pair<string, int> SmppClient::sendSms(const SmppAddress &sender, const SmppAddress &receiver, const string &shortMessage,
                            list<TLV> tags, const uint8_t priority_flag, const string &schedule_delivery_time,
                            const string &validity_period, const int dataCoding) {
     int messageLen = shortMessage.length();
@@ -135,8 +137,9 @@ string SmppClient::sendSms(const SmppAddress &sender, const SmppAddress &receive
 
     // submit_sm if the short message could fit into one pdu.
     if (messageLen <= singleSmsOctetLimit || csmsMethod == CSMS_PAYLOAD) {
-        return submitSm(sender, receiver, shortMessage, tags, priority_flag, schedule_delivery_time, validity_period,
+        string smscId = submitSm(sender, receiver, shortMessage, tags, priority_flag, schedule_delivery_time, validity_period,
                         esmClass, dataCoding);
+        return std::make_pair(smscId, 1);
     }
 
     // CSMS -> split message
@@ -168,7 +171,7 @@ string SmppClient::sendSms(const SmppAddress &sender, const SmppAddress &receive
                              esmClass | 0x40, dataCoding);
         }
 
-        return smsId;
+        return std::make_pair(smsId, segments);
     } else {  // csmsMethod == CSMS_16BIT_TAGS)
         tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
         tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
@@ -187,7 +190,7 @@ string SmppClient::sendSms(const SmppAddress &sender, const SmppAddress &receive
         tags.pop_back();
         // pop SAR_MSG_REF_NUM tag
         tags.pop_back();
-        return smsId;
+        return std::make_pair(smsId, segment);
     }
 }
 
