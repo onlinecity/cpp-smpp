@@ -121,6 +121,7 @@ class SmppClient {
     /**
      * Sends an SMS to the SMSC.
      * The SMS is split into multiple if it doesn't into one.
+     * Returns smsc id and number of smses sent.
      *
      * @param sender
      * @param receiver
@@ -132,7 +133,7 @@ class SmppClient {
      * @param dataCoding
      * @return SMSC sms id.
      */
-    std::string sendSms(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
+    std::pair<std::string, int> sendSms(const SmppAddress &sender, const SmppAddress &receiver, const std::string &shortMessage,
                         std::list<TLV> tags = std::list<TLV>(), const uint8_t priority_flag = 0,
                         const std::string &schedule_delivery_time = "", const std::string &validity_period = "",
                         const int dataCoding = smpp::DATA_CODING_DEFAULT);
