@@ -7,11 +7,13 @@
 #ifndef SMPP_SMPPCLIENT_H_
 #define SMPP_SMPPCLIENT_H_
 
-#include <stdint.h>
+#include <cstdint>
+
+#include "asio.hpp"
 
 #include <boost/scoped_array.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/version.hpp>
+//#include <boost/asio.hpp>
+//#include <boost/asio/version.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
@@ -65,6 +67,7 @@ class SmppClient {
     uint8_t addrTon;  // addrTon = 0;
     uint8_t addrNpi;  // addrNpi = 0;
     std::string addrRange;
+
     // ESME transmitter parameters
     std::string serviceType;
     uint8_t esmClass;
@@ -81,7 +84,7 @@ class SmppClient {
     boost::function<uint16_t()> msgRefCallback;
 
     int state;
-    std::shared_ptr<boost::asio::ip::tcp::socket> socket;
+    std::shared_ptr<asio::ip::tcp::socket> socket;
     uint32_t seqNo;
     std::list<PDU> pdu_queue;
     // Socket write timeout in milliseconds. Default is 5000 milliseconds.
@@ -95,7 +98,7 @@ class SmppClient {
     /**
      * Constructs a new SmppClient object.
      */
-    explicit SmppClient(std::shared_ptr<boost::asio::ip::tcp::socket>);
+    explicit SmppClient(std::shared_ptr<asio::ip::tcp::socket>);
 
     ~SmppClient();
 
@@ -407,14 +410,14 @@ class SmppClient {
 
     void readPduBlocking();
 
-    void handleTimeout(boost::optional<boost::system::error_code>* opt, const boost::system::error_code &error);
+    void handleTimeout(boost::optional<asio::error_code>* opt, const asio::error_code &error);
 
     /**
      * Async write handler.
      * @param
      * @throw TransportException if an error occurred.
      */
-    void writeHandler(boost::optional<boost::system::error_code>* opt, const boost::system::error_code &error);
+    void writeHandler(boost::optional<asio::error_code>* opt, const asio::error_code &error);
 
     /**
      * Peeks at the socket and returns true if there is data to be read.
@@ -433,11 +436,11 @@ class SmppClient {
      * @param error Boost error code
      * @param read Bytes read
      */
-    void readPduHeaderHandler(const boost::system::error_code &error, size_t read,
+    void readPduHeaderHandler(const asio::error_code &error, size_t read,
                               const boost::shared_array<uint8_t> &pduLength);
 
-    void readPduHeaderHandlerBlocking(boost::optional<boost::system::error_code>* opt,
-                                      const boost::system::error_code &error, size_t read,
+    void readPduHeaderHandlerBlocking(boost::optional<asio::error_code>* opt,
+                                      const asio::error_code &error, size_t read,
                                       boost::shared_array<uint8_t> pduLength);
 
     /**
@@ -447,7 +450,7 @@ class SmppClient {
      * @param error Boost error code
      * @param read Bytes read
      */
-    void readPduBodyHandler(const boost::system::error_code &error, size_t read, boost::shared_array<uint8_t> pduLength,
+    void readPduBodyHandler(const asio::error_code &error, size_t read, boost::shared_array<uint8_t> pduLength,
                             boost::shared_array<uint8_t> pduBuffer);
 
     /**
@@ -489,12 +492,12 @@ class SmppClient {
      * Calls io_service or get_io_service on the current socket depending on the Boost.Asio version
      * In Boost ASIO 1.6.0+/Boost 1.47 io_service is renamed to get_io_service
      */
-    boost::asio::io_service &getIoService() const {
-#if defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
+    asio::io_service &getIoService() const {
+//#if defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
         return socket->get_io_service();
-#else
-        return socket->io_service();
-#endif  // defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
+//#else
+//        return socket->io_service();
+//#endif  // defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
     }
 };
 }  // namespace smpp

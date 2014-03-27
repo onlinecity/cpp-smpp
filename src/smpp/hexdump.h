@@ -7,7 +7,7 @@
 #ifndef SMPP_HEXDUMP_H_
 #define SMPP_HEXDUMP_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <sstream>
 #include <iomanip>

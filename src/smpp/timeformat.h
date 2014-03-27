@@ -7,7 +7,6 @@
 #ifndef SMPP_TIMEFORMAT_H_
 #define SMPP_TIMEFORMAT_H_
 
-//#include <boost/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>

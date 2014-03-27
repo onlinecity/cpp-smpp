@@ -7,7 +7,7 @@
 #ifndef SMPP_SMPP_H_
 #define SMPP_SMPP_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 namespace smpp {

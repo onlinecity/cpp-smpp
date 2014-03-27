@@ -6,6 +6,7 @@
 #include <glog/logging.h>
 #include <list>
 #include <string>
+#include "asio.hpp"
 #include "gtest/gtest.h"
 #include "smpp/gsmencoding.h"
 #include "smpp/timeformat.h"
@@ -173,6 +174,7 @@ TEST_F(SmppClientTest, submitExtended) {
 TEST_F(SmppClientTest, receive) {
     socket->connect(endpoint);
     client->bindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
+    LOG(INFO) << "Waiting for smpp connection to send message";
     smpp::SMS sms = client->readSms();
 }
 

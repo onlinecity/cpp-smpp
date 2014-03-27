@@ -18,14 +18,15 @@ using std::pair;
 using std::shared_ptr;
 
 using boost::optional;
-using boost::system::system_error;
-using boost::system::error_code;
+//using boost::system::system_error;
+using asio::system_error;
+using asio::error_code;
 using boost::shared_array;
 using boost::numeric_cast;
-using boost::asio::ip::tcp;
-using boost::asio::deadline_timer;
-using boost::asio::async_write;
-using boost::asio::buffer;
+using asio::ip::tcp;
+using asio::deadline_timer;
+using asio::async_write;
+using asio::buffer;
 using boost::local_time::local_date_time;
 using boost::local_time::not_a_date_time;
 
@@ -465,7 +466,7 @@ void SmppClient::readPduBlocking() {
     optional<error_code> ioResult;
     optional<error_code> timerResult;
     shared_array<uint8_t> pduHeader(new uint8_t[4]);
-    async_read(*socket, boost::asio::buffer(pduHeader.get(), 4),
+    async_read(*socket, asio::buffer(pduHeader.get(), 4),
                boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1, _2, pduHeader));
     deadline_timer timer(getIoService());
     timer.expires_from_now(boost::posix_time::milliseconds(socketReadTimeout));
@@ -500,7 +501,7 @@ void SmppClient::socketExecute() {
 
 void SmppClient::readPduHeaderHandler(const error_code &error, size_t len, const shared_array<uint8_t> &pduLength) {
     if (error) {
-        if (error == boost::asio::error::operation_aborted) {
+        if (error == asio::error::operation_aborted) {
             // Not treated as an error
             return;
         }
@@ -519,7 +520,7 @@ void SmppClient::readPduHeaderHandler(const error_code &error, size_t len, const
 void SmppClient::readPduHeaderHandlerBlocking(optional<error_code>* opt, const error_code &error, size_t read,
         shared_array<uint8_t> pduLength) {
     if (error) {
-        if (error == boost::asio::error::operation_aborted) {
+        if (error == asio::error::operation_aborted) {
             // Not treated as an error
             return;
         }

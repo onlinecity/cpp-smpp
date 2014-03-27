@@ -7,7 +7,7 @@
 #ifndef SMPP_PDU_H_
 #define SMPP_PDU_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <netinet/in.h>
 
 #include <boost/numeric/conversion/cast.hpp>
