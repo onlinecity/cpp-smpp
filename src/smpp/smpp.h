@@ -66,7 +66,7 @@ const uint32_t ESME_RINVNUMDESTS = 0x00000033;  // Invalid number of destination
 const uint32_t ESME_RINVDLNAME = 0x00000034;  // Invalid Distribution List name
 const uint32_t ESME_RINVDESTFLAG = 0x00000040;  // Destination flag (submit_multi)
 const uint32_t ESME_RINVSUBREP =
-    0x00000042;  // Invalid ‘submit with replace’ request (i.e. submit_sm with replace_if_present_flag set)
+  0x00000042;  // Invalid ‘submit with replace’ request (i.e. submit_sm with replace_if_present_flag set)
 const uint32_t ESME_RINVESMSUBMIT = 0x00000043;  // Invalid esm_SUBMIT field data
 const uint32_t ESME_RCNTSUBDL = 0x00000044;  // Cannot Submit to Distribution List
 const uint32_t ESME_RSUBMITFAIL = 0x00000045;  // submit_sm or submit_multi failed
@@ -77,7 +77,8 @@ const uint32_t ESME_RINVDSTNPI = 0x00000051;  // Invalid Destination address NPI
 const uint32_t ESME_RINVSYSTYP = 0x00000053;  // Invalid system_type field
 const uint32_t ESME_RINVREPFLAG = 0x00000054;  // Invalid replace_if_present flag
 const uint32_t ESME_RINVNUMMSGS = 0x00000055;  // Invalid number of messages
-const uint32_t ESME_RTHROTTLED = 0x00000058;  // Throttling error (ESME has exceeded allowed message limits)
+const uint32_t ESME_RTHROTTLED =
+  0x00000058;  // Throttling error (ESME has exceeded allowed message limits)
 const uint32_t ESME_RINVSCHED = 0x00000061;  // Invalid Scheduled Delivery Time
 const uint32_t ESME_RINVEXPIRY = 0x00000062;  // Invalid message (Expiry time)
 const uint32_t ESME_RINVDFTMSGID = 0x00000063;  // Predefined Message Invalid or Not Found
@@ -191,18 +192,18 @@ const uint8_t STATE_REJECTED = 8;
 std::string getEsmeStatus(uint32_t);
 
 class SmppAddress {
-  public:
-    std::string value;
-    uint8_t ton;  // type-of-number
-    uint8_t npi;  // numbering-plan-indicator
+ public:
+  std::string value;
+  uint8_t ton;  // type-of-number
+  uint8_t npi;  // numbering-plan-indicator
 
-    SmppAddress(const std::string &_value,
-        const uint8_t &_ton = smpp::TON_UNKNOWN,
-        const uint8_t &_npi = smpp::NPI_UNKNOWN) :
-        value(_value),
-        ton(_ton),
-        npi(_npi) {
-    }
+  SmppAddress(const std::string &_value,
+              const uint8_t &_ton = smpp::TON_UNKNOWN,
+              const uint8_t &_npi = smpp::NPI_UNKNOWN) :
+    value(_value),
+    ton(_ton),
+    npi(_npi) {
+  }
 };
 }  // namespace smpp
 #endif  // SMPP_SMPP_H_

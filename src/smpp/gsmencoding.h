@@ -19,20 +19,20 @@ typedef boost::bimaps::bimap<std::string, std::string> GsmDictionary;
  * It's a singleton so call getInstance.
  */
 class GsmEncoder {
-  public:
-    /**
-     * Returns the input string encoded in GSM 0338.
-     * @param input String to be encoded.
-     * @return Encoded string.
-     */
-    static std::string getGsm0338(const std::string &input);
+ public:
+  /**
+   * Returns the input string encoded in GSM 0338.
+   * @param input String to be encoded.
+   * @return Encoded string.
+   */
+  static std::string getGsm0338(const std::string &input);
 
-    /**
-     * Converts an GSM 0338 encoded string into UTF8.
-     * @param input String to be encoded.
-     * @return UTF8-encoded string.
-     */
-    static std::string getUtf8(const std::string &input);
+  /**
+   * Converts an GSM 0338 encoded string into UTF8.
+   * @param input String to be encoded.
+   * @return UTF8-encoded string.
+   */
+  static std::string getUtf8(const std::string &input);
 };
 }  // namespace tools
 }  // namespace oc
