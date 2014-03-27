@@ -22,9 +22,13 @@
 #include "smpp/exceptions.h"
 #include "smpp/hexdump.h"
 
+typedef boost::shared_array<uint8_t> PduData;
+
 namespace smpp {
 const int HEADERFIELD_SIZE = 4;
 const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
+
+
 
 /**
  * Class for representing a PDU.
@@ -59,7 +63,7 @@ class PDU {
      * @param pduLength
      * @param pduBuffer
      */
-    PDU(const boost::shared_array<uint8_t> &pduLength, const boost::shared_array<uint8_t> &pduBuffer);
+    PDU(const PduData &pduLength, const PduData &pduBuffer);
 
     /**
      * Copy constructor
@@ -70,7 +74,7 @@ class PDU {
     /**
      * @return All data in this PDU as array of unsigned char array.
      */
-    const boost::shared_array<uint8_t> getOctets();
+    const PduData getOctets();
 
     /**
      * @return PDU size in octets.
@@ -112,7 +116,7 @@ class PDU {
 
     PDU &operator<<(const smpp::SmppAddress);
     PDU &operator<<(const smpp::TLV);
-    PDU &addOctets(const boost::shared_array<uint8_t> &octets, const std::streamsize &len);
+    PDU &addOctets(const PduData &octets, const std::streamsize &len);
 
     /**
      * Skips n octets.
@@ -136,14 +140,14 @@ class PDU {
      * @param array Target array.
      * @param n Octets to copy.
      */
-    void readOctets(boost::shared_array<uint8_t> &octets, const std::streamsize &n);
+    void readOctets(PduData &octets, const std::streamsize &n);
 
     /**
      * @return True if the read marker is not at the end of the PDU.
      */
     bool hasMoreData();
 
-    static uint32_t getPduLength(boost::shared_array<uint8_t> pduHeader);
+    static uint32_t getPduLength(PduData pduHeader);
 };
 // PDU
 std::ostream &operator<<(std::ostream &, smpp::PDU &);

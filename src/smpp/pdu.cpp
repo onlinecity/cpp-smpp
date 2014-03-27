@@ -31,7 +31,7 @@ PDU::PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_se
     (*this) << seqNo;
 }
 
-PDU::PDU(const shared_array<uint8_t> &pduLength, const shared_array<uint8_t> &pduBuffer) :
+PDU::PDU(const PduData &pduLength, const PduData &pduBuffer) :
     sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false) {
     uint32_t bufSize = PDU::getPduLength(pduLength);
     buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);
@@ -68,7 +68,7 @@ PDU::PDU(const PDU &rhs) :
     resetMarker();  // remember to reset the marker after copying.
 }
 
-const shared_array<uint8_t> PDU::getOctets() {
+const PduData PDU::getOctets() {
     uint32_t size = getSize();
     uint32_t beSize = htonl(size);
     buf.seekp(0, ios::beg);
@@ -80,7 +80,7 @@ const shared_array<uint8_t> PDU::getOctets() {
 
     buf.seekp(0, ios::end);
     buf.seekg(0, ios::beg);
-    shared_array<uint8_t> octets(new uint8_t[size]);
+    PduData octets(new uint8_t[size]);
     buf.read(reinterpret_cast<char*>(octets.get()), size);
 
     if (buf.fail()) {
@@ -194,7 +194,7 @@ PDU &PDU::operator <<(smpp::TLV tlv) {
     return *this;
 }
 
-PDU &PDU::addOctets(const shared_array<uint8_t> &octets, const streamsize &len) {
+PDU &PDU::addOctets(const PduData &octets, const streamsize &len) {
     buf.write(reinterpret_cast<char*>(octets.get()), len);
 
     if (buf.fail()) {
@@ -270,7 +270,7 @@ PDU &PDU::operator>>(std::basic_string<char> &s) {
     return *this;
 }
 
-void PDU::readOctets(shared_array<uint8_t> &octets, const streamsize &len) {
+void PDU::readOctets(PduData &octets, const streamsize &len) {
     buf.readsome(reinterpret_cast<char*>(octets.get()), len);
 
     if (buf.fail()) {
@@ -283,7 +283,7 @@ bool PDU::hasMoreData() {
     return !buf.eof();
 }
 
-uint32_t PDU::getPduLength(boost::shared_array<uint8_t> pduHeader) {
+uint32_t PDU::getPduLength(PduData pduHeader) {
     uint32_t* i = reinterpret_cast<uint32_t*>(pduHeader.get());
     return ntohl(*i);
 }

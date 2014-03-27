@@ -18,7 +18,6 @@ using std::pair;
 using std::shared_ptr;
 
 using boost::optional;
-//using boost::system::system_error;
 using asio::system_error;
 using asio::error_code;
 using boost::shared_array;
@@ -158,7 +157,7 @@ pair<string, int> SmppClient::sendSms(const SmppAddress &sender, const SmppAddre
             // encode udh
             int partSize = (*itr).size();
             int size = 6 + partSize;
-            boost::scoped_array<uint8_t> udh(new uint8_t[size]);
+            std::unique_ptr<uint8_t[]> udh(new uint8_t[size]);
             udh[0] = 0x05;  // length of udh excluding first byte
             udh[1] = 0x00;  //
             udh[2] = 0x03;  // length of the header
