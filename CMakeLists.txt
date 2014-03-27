@@ -9,8 +9,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -pedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-long-long -Wno-variadic-macros") # warnings as errors
 
+# ASIO lib
 include(asio.cmake)
 include_directories(${ASIO_INCLUDE_DIR})
+
 # Find Boost library
 set(Boost_USE_STATIC_LIBS OFF) # Or we get errors with -fPIC
 set(Boost_USE_MULTITHREADED ON)
