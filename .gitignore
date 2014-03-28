@@ -14,3 +14,4 @@ install_manifest.txt
 *.orig
 third_party/
 Testing/
+.ycm_extra_conf.pyc
