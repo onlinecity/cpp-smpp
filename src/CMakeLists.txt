@@ -11,13 +11,13 @@ SET(headers
 )
 
 SET(sources
-	smpp/gsmencoding.cpp
-	smpp/pdu.cpp
+	smpp/gsmencoding.cc
+	smpp/pdu.cc
 	smpp/smppclient.cc
-	smpp/smpp.cpp
-	smpp/sms.cpp
-	smpp/timeformat.cpp
-	smpp/hexdump.cpp
+	smpp/smpp.cc
+	smpp/sms.cc
+	smpp/timeformat.cc
+	smpp/hexdump.cc
 )
 
 
