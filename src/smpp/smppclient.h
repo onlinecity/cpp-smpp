@@ -436,11 +436,11 @@ class SmppClient {
    * @param read Bytes read
    */
   void readPduHeaderHandler(const asio::error_code &error, size_t read,
-                            const PduData &pduLength);
+                            const PduLengthHeader *pduLength);
 
   void readPduHeaderHandlerBlocking(boost::optional<asio::error_code>* opt,
                                     const asio::error_code &error, size_t read,
-                                    const PduData &pduLength);
+                                    const PduLengthHeader *pduLength);
 
   /**
    * Handler for reading a PDU body.
@@ -450,8 +450,8 @@ class SmppClient {
    * @param read Bytes read
    */
   void readPduBodyHandler(const asio::error_code &error, size_t read,
-                          const PduData &pduLength,
-                          const PduData &pduBuffer);
+                          const PduLengthHeader *pduLength,
+                          const PduData *pduBuffer);
 
   /**
    * Returns a response for a PDU we have sent,

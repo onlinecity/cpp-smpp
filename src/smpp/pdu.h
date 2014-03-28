@@ -16,17 +16,21 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <array>
 
 #include "smpp/smpp.h"
 #include "smpp/tlv.h"
 #include "smpp/exceptions.h"
 #include "smpp/hexdump.h"
 
-typedef std::string PduData;
 
 namespace smpp {
+
 const int HEADERFIELD_SIZE = 4;
 const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
+
+typedef std::string PduData;
+typedef std::array<char, HEADERFIELD_SIZE> PduLengthHeader;
 
 /**
  * Class for representing a PDU.
@@ -61,7 +65,7 @@ class PDU {
    * @param pduLength
    * @param pduBuffer
    */
-  PDU(const PduData &pduLength, const PduData &pduBuffer);
+  PDU(const PduLengthHeader &pduLength, const PduData &pduBuffer);
 
   /**
    * Copy constructor
@@ -145,7 +149,7 @@ class PDU {
    */
   bool hasMoreData();
 
-  static uint32_t getPduLength(PduData pduHeader);
+  static uint32_t getPduLength(const PduLengthHeader &pduHeader);
 };
 // PDU
 std::ostream &operator<<(std::ostream &, smpp::PDU &);

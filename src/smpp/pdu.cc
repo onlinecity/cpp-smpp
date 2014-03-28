@@ -33,10 +33,10 @@ PDU::PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_se
   (*this) << seqNo;
 }
 
-PDU::PDU(const PduData &pduLength, const PduData &pduBuffer) :
+PDU::PDU(const PduLengthHeader &pduLength, const PduData &pduBuffer) :
   sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false) {
   uint32_t bufSize = PDU::getPduLength(pduLength);
-  buf.write(pduLength.c_str(), HEADERFIELD_SIZE);
+  buf.write(pduLength.data(), HEADERFIELD_SIZE);
 
   if (buf.fail()) {
     throw smpp::SmppException("PDU failed to write length");
@@ -287,8 +287,8 @@ bool PDU::hasMoreData() {
   return !buf.eof();
 }
 
-uint32_t PDU::getPduLength(PduData pduHeader) {
-  auto i = reinterpret_cast<const uint32_t*>(pduHeader.c_str());
+uint32_t PDU::getPduLength(const PduLengthHeader &pduHeader) {
+  auto i = reinterpret_cast<const uint32_t*>(pduHeader.data());
   return ntohl(*i);
 }
 
