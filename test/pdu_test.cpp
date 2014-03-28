@@ -46,10 +46,14 @@ TEST(PduTest, binary) {
     uint8_t testdata[] = {
             0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x74, 0x65, 0x73, 0x74, 0x00, 0xde,
             0xad, 0xbe, 0xef, 0x13, 0x37, 0x80 };
-    boost::shared_array<uint8_t> head(new uint8_t[4]);
-    std::copy(testheader, testheader + 4, head.get());
-    boost::shared_array<uint8_t> data(new uint8_t[0x1c - 4]);
-    std::copy(testdata, testdata + 0x1c - 4, data.get());
+
+    PduData head;
+    PduData data;
+    head.resize(4);
+    data.resize(0x1c-4);
+
+    std::copy(testheader, testheader + 4, head.begin());
+    std::copy(testdata, testdata + 0x1c - 4, data.begin());
     smpp::PDU pdu(head, data);
 
     std::string s;

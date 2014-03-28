@@ -12,7 +12,7 @@ using std::hex;
 using std::setfill;
 using std::setw;
 
-std::string oc::tools::hexdump(uint8_t* bytes, size_t length) {
+std::string oc::tools::hexdump(const unsigned char* bytes, size_t length) {
   stringstream out;
 
   if (length == 0) {

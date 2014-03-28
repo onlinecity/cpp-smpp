@@ -31,10 +31,12 @@ TEST(SmsTest, copy) {
             0x36, 0x31, 0x35, 0x39, 0x39, 0x31, 0x37, 0x00, 0x05, 0x00, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x00,
             0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x02, 0x69, 0x00, 0x04, 0x27, 0x00, 0x01, 0x02 };
 
-    boost::shared_array<uint8_t> head(new uint8_t[4]);
-    std::copy(testheader, testheader + 4, head.get());
-    boost::shared_array<uint8_t> data(new uint8_t[53]);
-    std::copy(testdata, testdata + 53, data.get());
+    PduData head;
+    head.resize(4);
+    std::copy(testheader, testheader + 4, head.begin());
+    PduData data;
+    data.resize(53);
+    std::copy(testdata, testdata + 53, data.begin());
 
     smpp::PDU pdu(head, data);
     smpp::SMS sms(pdu);
@@ -77,10 +79,12 @@ TEST(SmsTest, dlr) {
             0x63, 0x36, 0x37, 0x65, 0x31, 0x36, 0x30, 0x38, 0x32, 0x34, 0x38, 0x33, 0x66, 0x39, 0x65, 0x38, 0x63, 0x64,
             0x31, 0x62, 0x31, 0x33, 0x35, 0x64, 0x64, 0x00 };
 
-    boost::shared_array<uint8_t> head(new uint8_t[4]);
-    std::copy(testheader, testheader + 4, head.get());
-    boost::shared_array<uint8_t> data(new uint8_t[0xe0]);
-    std::copy(testdata, testdata + 0xe0, data.get());
+    PduData head;
+    head.resize(4);
+    std::copy(testheader, testheader + 4, head.begin());
+    PduData data;
+    data.resize(0xe0);
+    std::copy(testdata, testdata + 0xe0, data.begin());
 
     smpp::PDU pdu(head, data);
     smpp::SMS sms(pdu);
@@ -105,7 +109,7 @@ TEST(SmsTest, dlr) {
     EXPECT_EQ(it->getOctets()[0], smpp::STATE_DELIVERED);
     it++;
     EXPECT_EQ(it->getTag(), smpp::tags::RECEIPTED_MESSAGE_ID);
-    EXPECT_EQ(string(reinterpret_cast<char*>(it->getOctets().get())), string("dc0dc8ec67e16082483f9e8cd1b135dd"));
+    EXPECT_EQ(it->getOctets(), string("dc0dc8ec67e16082483f9e8cd1b135dd", 33));
 
     // Assertions for DLR part of SMS
     EXPECT_EQ(dlr.id, string("dc0dc8ec67e16082483f9e8cd1b135dd"));

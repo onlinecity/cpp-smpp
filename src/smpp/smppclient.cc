@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <cassert>
 
 using std::string;
 using std::vector;
@@ -383,7 +384,7 @@ namespace smpp {
     deadline_timer timer(getIoService());
     timer.expires_from_now(boost::posix_time::milliseconds(socketWriteTimeout));
     timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
-    async_write(*socket, buffer(pdu.getOctets().get(), pdu.getSize()),
+    async_write(*socket, buffer(static_cast<const void*>(pdu.getOctets().c_str()), pdu.getSize()),
         boost::bind(&SmppClient::writeHandler, this, &ioResult, _1));
     socketExecute();
 
@@ -451,8 +452,9 @@ namespace smpp {
 
   bool SmppClient::socketPeek() {
     // prepare our read
-    shared_array<uint8_t> pduHeader(new uint8_t[4]);
-    async_read(*socket, buffer(pduHeader.get(), 4),
+    PduData pduHeader;
+    pduHeader.resize(4);
+    async_read(*socket, buffer(&*pduHeader.begin(), 4),
         boost::bind(&smpp::SmppClient::readPduHeaderHandler, this, _1, _2, pduHeader));
     size_t handlersCalled = getIoService().poll_one();
     getIoService().reset();
@@ -464,9 +466,10 @@ namespace smpp {
   void SmppClient::readPduBlocking() {
     optional<error_code> ioResult;
     optional<error_code> timerResult;
-    shared_array<uint8_t> pduHeader(new uint8_t[4]);
-    async_read(*socket, asio::buffer(pduHeader.get(), 4),
-        boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1, _2, pduHeader));
+    PduData pduHeader;
+    pduHeader.resize(4);
+    auto buf = asio::buffer(static_cast<void*>(&*pduHeader.begin()), 4);
+    async_read(*socket, buf, boost::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1, _2, pduHeader));
     deadline_timer timer(getIoService());
     timer.expires_from_now(boost::posix_time::milliseconds(socketReadTimeout));
     timer.async_wait(boost::bind(&SmppClient::handleTimeout, this, &timerResult, _1));
@@ -498,7 +501,7 @@ namespace smpp {
     getIoService().reset();
   }
 
-  void SmppClient::readPduHeaderHandler(const error_code &error, size_t len, const shared_array<uint8_t> &pduLength) {
+  void SmppClient::readPduHeaderHandler(const error_code &error, size_t len, const PduData &pduLength) {
     if (error) {
       if (error == asio::error::operation_aborted) {
         // Not treated as an error
@@ -509,15 +512,16 @@ namespace smpp {
     }
 
     uint32_t i = PDU::getPduLength(pduLength);
-    shared_array<uint8_t> pduBuffer(new uint8_t[i]);
+    PduData pduBuffer;
+    pduBuffer.resize(i);
     // start reading after the size mark of the pdu
-    async_read(*socket, buffer(pduBuffer.get(), i - 4),
+    async_read(*socket, buffer(&*pduBuffer.begin(), i - 4),
         boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2, pduLength, pduBuffer));
     socketExecute();
   }
 
   void SmppClient::readPduHeaderHandlerBlocking(optional<error_code>* opt, const error_code &error, size_t read,
-      shared_array<uint8_t> pduLength) {
+      const PduData &pduLength) {
     if (error) {
       if (error == asio::error::operation_aborted) {
         // Not treated as an error
@@ -529,21 +533,20 @@ namespace smpp {
 
     opt->reset(error);
     uint32_t i = PDU::getPduLength(pduLength);
-    shared_array<uint8_t> pduBuffer(new uint8_t[i - 4]);
+    PduData pduBuffer;
+    pduBuffer.resize(i - 4);
     // start reading after the size mark of the pdu
-    async_read(*socket, buffer(pduBuffer.get(), i - 4),
+    async_read(*socket, buffer(static_cast<char*>(&*pduBuffer.begin()), i - 4),
         boost::bind(&smpp::SmppClient::readPduBodyHandler, this, _1, _2, pduLength, pduBuffer));
     socketExecute();
   }
 
-  void SmppClient::readPduBodyHandler(const error_code &error, size_t len, shared_array<uint8_t> pduLength,
-      shared_array<uint8_t> pduBuffer) {
+  void SmppClient::readPduBodyHandler(const error_code &error, size_t len, const PduData &pduLength, const PduData &pduBuffer) {
     if (error) {
       throw TransportException(system_error(error).what());
     }
 
-    PDU pdu(pduLength, pduBuffer);
-    pdu_queue.push_back(pdu);
+    pdu_queue.emplace_back(pduLength, pduBuffer);
   }
 
   // blocks until response is read

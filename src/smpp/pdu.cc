@@ -6,6 +6,7 @@
 
 #include "smpp/pdu.h"
 #include <string>
+#include <iostream>
 
 using std::ios;
 using std::ios_base;
@@ -35,13 +36,13 @@ PDU::PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_se
 PDU::PDU(const PduData &pduLength, const PduData &pduBuffer) :
   sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false) {
   uint32_t bufSize = PDU::getPduLength(pduLength);
-  buf.write(reinterpret_cast<char*>(pduLength.get()), HEADERFIELD_SIZE);
+  buf.write(pduLength.c_str(), HEADERFIELD_SIZE);
 
   if (buf.fail()) {
     throw smpp::SmppException("PDU failed to write length");
   }
 
-  buf.write(reinterpret_cast<char*>(pduBuffer.get()), bufSize - HEADERFIELD_SIZE);
+  buf.write(pduBuffer.c_str(), bufSize - HEADERFIELD_SIZE);
 
   if (buf.fail()) {
     throw smpp::SmppException("PDU failed to write octets");
@@ -81,8 +82,9 @@ const PduData PDU::getOctets() {
 
   buf.seekp(0, ios::end);
   buf.seekg(0, ios::beg);
-  PduData octets(new uint8_t[size]);
-  buf.read(reinterpret_cast<char*>(octets.get()), size);
+  PduData octets;
+  octets.resize(size);
+  buf.read(&*octets.begin(), size);
 
   if (buf.fail()) {
     throw smpp::SmppException("PDU failed to read octets");
@@ -196,7 +198,7 @@ PDU &PDU::operator <<(smpp::TLV tlv) {
 }
 
 PDU &PDU::addOctets(const PduData &octets, const streamsize &len) {
-  buf.write(reinterpret_cast<char*>(octets.get()), len);
+  buf.write(octets.c_str(), len);
 
   if (buf.fail()) {
     throw smpp::SmppException("PDU failed to write octets");
@@ -271,8 +273,9 @@ PDU &PDU::operator>>(std::basic_string<char> &s) {
   return *this;
 }
 
-void PDU::readOctets(PduData &octets, const streamsize &len) {
-  buf.readsome(reinterpret_cast<char*>(octets.get()), len);
+void PDU::readOctets(PduData *octets, const streamsize &len) {
+  octets->resize(len);
+  buf.readsome(&*octets->begin(), len);
 
   if (buf.fail()) {
     throw smpp::SmppException(buf.eof() ? "PDU reached EOF" : "Last PDU IO operation failed");
@@ -285,7 +288,7 @@ bool PDU::hasMoreData() {
 }
 
 uint32_t PDU::getPduLength(PduData pduHeader) {
-  uint32_t* i = reinterpret_cast<uint32_t*>(pduHeader.get());
+  auto i = reinterpret_cast<const uint32_t*>(pduHeader.c_str());
   return ntohl(*i);
 }
 
@@ -303,7 +306,7 @@ std::ostream &smpp::operator<<(std::ostream &out, smpp::PDU &pdu) {
       << hex << pdu.getCommandId() << dec << endl << "cmd status:0x" << hex << pdu.getCommandStatus() <<
       dec << " : "
       << smpp::getEsmeStatus(pdu.getCommandStatus()) << endl;
-  out << oc::tools::hexdump(pdu.getOctets().get(), static_cast<size_t>(size));
+  out << oc::tools::hexdump(reinterpret_cast<const unsigned char*>(pdu.getOctets().c_str()), static_cast<size_t>(size));
   return out;
 }
 

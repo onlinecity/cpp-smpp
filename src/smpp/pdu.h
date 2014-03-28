@@ -22,13 +22,11 @@
 #include "smpp/exceptions.h"
 #include "smpp/hexdump.h"
 
-typedef boost::shared_array<uint8_t> PduData;
+typedef std::string PduData;
 
 namespace smpp {
 const int HEADERFIELD_SIZE = 4;
 const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
-
-
 
 /**
  * Class for representing a PDU.
@@ -140,7 +138,7 @@ class PDU {
    * @param array Target array.
    * @param n Octets to copy.
    */
-  void readOctets(PduData &octets, const std::streamsize &n);
+  void readOctets(PduData *octets, const std::streamsize &n);
 
   /**
    * @return True if the read marker is not at the end of the PDU.

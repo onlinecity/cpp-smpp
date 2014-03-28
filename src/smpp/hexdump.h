@@ -20,7 +20,7 @@ namespace tools {
  * @param length Length of the byte array.
  * @return
  */
-std::string hexdump(uint8_t* bytes, size_t length);
+std::string hexdump(const unsigned char* bytes, size_t length);
 
 }  // namespace tools
 }  // namespace oc

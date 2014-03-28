@@ -76,9 +76,10 @@ SMS::SMS(PDU &pdu) :
   pdu >> sm_default_msg_id;
   pdu >> sm_length;
   // read short_message with readOctets to ensure we get all chars including null bytes
-  boost::shared_array<uint8_t> msg(new uint8_t[sm_length]);
-  pdu.readOctets(msg, boost::numeric_cast<streamsize>(sm_length));
-  short_message = string(reinterpret_cast<char*>(msg.get()), boost::numeric_cast<size_t>(sm_length));
+  PduData msg;
+  msg.resize(sm_length);
+  pdu.readOctets(&msg, sm_length);
+  short_message = msg;
   // fetch any optional tags
   uint16_t len = 0;
   uint16_t tag = 0;
@@ -96,9 +97,10 @@ SMS::SMS(PDU &pdu) :
       continue;
     }
 
-    boost::shared_array<uint8_t> octets(new uint8_t[len]);
-    pdu.readOctets(octets, len);
-    tlvs.push_back(TLV(tag, len, octets));
+    PduData octets;
+    octets.resize(len);
+    pdu.readOctets(&octets, len);
+    tlvs.push_back(TLV(tag, octets));
   }
 }
 
