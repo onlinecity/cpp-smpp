@@ -11,7 +11,6 @@
 
 #include "asio.hpp"
 
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_io.hpp>
@@ -20,6 +19,7 @@
 
 #include <glog/logging.h>
 
+#include <chrono>
 #include <list>
 #include <memory>
 #include <sstream>
@@ -32,10 +32,12 @@
 #include "smpp/smpp.h"
 #include "smpp/sms.h"
 #include "smpp/timeformat.h"
+#include "smpp/time_traits.h"
 #include "smpp/tlv.h"
 
 namespace smpp {
 
+typedef asio::basic_deadline_timer<std::chrono::system_clock, smpp::CXX11Traits<std::chrono::system_clock>> ChronoDeadlineTimer;
 typedef boost::tuple<std::string, boost::local_time::local_date_time, int, int> QuerySmResult;
 
 /**

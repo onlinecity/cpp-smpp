@@ -6,6 +6,7 @@ SET(headers
 	smpp/smpp.h
 	smpp/sms.h
 	smpp/timeformat.h
+  smpp/time_traits.h
 	smpp/tlv.h
 	smpp/hexdump.h
 )

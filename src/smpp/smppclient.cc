@@ -21,10 +21,8 @@ using std::shared_ptr;
 
 using asio::system_error;
 using asio::error_code;
-using boost::shared_array;
 using boost::numeric_cast;
 using asio::ip::tcp;
-using asio::deadline_timer;
 using asio::async_write;
 using asio::buffer;
 using boost::local_time::local_date_time;
@@ -381,8 +379,8 @@ namespace smpp {
       LOG(INFO) << pdu;
     }
 
-    deadline_timer timer(getIoService());
-    timer.expires_from_now(boost::posix_time::milliseconds(socketWriteTimeout));
+    smpp::ChronoDeadlineTimer timer(getIoService());
+    timer.expires_from_now(std::chrono::milliseconds(socketWriteTimeout));
     timer.async_wait(std::bind(&SmppClient::handleTimeout, this, &timerResult, std::placeholders::_1));
 
     async_write(*socket,
@@ -470,12 +468,17 @@ namespace smpp {
     boost::optional<error_code> ioResult;
     boost::optional<error_code> timerResult;
     PduLengthHeader pduHeader;
+    async_read(*socket,
+        asio::buffer(pduHeader),
+        std::bind(&SmppClient::readPduHeaderHandlerBlocking,
+          this,
+          &ioResult,
+          std::placeholders::_1,
+          std::placeholders::_2,
+          &pduHeader));
 
-    //async_read(*socket, asio::buffer(pduHeader), std::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, _1,std::placeholders::_2, &pduHeader));
-    async_read(*socket, asio::buffer(pduHeader), std::bind(&SmppClient::readPduHeaderHandlerBlocking, this, &ioResult, std::placeholders::_1,std::placeholders::_2, &pduHeader));
-
-    deadline_timer timer(getIoService());
-    timer.expires_from_now(boost::posix_time::milliseconds(socketReadTimeout));
+    smpp::ChronoDeadlineTimer timer(getIoService());
+    timer.expires_from_now(std::chrono::milliseconds(socketReadTimeout));
     timer.async_wait(std::bind(&SmppClient::handleTimeout, this, &timerResult, std::placeholders::_1));
     socketExecute();
 
