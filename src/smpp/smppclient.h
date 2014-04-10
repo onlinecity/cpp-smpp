@@ -11,13 +11,11 @@
 
 #include "asio.hpp"
 
-#include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_io.hpp>
 #include <boost/function.hpp>
-#include <boost/bind/bind.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <glog/logging.h>
