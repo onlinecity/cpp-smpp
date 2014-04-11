@@ -5,6 +5,7 @@
  */
 
 #include "smpp/pdu.h"
+#include <netinet/in.h>
 #include <string>
 #include <iostream>
 #include "hexdump.h"
