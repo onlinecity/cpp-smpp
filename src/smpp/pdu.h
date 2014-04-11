@@ -7,13 +7,6 @@
 #ifndef SMPP_PDU_H_
 #define SMPP_PDU_H_
 
-#include <cstdint>
-#include <netinet/in.h>
-
-#include <boost/numeric/conversion/cast.hpp>
-#include <boost/shared_array.hpp>
-
-#include <iomanip>
 #include <string>
 #include <sstream>
 #include <array>
@@ -21,8 +14,6 @@
 #include "smpp/smpp.h"
 #include "smpp/tlv.h"
 #include "smpp/exceptions.h"
-#include "smpp/hexdump.h"
-
 
 namespace smpp {
 

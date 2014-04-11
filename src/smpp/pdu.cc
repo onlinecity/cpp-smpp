@@ -7,6 +7,7 @@
 #include "smpp/pdu.h"
 #include <string>
 #include <iostream>
+#include "hexdump.h"
 
 using std::ios;
 using std::ios_base;
@@ -15,7 +16,7 @@ using std::streamsize;
 using std::dec;
 using std::hex;
 using std::endl;
-using boost::shared_array;
+//using boost::shared_array;
 
 namespace smpp {
 
