@@ -9,6 +9,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -pedantic")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-long-long -Wno-variadic-macros") # warnings as errors
 
+# Add src before libs to make use it don't use installed headers
+include_directories(src)
+
 # ASIO lib
 include(asio.cmake)
 include_directories(${ASIO_INCLUDE_DIR})
@@ -37,7 +40,6 @@ set(link_libs
 	${GFLAGS_LIB}
 )
 
-include_directories(src)
 add_subdirectory (src)
 
 option (ENABLE_TEST "Compile unit testing and CTest target" ON)
