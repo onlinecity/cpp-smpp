@@ -8,20 +8,19 @@
 #define SMPP_SMPPCLIENT_H_
 
 #include <boost/thread/thread.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/tuple/tuple_io.hpp>
-#include <boost/function.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <glog/logging.h>
 
 #include <cstdint>
 
 #include <chrono>
+#include <functional>
 #include <list>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <vector>
 #include <utility>
 
@@ -38,7 +37,7 @@ namespace smpp {
 
 typedef asio::basic_deadline_timer<std::chrono::system_clock, smpp::CXX11Traits<std::chrono::system_clock>>
     ChronoDeadlineTimer;
-typedef boost::tuple<std::string, boost::local_time::local_date_time, int, int> QuerySmResult;
+typedef std::tuple<std::string, boost::local_time::local_date_time, int, int> QuerySmResult;
 
 /**
  * Class for sending and receiving SMSes through the SMPP protocol.
@@ -78,7 +77,7 @@ class SmppClient {
   // Method to use when dealing with concatenated messages.
   int csmsMethod;
 
-  boost::function<uint16_t()> msgRefCallback;
+  std::function<uint16_t()> msgRefCallback;
 
   int state;
   std::shared_ptr<asio::ip::tcp::socket> socket;
@@ -149,7 +148,7 @@ class SmppClient {
   /**
    * Query the SMSC about current state/status of a previous sent SMS.
    * You must specify the SMSC assigned message id and source of the sent SMS.
-   * Returns an boost::tuple with elements: message_id, final_date, message_state and error_code.
+   * Returns an std::tuple with elements: message_id, final_date, message_state and error_code.
    * message_state would be one of the SMPP::STATE_* constants. (SMPP v3.4 section 5.2.28)
    * error_code depends on the telco network, so could be anything.
    *
@@ -327,7 +326,7 @@ class SmppClient {
    * The returned integer must be modulo 65535 (0xffff)
    * @param cb
    */
-  void setMsgRefCallback(boost::function<uint16_t()> cb) {
+  void setMsgRefCallback(std::function<uint16_t()> cb) {
     msgRefCallback = cb;
   }
 

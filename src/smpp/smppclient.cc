@@ -293,10 +293,8 @@ namespace smpp {
         it = pdu_queue.erase(it);
         continue;
       }
-
       ++it;
     }
-
     return SMS();
   }
 
@@ -319,7 +317,6 @@ namespace smpp {
         n = len - pos;
       }
     }
-
     return parts;
   }
 
@@ -366,7 +363,6 @@ namespace smpp {
     if (++seqNo > 0x7FFFFFFF) {
       throw SmppException("Ran out of sequence numbers");
     }
-
     return seqNo;
   }
 
@@ -407,15 +403,12 @@ namespace smpp {
       case smpp::ESME_RINVPASWD:
         throw smpp::InvalidPasswordException(smpp::getEsmeStatus(resp.getCommandStatus()));
         break;
-
       case smpp::ESME_RINVSYSID:
         throw smpp::InvalidSystemIdException(smpp::getEsmeStatus(resp.getCommandStatus()));
         break;
-
       case smpp::ESME_RINVSRCADR:
         throw smpp::InvalidSourceAddressException(smpp::getEsmeStatus(resp.getCommandStatus()));
         break;
-
       case smpp::ESME_RINVDSTADR:
         throw smpp::InvalidDestinationAddressException(smpp::getEsmeStatus(resp.getCommandStatus()));
         break;
@@ -567,7 +560,6 @@ namespace smpp {
 
     while (it != pdu_queue.end()) {
       PDU pdu = (*it);
-
       if (pdu.getSequenceNo() == sequence && pdu.getCommandId() == response) {
         it = pdu_queue.erase(it);
         return pdu;
@@ -578,7 +570,6 @@ namespace smpp {
 
     while (true) {
       PDU pdu = readPdu(true);
-
       if (!pdu.null) {
         if ((pdu.getSequenceNo() == sequence && (pdu.getCommandId() == response
                 || pdu.getCommandId() == GENERIC_NACK))
@@ -597,12 +588,10 @@ namespace smpp {
 
     while (it != pdu_queue.end()) {
       PDU pdu = (*it);
-
       if (pdu.getCommandId() == ENQUIRE_LINK) {
         PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.getSequenceNo());
         sendCommand(resp);
       }
-
       it++;
     }
 

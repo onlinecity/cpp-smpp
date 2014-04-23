@@ -6,6 +6,7 @@
 #include <glog/logging.h>
 #include <list>
 #include <string>
+#include <tuple>
 #include "asio.hpp"
 #include "gtest/gtest.h"
 #include "smpp/gsmencoding.h"
@@ -60,7 +61,7 @@ TEST_F(SmppClientTest, querySm) {
   auto smscResult = client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   string smscId = smscResult.first;
   smpp::QuerySmResult result = client->querySm(smscId, from);
-  ASSERT_EQ(result.get<0>(), smscId);
+  ASSERT_EQ(std::get<0>(result), smscId);
   client->unbind();
   socket->close();
 }
