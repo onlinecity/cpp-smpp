@@ -7,17 +7,14 @@
 #ifndef SMPP_SMPPCLIENT_H_
 #define SMPP_SMPPCLIENT_H_
 
-#include <cstdint>
-
-#include "asio.hpp"
-
 #include <boost/thread/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_io.hpp>
 #include <boost/function.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-
 #include <glog/logging.h>
+
+#include <cstdint>
 
 #include <chrono>
 #include <list>
@@ -26,7 +23,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <utility>
 
+#include "asio.hpp"
 #include "smpp/exceptions.h"
 #include "smpp/pdu.h"
 #include "smpp/smpp.h"
@@ -136,8 +135,10 @@ class SmppClient {
    */
   std::pair<std::string, int> sendSms(const SmppAddress &sender, const SmppAddress &receiver,
                                       const std::string &shortMessage,
-                                      std::list<TLV> tags = std::list<TLV>(), const uint8_t priority_flag = 0,
-                                      const std::string &schedule_delivery_time = "", const std::string &validity_period = "",
+                                      std::list<TLV> tags = std::list<TLV>(),
+                                      const uint8_t priority_flag = 0,
+                                      const std::string &schedule_delivery_time = "",
+                                      const std::string &validity_period = "",
                                       const int dataCoding = smpp::DATA_CODING_DEFAULT);
   /**
    * Returns the first SMS in the PDU queue,
@@ -490,15 +491,10 @@ class SmppClient {
   static uint16_t defaultMessageRef();
 
   /**
-   * Calls io_service or get_io_service on the current socket depending on the Boost.Asio version
-   * In Boost ASIO 1.6.0+/Boost 1.47 io_service is renamed to get_io_service
+   * Calls io_service or get_io_service on the current socket.
    */
   asio::io_service &getIoService() const {
-//#if defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
     return socket->get_io_service();
-//#else
-//        return socket->io_service();
-//#endif  // defined(BOOST_ASIO_VERSION) && (BOOST_ASIO_VERSION >= 100600)
   }
 };
 }  // namespace smpp

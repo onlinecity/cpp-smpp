@@ -42,7 +42,6 @@ struct CXX11Traits {
       boost::posix_time::microseconds(in_usec.count());
     return result;
   }
-
 };
 }  // namespace smpp
 
