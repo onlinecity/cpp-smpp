@@ -81,7 +81,7 @@ class TLV {
 
   template <class Integral, class = typename std::enable_if<std::is_integral<Integral>::value >::type>
   TLV(const uint16_t &_tag, Integral value) :
-      tag(_tag), len(sizeof(value)), octets(std::to_string(value)) {
+    tag(_tag), len(sizeof(value)), octets(std::to_string(value)) {
   }
 
   /**

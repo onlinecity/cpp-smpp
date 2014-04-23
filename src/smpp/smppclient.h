@@ -37,7 +37,8 @@
 
 namespace smpp {
 
-typedef asio::basic_deadline_timer<std::chrono::system_clock, smpp::CXX11Traits<std::chrono::system_clock>> ChronoDeadlineTimer;
+typedef asio::basic_deadline_timer<std::chrono::system_clock, smpp::CXX11Traits<std::chrono::system_clock>>
+    ChronoDeadlineTimer;
 typedef boost::tuple<std::string, boost::local_time::local_date_time, int, int> QuerySmResult;
 
 /**
@@ -409,14 +410,14 @@ class SmppClient {
 
   void readPduBlocking();
 
-  void handleTimeout(boost::optional<asio::error_code>* opt, const asio::error_code &error);
+  void handleTimeout(boost::optional<asio::error_code> *opt, const asio::error_code &error);
 
   /**
    * Async write handler.
    * @param
    * @throw TransportException if an error occurred.
    */
-  void writeHandler(boost::optional<asio::error_code>* opt, const asio::error_code &error);
+  void writeHandler(boost::optional<asio::error_code> *opt, const asio::error_code &error);
 
   /**
    * Peeks at the socket and returns true if there is data to be read.
@@ -438,7 +439,7 @@ class SmppClient {
   void readPduHeaderHandler(const asio::error_code &error, size_t read,
                             const PduLengthHeader *pduLength);
 
-  void readPduHeaderHandlerBlocking(boost::optional<asio::error_code>* opt,
+  void readPduHeaderHandlerBlocking(boost::optional<asio::error_code> *opt,
                                     const asio::error_code &error, size_t read,
                                     const PduLengthHeader *pduLength);
 
