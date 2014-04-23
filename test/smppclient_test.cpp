@@ -45,7 +45,7 @@ TEST_F(SmppClientTest, submit) {
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message = "message to send";
-  client->sendSms(from, to, GsmEncoder::getGsm0338(message));
+  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   client->unbind();
   socket->close();
 }
@@ -57,7 +57,7 @@ TEST_F(SmppClientTest, querySm) {
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message = "message to send";
-  auto smscResult = client->sendSms(from, to, GsmEncoder::getGsm0338(message));
+  auto smscResult = client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   string smscId = smscResult.first;
   smpp::QuerySmResult result = client->querySm(smscId, from);
   ASSERT_EQ(result.get<0>(), smscId);
@@ -81,11 +81,11 @@ TEST_F(SmppClientTest, csms) {
 
   int csmsMethod = client->getCsmsMethod();
   client->setCsmsMethod(SmppClient::CSMS_PAYLOAD);
-  client->sendSms(from, to, GsmEncoder::getGsm0338(message));
+  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
-  client->sendSms(from, to, GsmEncoder::getGsm0338(message));
+  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   client->setCsmsMethod(SmppClient::CSMS_8BIT_UDH);
-  client->sendSms(from, to, GsmEncoder::getGsm0338(message));
+  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   client->setCsmsMethod(csmsMethod);
   client->unbind();
   socket->close();
@@ -102,7 +102,7 @@ TEST_F(SmppClientTest, tlv) {
   taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT,
                         static_cast<uint8_t>(0x01)));  // "flash sms" use-case
   taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
-  client->sendSms(from, to, GsmEncoder::getGsm0338(message), taglist);
+  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist);
   client->unbind();
   socket->close();
 }
@@ -125,7 +125,7 @@ TEST_F(SmppClientTest, tlvExtended) {
   taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
   int csmsMethod = client->getCsmsMethod();
   client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
-  client->sendSms(from, to, GsmEncoder::getGsm0338(message), taglist);
+  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist);
   client->setCsmsMethod(csmsMethod);
   client->unbind();
   socket->close();
@@ -153,7 +153,7 @@ TEST_F(SmppClientTest, submitExtended) {
   string vt = getTimeString(time_duration(1, 0, 0));  // valid for one hour
   uint8_t regdlr = client->getRegisteredDelivery();
   client->setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);
-  client->sendSms(from, to, GsmEncoder::getGsm0338(message), taglist, 0x01, sdt, vt,
+  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist, 0x01, sdt, vt,
                   smpp::DATA_CODING_ISO8859_1);
   client->setRegisteredDelivery(regdlr);
   client->unbind();
