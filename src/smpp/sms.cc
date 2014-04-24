@@ -15,48 +15,48 @@ using std::string;
 
 namespace smpp {
 SMS::SMS() :
-  service_type(""), /**/
-  source_addr_ton(0), /**/
-  source_addr_npi(0), /**/
-  source_addr(""), /**/
-  dest_addr_ton(0), /**/
-  dest_addr_npi(0), /**/
-  dest_addr(""), /**/
-  esm_class(0), /**/
-  protocol_id(0), /**/
-  priority_flag(0), /**/
-  schedule_delivery_time(""), /**/
-  validity_period(""), /**/
-  registered_delivery(0), /**/
-  replace_if_present_flag(0), /**/
-  data_coding(0), /**/
-  sm_default_msg_id(0), /**/
-  sm_length(0), /**/
-  short_message(""), /**/
-  tlvs(), /**/
+  service_type(""),
+  source_addr_ton(0),
+  source_addr_npi(0),
+  source_addr(""),
+  dest_addr_ton(0),
+  dest_addr_npi(0),
+  dest_addr(""),
+  esm_class(0),
+  protocol_id(0),
+  priority_flag(0),
+  schedule_delivery_time(""),
+  validity_period(""),
+  registered_delivery(0),
+  replace_if_present_flag(0),
+  data_coding(0),
+  sm_default_msg_id(0),
+  sm_length(0),
+  short_message(""),
+  tlvs(),
   is_null(true) {
 }
 
 SMS::SMS(PDU &pdu) :
-  service_type(""), /**/
-  source_addr_ton(0), /**/
-  source_addr_npi(0), /**/
-  source_addr(""), /**/
-  dest_addr_ton(0), /**/
-  dest_addr_npi(0), /**/
-  dest_addr(""), /**/
-  esm_class(0), /**/
-  protocol_id(0), /**/
-  priority_flag(0), /**/
-  schedule_delivery_time(""), /**/
-  validity_period(""), /**/
-  registered_delivery(0), /**/
-  replace_if_present_flag(0), /**/
-  data_coding(0), /**/
-  sm_default_msg_id(0), /**/
-  sm_length(0), /**/
-  short_message(""), /**/
-  tlvs(), /**/
+  service_type(""),
+  source_addr_ton(0),
+  source_addr_npi(0),
+  source_addr(""),
+  dest_addr_ton(0),
+  dest_addr_npi(0),
+  dest_addr(""),
+  esm_class(0),
+  protocol_id(0),
+  priority_flag(0),
+  schedule_delivery_time(""),
+  validity_period(""),
+  registered_delivery(0),
+  replace_if_present_flag(0),
+  data_coding(0),
+  sm_default_msg_id(0),
+  sm_length(0),
+  short_message(""),
+  tlvs(),
   is_null(false) {
   pdu >> service_type;
   pdu >> source_addr_ton;
@@ -105,25 +105,25 @@ SMS::SMS(PDU &pdu) :
 }
 
 SMS::SMS(const SMS &rhs) :
-  service_type(rhs.service_type), /**/
-  source_addr_ton(rhs.source_addr_ton), /**/
-  source_addr_npi(rhs.source_addr_npi), /**/
-  source_addr(rhs.source_addr), /**/
-  dest_addr_ton(rhs.dest_addr_ton), /**/
-  dest_addr_npi(rhs.dest_addr_npi), /**/
-  dest_addr(rhs.dest_addr), /**/
-  esm_class(rhs.esm_class), /**/
-  protocol_id(rhs.protocol_id), /**/
-  priority_flag(rhs.priority_flag), /**/
-  schedule_delivery_time(rhs.schedule_delivery_time), /**/
-  validity_period(rhs.validity_period), /**/
-  registered_delivery(rhs.registered_delivery), /**/
-  replace_if_present_flag(rhs.replace_if_present_flag), /**/
-  data_coding(rhs.data_coding), /**/
-  sm_default_msg_id(rhs.sm_default_msg_id), /**/
-  sm_length(rhs.sm_length), /**/
-  short_message(rhs.short_message), /**/
-  tlvs(), /**/
+  service_type(rhs.service_type),
+  source_addr_ton(rhs.source_addr_ton),
+  source_addr_npi(rhs.source_addr_npi),
+  source_addr(rhs.source_addr),
+  dest_addr_ton(rhs.dest_addr_ton),
+  dest_addr_npi(rhs.dest_addr_npi),
+  dest_addr(rhs.dest_addr),
+  esm_class(rhs.esm_class),
+  protocol_id(rhs.protocol_id),
+  priority_flag(rhs.priority_flag),
+  schedule_delivery_time(rhs.schedule_delivery_time),
+  validity_period(rhs.validity_period),
+  registered_delivery(rhs.registered_delivery),
+  replace_if_present_flag(rhs.replace_if_present_flag),
+  data_coding(rhs.data_coding),
+  sm_default_msg_id(rhs.sm_default_msg_id),
+  sm_length(rhs.sm_length),
+  short_message(rhs.short_message),
+  tlvs(),
   is_null(rhs.is_null) {
   if (!is_null) {
     tlvs.assign(rhs.tlvs.begin(), rhs.tlvs.end());
@@ -143,14 +143,14 @@ DeliveryReport::DeliveryReport() :
 }
 
 DeliveryReport::DeliveryReport(const SMS &sms) :
-  SMS(sms), /**/
-  id(""), /**/
-  sub(0), /**/
-  dlvrd(0), /**/
-  submitDate(), /**/
-  doneDate(), /**/
-  stat(""), /**/
-  err(""), /**/
+  SMS(sms),
+  id(""),
+  sub(0),
+  dlvrd(0),
+  submitDate(),
+  doneDate(),
+  stat(""),
+  err(""),
   text("") {
   std::regex expression(
     "^id:([^ ]+)\\s+sub:(\\d{1,3})\\s+dlvrd:(\\d{1,3})\\s+submit\\s+date:(\\d{1,10})\\s+done\\s+date:(\\d{1,10})\\s+stat:([A-Z]{7})\\s+err:(\\d{1,3})\\s+text:(.*)$");
@@ -169,14 +169,14 @@ DeliveryReport::DeliveryReport(const SMS &sms) :
 }
 
 DeliveryReport::DeliveryReport(const DeliveryReport &rhs) :
-  smpp::SMS(rhs), /**/
-  id(rhs.id), /**/
-  sub(rhs.sub), /**/
-  dlvrd(rhs.dlvrd), /**/
-  submitDate(rhs.submitDate), /**/
-  doneDate(rhs.doneDate), /**/
-  stat(rhs.stat), /**/
-  err(rhs.err), /**/
+  smpp::SMS(rhs),
+  id(rhs.id),
+  sub(rhs.sub),
+  dlvrd(rhs.dlvrd),
+  submitDate(rhs.submitDate),
+  doneDate(rhs.doneDate),
+  stat(rhs.stat),
+  err(rhs.err),
   text(rhs.text) {
 }
 }  // namespace smpp
