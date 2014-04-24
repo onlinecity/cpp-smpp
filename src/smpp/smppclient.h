@@ -7,7 +7,6 @@
 #ifndef SMPP_SMPPCLIENT_H_
 #define SMPP_SMPPCLIENT_H_
 
-//#include <boost/thread/thread.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <glog/logging.h>
 
