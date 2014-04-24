@@ -7,11 +7,12 @@
 #ifndef SMPP_SMS_H_
 #define SMPP_SMS_H_
 
-#include <boost/shared_array.hpp>
-#include <boost/date_time.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+///#include <boost/shared_array.hpp>
+//#include <boost/date_time.hpp>
+//#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <chrono>
 #include <list>
 #include <string>
 
@@ -71,8 +72,8 @@ class DeliveryReport: public SMS {
   std::string id;
   uint32_t sub;
   uint32_t dlvrd;
-  boost::posix_time::ptime submitDate;
-  boost::posix_time::ptime doneDate;
+  std::chrono::time_point<std::chrono::system_clock> submit_date_;
+  std::chrono::time_point<std::chrono::system_clock> done_date_;
   std::string stat;
   std::string err;
   std::string text;

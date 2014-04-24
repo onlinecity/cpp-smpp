@@ -11,6 +11,7 @@
 #include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
+#include <chrono>
 #include <utility>
 #include <regex>
 #include <string>
@@ -21,6 +22,8 @@ namespace smpp {
 namespace timeformat {
 
 typedef std::pair<boost::local_time::local_date_time, boost::posix_time::time_duration> DatePair;
+
+std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::string &time);
 
 /**
  * Parses a relative timestamp and returns it as a time_duration.
@@ -59,6 +62,7 @@ boost::posix_time::ptime parseDlrTimestamp(const std::string &time);
  * @return
  */
 std::string getTimeString(const boost::local_time::local_date_time &ldt);
+
 /**
  * Returns a relative timestamp created from the time_duration. Since a time_duration does not handle
  * dates, the relative dates is calculated with the assumption of one year equals 365 days and a month is 30 days long.

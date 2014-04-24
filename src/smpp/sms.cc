@@ -135,8 +135,8 @@ DeliveryReport::DeliveryReport() :
   id(""),
   sub(0),
   dlvrd(0),
-  submitDate(),
-  doneDate(),
+  submit_date_(),
+  done_date_(),
   stat(""),
   err(""),
   text("") {
@@ -147,8 +147,8 @@ DeliveryReport::DeliveryReport(const SMS &sms) :
   id(""),
   sub(0),
   dlvrd(0),
-  submitDate(),
-  doneDate(),
+  submit_date_(),
+  done_date_(),
   stat(""),
   err(""),
   text("") {
@@ -160,8 +160,8 @@ DeliveryReport::DeliveryReport(const SMS &sms) :
     id = what[1];
     sub = stoi(what[2]);
     dlvrd = stoi(what[3]);
-    submitDate = smpp::timeformat::parseDlrTimestamp(what[4]);
-    doneDate = smpp::timeformat::parseDlrTimestamp(what[5]);
+    submit_date_ = smpp::timeformat::ParseDlrTimestamp(what[4]);
+    done_date_ = smpp::timeformat::ParseDlrTimestamp(what[5]);
     stat = what[6];
     err = what[7];
     text = what[8];
@@ -173,8 +173,8 @@ DeliveryReport::DeliveryReport(const DeliveryReport &rhs) :
   id(rhs.id),
   sub(rhs.sub),
   dlvrd(rhs.dlvrd),
-  submitDate(rhs.submitDate),
-  doneDate(rhs.doneDate),
+  submit_date_(rhs.submit_date_),
+  done_date_(rhs.done_date_),
   stat(rhs.stat),
   err(rhs.err),
   text(rhs.text) {

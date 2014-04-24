@@ -26,6 +26,15 @@ using std::smatch;
 
 namespace smpp {
 namespace timeformat {
+
+std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::string &time) {
+  struct tm tm;
+  tm.tm_isdst = -1;  // Set to avoid garbage.
+  tm.tm_sec = 0;     // Set to avoid garbage.
+  strptime(time.c_str(), "%y%m%d%H%M", &tm);
+  return std::chrono::system_clock::from_time_t(mktime(&tm));
+}
+
 time_duration parseRelativeTimestamp(const smatch &match) {
   int yy = stoi(match[1]);
   int mon = stoi(match[2]);

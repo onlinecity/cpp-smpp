@@ -152,6 +152,7 @@ TEST_F(SmppClientTest, submitExtended) {
   ldt += time_duration(0, 5, 0);
   string sdt = getTimeString(ldt);  // send in five minutes
   string vt = getTimeString(time_duration(1, 0, 0));  // valid for one hour
+
   uint8_t regdlr = client->getRegisteredDelivery();
   client->setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);
   client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist, 0x01, sdt, vt,

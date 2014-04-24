@@ -4,13 +4,12 @@
  */
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
 
 #include <algorithm>
 #include <list>
 #include <string>
 
+#include "smpp/timeformat.h"
 #include "gtest/gtest.h"
 #include "smpp/sms.h"
 #include "smpp/smpp.h"
@@ -58,9 +57,6 @@ TEST(SmsTest, copy) {
 }
 
 TEST(SmsTest, dlr) {
-  using boost::gregorian::date;
-  using boost::posix_time::ptime;
-  using boost::posix_time::time_duration;
   uint8_t testheader[] = { 0x00, 0x00, 0x00, 0xe4 };
   uint8_t testdata[] = {
     0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x34, 0x35, 0x32,
@@ -108,8 +104,8 @@ TEST(SmsTest, dlr) {
   EXPECT_EQ(dlr.id, string("dc0dc8ec67e16082483f9e8cd1b135dd"));
   EXPECT_EQ(dlr.sub, uint32_t(1));
   EXPECT_EQ(dlr.dlvrd, uint32_t(1));
-  EXPECT_EQ(dlr.submitDate, ptime(date(2011, boost::gregorian::Oct, 26), time_duration(16, 46, 0)));
-  EXPECT_EQ(dlr.doneDate, ptime(date(2011, boost::gregorian::Oct, 26), time_duration(16, 47, 0)));
+  EXPECT_EQ(dlr.submit_date_, smpp::timeformat::ParseDlrTimestamp("1110261646"));
+  EXPECT_EQ(dlr.done_date_, smpp::timeformat::ParseDlrTimestamp("1110261647"));
   EXPECT_EQ(dlr.stat, string("DELIVRD"));
   EXPECT_EQ(dlr.err, string("000"));
 }

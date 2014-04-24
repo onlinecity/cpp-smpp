@@ -64,6 +64,34 @@ TEST(TimeTest, formats) {
   EXPECT_THROW(parseSmppTimestamp(""), smpp::SmppException);
 }
 
+TEST(TimeTest, ParseDlrTimestamp) {
+  namespace sc = std::chrono;
+  struct tm tm;
+  tm.tm_year = 2014 - 1900;
+  tm.tm_mon = 1;
+  tm.tm_mday = 3;
+  tm.tm_hour = 13;
+  tm.tm_min = 37;
+  tm.tm_sec = 0;
+  tm.tm_isdst = -1;
+
+  auto exp_time1 = sc::system_clock::from_time_t(std::mktime(&tm));
+  auto time1 = smpp::timeformat::ParseDlrTimestamp("1402031337");
+  ASSERT_EQ(time1, exp_time1);
+
+  tm.tm_year = 2009 - 1900;
+  tm.tm_mon = 5;
+  tm.tm_mday = 5;
+  tm.tm_hour = 13;
+  tm.tm_min = 37;
+  tm.tm_sec = 0;
+  tm.tm_isdst = -1;
+
+  auto exp_time2 = sc::system_clock::from_time_t(std::mktime(&tm));
+  auto time2 = smpp::timeformat::ParseDlrTimestamp("0906051337");
+  ASSERT_EQ(time2, exp_time2);
+}
+
 TEST(TimeTest, dlr) {
   ptime pt1 = parseDlrTimestamp("1102031337");
   ASSERT_EQ(pt1, ptime(date(2011, boost::gregorian::Feb, 3), time_duration(13, 37, 0)));
