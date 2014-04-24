@@ -368,8 +368,8 @@ namespace smpp {
 
   void SmppClient::sendPdu(PDU &pdu) {
     checkConnection();
-    boost::optional<error_code> ioResult;
-    boost::optional<error_code> timerResult;
+    bool ioResult = false;
+    bool timerResult = false;
 
     if (verbose) {
       LOG(INFO) << pdu;
@@ -458,8 +458,8 @@ namespace smpp {
   }
 
   void SmppClient::readPduBlocking() {
-    boost::optional<error_code> ioResult;
-    boost::optional<error_code> timerResult;
+    bool ioResult = false;
+    bool timerResult = false;
     PduLengthHeader pduHeader;
     async_read(*socket,
         asio::buffer(pduHeader),
@@ -484,13 +484,15 @@ namespace smpp {
     socketExecute();
   }
 
-  void SmppClient::handleTimeout(boost::optional<error_code>* opt, const error_code &error) {
-    opt->reset(error);
+  void SmppClient::handleTimeout(bool *had_error, const error_code &error) {
+    *had_error = true;
+   // if (error) {
+   //   *had_error = true;
+   // }
   }
 
-  void SmppClient::writeHandler(boost::optional<error_code>* opt, const error_code &error) {
-    opt->reset(error);
-
+  void SmppClient::writeHandler(bool *had_error, const error_code &error) {
+    *had_error = true;
     if (error) {
       throw TransportException(system_error(error).what());
     }
@@ -523,9 +525,8 @@ namespace smpp {
     socketExecute();
   }
 
-  void SmppClient::readPduHeaderHandlerBlocking(boost::optional<error_code>* opt, const error_code &error, size_t read,
+  void SmppClient::readPduHeaderHandlerBlocking(bool *had_error, const error_code &error, size_t read,
       const PduLengthHeader *pduLength) {
-
     if (error) {
       if (error == asio::error::operation_aborted) {
         // Not treated as an error
@@ -535,7 +536,7 @@ namespace smpp {
       throw TransportException(system_error(error).what());
     }
 
-    opt->reset(error);
+    *had_error = true;
     uint32_t i = PDU::getPduLength(*pduLength);
     PduData pduBuffer;
     pduBuffer.resize(i - 4);
