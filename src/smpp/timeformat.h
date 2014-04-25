@@ -22,8 +22,9 @@ namespace smpp {
 namespace timeformat {
 
 typedef std::pair<boost::local_time::local_date_time, boost::posix_time::time_duration> DatePair;
+typedef std::pair<std::chrono::time_point<std::chrono::system_clock>,
+        std::chrono::seconds> ChronoDatePair;
 
-std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::string &time);
 
 /**
  * Parses a relative timestamp and returns it as a time_duration.
@@ -31,6 +32,7 @@ std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::
  * @return time_duration representation of the timestamp.
  */
 boost::posix_time::time_duration parseRelativeTimestamp(const std::smatch &match);
+std::chrono::seconds ParseRelativeTimestamp(const std::smatch &match);
 
 /**
  * Parses an absolute timestamp and returns it as a local_date_time.
@@ -38,6 +40,7 @@ boost::posix_time::time_duration parseRelativeTimestamp(const std::smatch &match
  * @return local_date_time representation of the timestamp.
  */
 boost::local_time::local_date_time parseAbsoluteTimestamp(const std::smatch &match);
+std::chrono::time_point<std::chrono::system_clock> ParseAbsoluteTimestamp(const std::smatch &match);
 
 /**
  * Parses a smpp timestamp and returns a DatePair representation of the timestamp.
@@ -48,6 +51,7 @@ boost::local_time::local_date_time parseAbsoluteTimestamp(const std::smatch &mat
  * @throw SmppException.
  */
 DatePair parseSmppTimestamp(const std::string &time);
+ChronoDatePair ParseSmppTimestamp(const std::string &time);
 
 /**
  * Parses a delivery receipt timestamp and returns it as ptime.
@@ -55,6 +59,7 @@ DatePair parseSmppTimestamp(const std::string &time);
  * @return ptime representation of the timestamp.
  */
 boost::posix_time::ptime parseDlrTimestamp(const std::string &time);
+std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::string &time);
 
 /**
  * Returns the local_date_time as a string formatted as an absolute timestamp

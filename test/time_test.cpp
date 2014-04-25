@@ -15,6 +15,10 @@
 #include "smpp/timeformat.h"
 
 using std::string;
+
+using smpp::timeformat::ChronoDatePair;
+using smpp::timeformat::ParseSmppTimestamp;
+
 using smpp::timeformat::DatePair;
 using smpp::timeformat::parseSmppTimestamp;
 using smpp::timeformat::parseDlrTimestamp;
@@ -25,6 +29,27 @@ using boost::local_time::posix_time_zone;
 using boost::gregorian::date;
 using boost::posix_time::time_duration;
 using boost::posix_time::ptime;
+namespace sc = std::chrono;
+
+void print(const std::string &tp_id, const sc::time_point<sc::system_clock> &tp) {
+  auto t = sc::system_clock::to_time_t(tp);
+  std::cout << tp_id << ":"
+  << std::put_time(std::localtime(&t), "%C %F %T %Z %z")
+  << std::endl;
+}
+
+sc::time_point<sc::system_clock> MakeTimePoint(int yy, int mon, int mday, int hour, int min, int sec, long gmtoff) {
+  struct tm tm;
+  tm.tm_year = yy - 1900;
+  tm.tm_mon = mon - 1;
+  tm.tm_mday = mday;
+  tm.tm_hour = hour;
+  tm.tm_min = min;
+  tm.tm_sec = sec;
+  tm.tm_isdst = -1;
+  tm.tm_gmtoff = gmtoff * 60;
+  return sc::system_clock::from_time_t(std::mktime(&tm));
+}
 
 TEST(TimeTest, absolute) {
   time_zone_ptr gmt(new posix_time_zone("GMT"));
@@ -41,10 +66,25 @@ TEST(TimeTest, absolute) {
   ASSERT_TRUE(!pair2.second.is_not_a_date_time());
   DatePair pair3 = parseSmppTimestamp("111019080000004-");
   ASSERT_EQ(pair3.first, local_date_time(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(9,
-                                         00, 0)), gmt));
+                                         0, 0)), gmt));
   ASSERT_EQ(pair3.first.zone()->base_utc_offset(), time_duration(-1, 0, 0));
   ASSERT_TRUE(!pair3.second.is_not_a_date_time());
 }
+
+TEST(TimeTest, ParseAbsolute) {
+  ChronoDatePair pair1 = ParseSmppTimestamp("111019080000002+");
+  auto time1 = MakeTimePoint(2011, 10, 19, 8, 0, 0, 2 * 15);
+  ASSERT_EQ(pair1.first, time1);
+
+  ChronoDatePair pair2 = ParseSmppTimestamp("111019080000017+");
+  auto time2 = MakeTimePoint(2011, 10, 19, 8, 0, 0, 17 * 15);
+  ASSERT_EQ(pair2.first, time2);
+
+  ChronoDatePair pair3 = ParseSmppTimestamp("111019080000004-");
+  auto time3 = MakeTimePoint(2011, 10, 19, 8, 0, 0, -4 * 15);
+  ASSERT_EQ(pair3.first, time3);
+}
+
 
 TEST(TimeTest, relative) {
   DatePair pair1 = parseSmppTimestamp("000002000000000R");
@@ -55,13 +95,20 @@ TEST(TimeTest, relative) {
   ASSERT_TRUE(!pair2.first.is_not_a_date_time());
 }
 
+TEST(TimeTest, ParseRelative) {
+  auto pair1 = ParseSmppTimestamp("000002000000000R");
+  EXPECT_EQ(pair1.second, sc::hours(48));
+  auto pair2 = ParseSmppTimestamp("991210233429000R");
+  EXPECT_EQ(pair2.second, sc::hours(876143) + sc::minutes(34) + sc::seconds(29));
+}
+
 TEST(TimeTest, formats) {
-  EXPECT_NO_THROW(parseSmppTimestamp("111019103011100+"));
-  EXPECT_NO_THROW(parseSmppTimestamp("000002000000000R"));
-  EXPECT_THROW(parseSmppTimestamp("11101910301110+"), smpp::SmppException);
-  EXPECT_THROW(parseSmppTimestamp("000002000000000r"), smpp::SmppException);
-  EXPECT_THROW(parseSmppTimestamp("0000020000AA000R"), smpp::SmppException);
-  EXPECT_THROW(parseSmppTimestamp(""), smpp::SmppException);
+  EXPECT_NO_THROW(ParseSmppTimestamp("111019103011100+"));
+  EXPECT_NO_THROW(ParseSmppTimestamp("000002000000000R"));
+  EXPECT_THROW(ParseSmppTimestamp("11101910301110+"), smpp::SmppException);
+  EXPECT_THROW(ParseSmppTimestamp("000002000000000r"), smpp::SmppException);
+  EXPECT_THROW(ParseSmppTimestamp("0000020000AA000R"), smpp::SmppException);
+  EXPECT_THROW(ParseSmppTimestamp(""), smpp::SmppException);
 }
 
 TEST(TimeTest, ParseDlrTimestamp) {
