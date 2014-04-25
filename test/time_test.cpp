@@ -5,11 +5,6 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/date_time/local_time/local_time.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-
 #include <string>
 #include "gtest/gtest.h"
 #include "smpp/timeformat.h"
@@ -19,16 +14,9 @@ using std::string;
 using smpp::timeformat::ChronoDatePair;
 using smpp::timeformat::ParseSmppTimestamp;
 
-using smpp::timeformat::DatePair;
-using smpp::timeformat::parseSmppTimestamp;
-using smpp::timeformat::parseDlrTimestamp;
-using smpp::timeformat::getTimeString;
-using boost::local_time::local_date_time;
-using boost::local_time::time_zone_ptr;
-using boost::local_time::posix_time_zone;
-using boost::gregorian::date;
-using boost::posix_time::time_duration;
-using boost::posix_time::ptime;
+//using boost::gregorian::date;
+//using boost::posix_time::time_duration;
+//using boost::posix_time::ptime;
 namespace sc = std::chrono;
 
 void print(const std::string &tp_id, const sc::time_point<sc::system_clock> &tp) {
@@ -51,26 +39,6 @@ sc::time_point<sc::system_clock> MakeTimePoint(int yy, int mon, int mday, int ho
   return sc::system_clock::from_time_t(std::mktime(&tm));
 }
 
-TEST(TimeTest, absolute) {
-  time_zone_ptr gmt(new posix_time_zone("GMT"));
-  DatePair pair1 = parseSmppTimestamp("111019080000002+");
-  local_date_time ldt1(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(8, 30, 0)), gmt);
-  ASSERT_EQ(pair1.first, local_date_time(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(7,
-                                         30, 0)), gmt));
-  ASSERT_EQ(pair1.first.zone()->base_utc_offset(), time_duration(0, 30, 0));
-  ASSERT_TRUE(!pair1.second.is_not_a_date_time());
-  DatePair pair2 = parseSmppTimestamp("111019080000017+");
-  ASSERT_EQ(pair2.first, local_date_time(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(3,
-                                         45, 0)), gmt));
-  ASSERT_EQ(pair2.first.zone()->base_utc_offset(), time_duration(4, 15, 0));
-  ASSERT_TRUE(!pair2.second.is_not_a_date_time());
-  DatePair pair3 = parseSmppTimestamp("111019080000004-");
-  ASSERT_EQ(pair3.first, local_date_time(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(9,
-                                         0, 0)), gmt));
-  ASSERT_EQ(pair3.first.zone()->base_utc_offset(), time_duration(-1, 0, 0));
-  ASSERT_TRUE(!pair3.second.is_not_a_date_time());
-}
-
 TEST(TimeTest, ParseAbsolute) {
   ChronoDatePair pair1 = ParseSmppTimestamp("111019080000002+");
   auto time1 = MakeTimePoint(2011, 10, 19, 8, 0, 0, 2 * 15);
@@ -83,16 +51,6 @@ TEST(TimeTest, ParseAbsolute) {
   ChronoDatePair pair3 = ParseSmppTimestamp("111019080000004-");
   auto time3 = MakeTimePoint(2011, 10, 19, 8, 0, 0, -4 * 15);
   ASSERT_EQ(pair3.first, time3);
-}
-
-
-TEST(TimeTest, relative) {
-  DatePair pair1 = parseSmppTimestamp("000002000000000R");
-  ASSERT_EQ(pair1.second, time_duration(48, 0, 0));
-  ASSERT_TRUE(!pair1.first.is_not_a_date_time());
-  DatePair pair2 = parseSmppTimestamp("991210233429000R");
-  ASSERT_EQ(pair2.second, time_duration(876143, 34, 29));
-  ASSERT_TRUE(!pair2.first.is_not_a_date_time());
 }
 
 TEST(TimeTest, ParseRelative) {
@@ -139,30 +97,36 @@ TEST(TimeTest, ParseDlrTimestamp) {
   ASSERT_EQ(time2, exp_time2);
 }
 
-TEST(TimeTest, dlr) {
-  ptime pt1 = parseDlrTimestamp("1102031337");
-  ASSERT_EQ(pt1, ptime(date(2011, boost::gregorian::Feb, 3), time_duration(13, 37, 0)));
-  ptime pt2 = parseDlrTimestamp("110203133755");
-  ASSERT_EQ(pt2, ptime(date(2011, boost::gregorian::Feb, 3), time_duration(13, 37, 55)));
-}
 
-TEST(TimeTest, formatAbsolute) {
-  // From /usr/share/zoneinfo/Europe/Copenhagen
-  time_zone_ptr copenhagen(new posix_time_zone("CET+1CEST,M3.5.0,M10.5.0/3"));
-  local_date_time ldt1(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(7, 30, 0)),
-                       copenhagen);
-  ASSERT_EQ(getTimeString(ldt1), string("111019093000008+"));
-}
+//TEST(TimeTest, formatAbsolute) {
+//  // From /usr/share/zoneinfo/Europe/Copenhagen
+//  time_zone_ptr copenhagen(new posix_time_zone("CET+1CEST,M3.5.0,M10.5.0/3"));
+//  local_date_time ldt1(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(7, 30, 0)),
+//                       copenhagen);
+//  ASSERT_EQ(getTimeString(ldt1), string("111019093000008+"));
+//}
 
-TEST(TimeTest, formatRelative) {
-  ASSERT_EQ(getTimeString(time_duration(48, 0, 0)), string("000002000000000R"));
-  ASSERT_EQ(getTimeString(time_duration(875043, 34, 29)), string("991025033429000R"));
+//TEST(TimeTest, formatRelative) {
+//  ASSERT_EQ(getTimeString(time_duration(48, 0, 0)), string("000002000000000R"));
+//  ASSERT_EQ(getTimeString(time_duration(875043, 34, 29)), string("991025033429000R"));
   /*
    * 876143 would overflow 99 years, but can technically be represented by using more than 11 months as the next field
    */
-  EXPECT_THROW(getTimeString(time_duration(876143, 34, 29)),
+//  EXPECT_THROW(getTimeString(time_duration(876143, 34, 29)),
+//               smpp::SmppException);  // 876143 would overflow 99 years
+//}
+
+TEST(TimeTest, FormatRelative) {
+  using smpp::timeformat::ToSmppTimeString;
+//  smpp::timeformat::ToSmppTimeString(sc::hours(4));
+  //smpp::timeformat::ToSmppTimeString(sc::hours(48) + sc::minutes(65));
+  smpp::timeformat::ToSmppTimeString(sc::hours(48) + sc::minutes(65));
+  EXPECT_EQ(ToSmppTimeString(sc::hours(48)), string("000002000000000R"));
+  EXPECT_EQ(ToSmppTimeString(sc::hours(875043) + sc::minutes(34) + sc::seconds(29)), string("991025033429000R"));
+  EXPECT_THROW(ToSmppTimeString(sc::hours(876143) + sc::minutes(34) + sc::seconds(29)),
                smpp::SmppException);  // 876143 would overflow 99 years
 }
+
 
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);

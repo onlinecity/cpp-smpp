@@ -7,6 +7,10 @@
 #include "smpp/timeformat.h"
 #include <string>
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/local_time/local_time.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+
 using std::setfill;
 using std::setw;
 using std::string;
@@ -35,19 +39,6 @@ std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::
   return std::chrono::system_clock::from_time_t(mktime(&tm));
 }
 
-
-time_duration parseRelativeTimestamp(const smatch &match) {
-  int yy = stoi(match[1]);
-  int mon = stoi(match[2]);
-  int dd = stoi(match[3]);
-  int hh = stoi(match[4]);
-  int min = stoi(match[5]);
-  int sec = stoi(match[6]);
-  int totalHours = (yy * 365 * 24) + (mon * 30 * 24) + (dd * 24) + hh;
-  time_duration td(totalHours, min, sec);
-  return td;
-}
-
 std::chrono::seconds ParseRelativeTimestamp(const smatch &match) {
   int yy = stoi(match[1]);
   int mon = stoi(match[2]);
@@ -59,26 +50,6 @@ std::chrono::seconds ParseRelativeTimestamp(const smatch &match) {
   long total_minutes = (total_hours * 60) + min;
   long total_seconds = (total_minutes * 60) + sec;
   return std::chrono::seconds(total_seconds);
-}
-
-local_date_time parseAbsoluteTimestamp(const smatch &match) {
-  string yy = match[1];
-  string mon = match[2];
-  string dd = match[3];
-  string hh = match[4];
-  string min = match[5];
-  string sec = match[6];
-  ptime ts(from_iso_string(string("20") + yy + mon + dd + "T" + hh + min + sec));
-  int n = stoi(match[8]);
-  int offsetHours = (n >> 2);
-  int offsetMinutes = (n % 4) * 15;
-  // construct timezone
-  stringstream gmt;
-  gmt << "GMT" << match[9] << setw(2) << setfill('0') << offsetHours << ":" << setw(2) << setfill('0')
-      << offsetMinutes;
-  time_zone_ptr zone(new boost::local_time::posix_time_zone(gmt.str()));
-  boost::local_time::local_date_time ldt(ts.date(), ts.time_of_day(), zone, false);
-  return ldt;
 }
 
 std::chrono::time_point<std::chrono::system_clock> ParseAbsoluteTimestamp(const std::smatch &match) {
@@ -105,35 +76,6 @@ std::chrono::time_point<std::chrono::system_clock> ParseAbsoluteTimestamp(const 
   tm.tm_gmtoff = offset_sign * ((offset_hours * 60 * 60) + (offset_minutes * 60));
 
   return std::chrono::system_clock::from_time_t(mktime(&tm));
-}
-
-DatePair parseSmppTimestamp(const string &time) {
-  // Matches the pattern “YYMMDDhhmmsstnnp”
-  static const regex pattern("^(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1})(\\d{2})([R+-])$");
-  smatch match;
-
-  if (regex_match(time.begin(), time.end(), match, pattern)) {
-    // relative
-    if (match[match.size() - 1] == "R") {
-      // parse the relative timestamp
-      time_duration td = parseRelativeTimestamp(match);
-      // construct a absolute timestamp based on the relative timestamp
-      time_zone_ptr zone(new posix_time_zone("GMT"));
-      local_date_time ldt = boost::local_time::local_sec_clock::local_time(zone);
-      ldt += td;
-      return DatePair(ldt, td);
-    } else {
-      // parse the absolute timestamp
-      boost::local_time::local_date_time ldt = parseAbsoluteTimestamp(match);
-      boost::local_time::local_date_time lt = boost::local_time::local_sec_clock::local_time(ldt.zone());
-      // construct a relative timestamp based on the local clock and the absolute timestamp
-      boost::local_time::local_time_period ltp(ldt, lt);
-      time_duration td = ltp.length();
-      return DatePair(ldt, td);
-    }
-  }
-
-  throw smpp::SmppException(string("Timestamp \"") + time + "\" has the wrong format.");
 }
 
 ChronoDatePair ParseSmppTimestamp(const string &time) {
@@ -166,17 +108,6 @@ ChronoDatePair ParseSmppTimestamp(const string &time) {
   throw smpp::SmppException(string("Timestamp \"") + time + "\" has the wrong format.");
 }
 
-
-ptime parseDlrTimestamp(const string &time) {
-  stringstream ss;
-  time_input_facet* fac = new time_input_facet("%y%m%d%H%M%S");  // looks like a memleak, but it's not
-  ss.imbue(std::locale(std::locale::classic(), fac));
-  ss << time;
-  ptime timestamp;
-  ss >> timestamp;
-  return timestamp;
-}
-
 string getTimeString(const local_date_time &ldt) {
   time_zone_ptr zone = ldt.zone();
   ptime t = ldt.local_time();
@@ -197,24 +128,34 @@ string getTimeString(const local_date_time &ldt) {
   return output.str();
 }
 
-string getTimeString(const time_duration &td) {
-  int totalHours = td.hours();
-  int yy = totalHours / 24 / 365;
-  totalHours -= (yy * 24 * 365);
-  int mon = totalHours / 24 / 30;
-  totalHours -= (mon * 24 * 30);
-  int dd = totalHours / 24;
-  totalHours -= (dd * 24);
+string ToSmppTimeString(const std::chrono::time_point<std::chrono::system_clock> &tp) {
 
+  return "hello";
+}
+
+string ToSmppTimeString(const std::chrono::seconds &d) {
+  namespace sc = std::chrono;
+  auto tmp(d);
+  auto h = sc::duration_cast<sc::hours>(tmp).count();
+  tmp -= sc::hours(h);
+  auto m = sc::duration_cast<sc::minutes>(tmp).count();
+  tmp -= sc::minutes(m);
+  auto s = sc::duration_cast<sc::seconds>(tmp).count();
+  int yy = h / 24 / 365;
+  h -= (yy * 24 * 365);
+  int mon = h / 24 / 30;
+  h -= (mon * 24 * 30);
+  int dd = h / 24;
+  h -= (dd * 24);
   if (yy > 99) {
     throw SmppException("Time duration overflows");
   }
 
-  stringstream output;
-  output << setfill('0') << setw(2) << yy << setw(2) << mon << setw(2) << dd << setw(
-           2) << totalHours << setw(2)
-         << td.minutes() << setw(2) << td.seconds() << "000R";
-  return output.str();
+  char buf[16];
+  //            YY  MM  DD  hh   mm   ss  000R
+  sprintf(buf, "%02i%02i%02i%02li%02li%02lli000R", yy, mon, dd, h, m, s);
+  return string(buf);
 }
+
 }  // namespace timeformat
 }  // namespace smpp

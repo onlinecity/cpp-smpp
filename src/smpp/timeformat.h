@@ -7,10 +7,6 @@
 #ifndef SMPP_TIMEFORMAT_H_
 #define SMPP_TIMEFORMAT_H_
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/date_time/local_time/local_time.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-
 #include <chrono>
 #include <utility>
 #include <regex>
@@ -21,7 +17,6 @@
 namespace smpp {
 namespace timeformat {
 
-typedef std::pair<boost::local_time::local_date_time, boost::posix_time::time_duration> DatePair;
 typedef std::pair<std::chrono::time_point<std::chrono::system_clock>,
         std::chrono::seconds> ChronoDatePair;
 
@@ -31,7 +26,6 @@ typedef std::pair<std::chrono::time_point<std::chrono::system_clock>,
  * @param match Relative timestamp on the form of a std::smatch
  * @return time_duration representation of the timestamp.
  */
-boost::posix_time::time_duration parseRelativeTimestamp(const std::smatch &match);
 std::chrono::seconds ParseRelativeTimestamp(const std::smatch &match);
 
 /**
@@ -39,7 +33,6 @@ std::chrono::seconds ParseRelativeTimestamp(const std::smatch &match);
  * @param match Absolute timestmp on the form of a std::smatch
  * @return local_date_time representation of the timestamp.
  */
-boost::local_time::local_date_time parseAbsoluteTimestamp(const std::smatch &match);
 std::chrono::time_point<std::chrono::system_clock> ParseAbsoluteTimestamp(const std::smatch &match);
 
 /**
@@ -50,7 +43,6 @@ std::chrono::time_point<std::chrono::system_clock> ParseAbsoluteTimestamp(const 
  * @return
  * @throw SmppException.
  */
-DatePair parseSmppTimestamp(const std::string &time);
 ChronoDatePair ParseSmppTimestamp(const std::string &time);
 
 /**
@@ -58,7 +50,6 @@ ChronoDatePair ParseSmppTimestamp(const std::string &time);
  * @param time Timestamp to parse.
  * @return ptime representation of the timestamp.
  */
-boost::posix_time::ptime parseDlrTimestamp(const std::string &time);
 std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::string &time);
 
 /**
@@ -66,7 +57,7 @@ std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::
  * @param ldt
  * @return
  */
-std::string getTimeString(const boost::local_time::local_date_time &ldt);
+//std::string getTimeString(const boost::local_time::local_date_time &ldt);
 
 /**
  * Returns a relative timestamp created from the time_duration. Since a time_duration does not handle
@@ -74,7 +65,8 @@ std::string getTimeString(const boost::local_time::local_date_time &ldt);
  * @param td time_duration to be calculated.
  * @return
  */
-std::string getTimeString(const boost::posix_time::time_duration &td);
+//std::string getTimeString(const boost::posix_time::time_duration &td);
+std::string ToSmppTimeString(const std::chrono::seconds &d);
 
 }  // namespace timeformat
 }  // namespace smpp

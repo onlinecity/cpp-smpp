@@ -25,8 +25,6 @@ using boost::numeric_cast;
 using asio::ip::tcp;
 using asio::async_write;
 using asio::buffer;
-using boost::local_time::local_date_time;
-using boost::local_time::not_a_date_time;
 
 namespace smpp {
   SmppClient::SmppClient(shared_ptr<tcp::socket> _socket) :
@@ -247,14 +245,14 @@ namespace smpp {
     reply >> final_date;
     reply >> message_state;
     reply >> error_code;
-    local_date_time ldt(not_a_date_time);
+    std::chrono::time_point<std::chrono::system_clock> tp;
 
     if (final_date.length() > 1) {
-      smpp::timeformat::DatePair p = smpp::timeformat::parseSmppTimestamp(final_date);
-      ldt = p.first;
+      smpp::timeformat::ChronoDatePair p = smpp::timeformat::ParseSmppTimestamp(final_date);
+      tp = p.first;
     }
 
-    return QuerySmResult(msgid, ldt, message_state, error_code);
+    return QuerySmResult(msgid, tp, message_state, error_code);
   }
 
   void SmppClient::enquireLink() {

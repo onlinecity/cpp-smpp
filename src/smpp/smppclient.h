@@ -11,7 +11,6 @@
 #include <glog/logging.h>
 
 #include <cstdint>
-
 #include <chrono>
 #include <functional>
 #include <list>
@@ -35,7 +34,7 @@
 namespace smpp {
 typedef asio::basic_deadline_timer<std::chrono::system_clock, smpp::CXX11Traits<std::chrono::system_clock>>
     ChronoDeadlineTimer;
-typedef std::tuple<std::string, boost::local_time::local_date_time, int, int> QuerySmResult;
+typedef std::tuple<std::string, std::chrono::time_point<std::chrono::system_clock>, int, int> QuerySmResult;
 
 /**
  * Class for sending and receiving SMSes through the SMPP protocol.
