@@ -37,7 +37,7 @@ PDU::PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_se
 
 PDU::PDU(const PduLengthHeader &pduLength, const PduData &pduBuffer) :
   sb(""), buf(&sb), cmdId(0), cmdStatus(0), seqNo(0), nullTerminateOctetStrings(true), null(false) {
-  uint32_t bufSize = PDU::getPduLength(pduLength);
+  uint32_t bufSize = PDU::GetPduLength(pduLength);
   buf.write(pduLength.data(), HEADERFIELD_SIZE);
 
   if (buf.fail()) {
@@ -69,7 +69,7 @@ PDU::PDU(const PDU &rhs) :
   seqNo(rhs.seqNo), /**/
   nullTerminateOctetStrings(rhs.nullTerminateOctetStrings), /**/
   null(rhs.null) {
-  resetMarker();  // remember to reset the marker after copying.
+  ResetMarker();  // remember to reset the marker after copying.
 }
 
 const PduData PDU::getOctets() {
@@ -93,7 +93,7 @@ const PduData PDU::getOctets() {
   }
 
   // Seek to start of PDU body
-  resetMarker();
+  ResetMarker();
   return octets;
 }
 
@@ -209,7 +209,7 @@ PDU &PDU::addOctets(const PduData &octets, const streamsize &len) {
   return *this;
 }
 
-void PDU::skip(int octets) {
+void PDU::Skip(int octets) {
   buf.seekg(octets, ios_base::cur);
 
   if (buf.fail()) {
@@ -217,7 +217,7 @@ void PDU::skip(int octets) {
   }
 }
 
-void PDU::resetMarker() {
+void PDU::ResetMarker() {
   // Seek to start of PDU body (after headers)
   buf.seekg(HEADERFIELD_SIZE * 4, ios::beg);
 
@@ -275,7 +275,7 @@ PDU &PDU::operator>>(std::basic_string<char> &s) {
   return *this;
 }
 
-void PDU::readOctets(PduData *octets, const streamsize &len) {
+void PDU::ReadOctets(PduData *octets, const streamsize &len) {
   octets->resize(len);
   buf.readsome(&*octets->begin(), len);
 
@@ -284,12 +284,12 @@ void PDU::readOctets(PduData *octets, const streamsize &len) {
   }
 }
 
-bool PDU::hasMoreData() {
+bool PDU::HasMoreData() {
   buf.peek();  // peek sets eof, it's not set until you try to read or peek at the data
   return !buf.eof();
 }
 
-uint32_t PDU::getPduLength(const PduLengthHeader &pduHeader) {
+uint32_t PDU::GetPduLength(const PduLengthHeader &pduHeader) {
   auto i = reinterpret_cast<const uint32_t*>(pduHeader.data());
   return ntohl(*i);
 }

@@ -22,7 +22,7 @@ TEST(PduTest, readWrite) {
   pdu << i32;
   pdu << i16;
   pdu << i8;
-  pdu.resetMarker();
+  pdu.ResetMarker();
   std::string s;
   uint32_t o32;
   uint16_t o16;

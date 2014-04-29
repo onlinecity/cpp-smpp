@@ -78,13 +78,13 @@ SMS::SMS(PDU &pdu) :
   // read short_message with readOctets to ensure we get all chars including null bytes
   PduData msg;
   msg.resize(sm_length);
-  pdu.readOctets(&msg, sm_length);
+  pdu.ReadOctets(&msg, sm_length);
   short_message = msg;
   // fetch any optional tags
   uint16_t len = 0;
   uint16_t tag = 0;
 
-  while (pdu.hasMoreData()) {
+  while (pdu.HasMoreData()) {
     pdu >> tag;
     pdu >> len;
 
@@ -99,7 +99,7 @@ SMS::SMS(PDU &pdu) :
 
     PduData octets;
     octets.resize(len);
-    pdu.readOctets(&octets, len);
+    pdu.ReadOctets(&octets, len);
     tlvs.push_back(TLV(tag, octets));
   }
 }

@@ -513,7 +513,7 @@ namespace smpp {
 
     assert(len == 4);
 
-    uint32_t i = PDU::getPduLength(*pduLength);
+    uint32_t i = PDU::GetPduLength(*pduLength);
     PduData pduBuffer;
     pduBuffer.resize(i);
     // start reading after the size mark of the pdu
@@ -535,7 +535,7 @@ namespace smpp {
     }
 
     *had_error = true;
-    uint32_t i = PDU::getPduLength(*pduLength);
+    uint32_t i = PDU::GetPduLength(*pduLength);
     PduData pduBuffer;
     pduBuffer.resize(i - 4);
     // start reading after the size mark of the pdu

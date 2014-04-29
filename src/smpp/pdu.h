@@ -115,12 +115,12 @@ class PDU {
    * Skips n octets.
    * @param n Octets to skip.
    */
-  void skip(int n);
+  void Skip(int n);
 
   /**
    * Resets the read marker to the beginning of the PDU.
    */
-  void resetMarker();
+  void ResetMarker();
 
   PDU &operator>>(int &);
   PDU &operator>>(uint8_t &i);
@@ -133,14 +133,14 @@ class PDU {
    * @param array Target array.
    * @param n Octets to copy.
    */
-  void readOctets(PduData *octets, const std::streamsize &n);
+  void ReadOctets(PduData *octets, const std::streamsize &n);
 
   /**
    * @return True if the read marker is not at the end of the PDU.
    */
-  bool hasMoreData();
+  bool HasMoreData();
 
-  static uint32_t getPduLength(const PduLengthHeader &pduHeader);
+  static uint32_t GetPduLength(const PduLengthHeader &pduHeader);
 };
 // PDU
 std::ostream &operator<<(std::ostream &, smpp::PDU &);
