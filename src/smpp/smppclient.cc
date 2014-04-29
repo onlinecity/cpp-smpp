@@ -104,7 +104,7 @@ namespace smpp {
     uint32_t pduStatus = resp.getCommandStatus();
 
     if (pduStatus != smpp::ESME_ROK) {
-      throw smpp::SmppException(smpp::getEsmeStatus(pduStatus));
+      throw smpp::SmppException(smpp::GetEsmeStatus(pduStatus));
     }
 
     state = OPEN;
@@ -233,9 +233,9 @@ namespace smpp {
   QuerySmResult SmppClient::QuerySm(std::string messageid, SmppAddress source) {
     PDU pdu = PDU(QUERY_SM, 0, NextSequenceNumber());
     pdu << messageid;
-    pdu << source.ton;
-    pdu << source.npi;
-    pdu << source.value;
+    pdu << source.ton_;
+    pdu << source.npi_;
+    pdu << source.value_;
     PDU reply = SendCommand(pdu);
     string msgid;
     string final_date;
@@ -399,21 +399,21 @@ namespace smpp {
 
     switch (resp.getCommandStatus()) {
       case smpp::ESME_RINVPASWD:
-        throw smpp::InvalidPasswordException(smpp::getEsmeStatus(resp.getCommandStatus()));
+        throw smpp::InvalidPasswordException(smpp::GetEsmeStatus(resp.getCommandStatus()));
         break;
       case smpp::ESME_RINVSYSID:
-        throw smpp::InvalidSystemIdException(smpp::getEsmeStatus(resp.getCommandStatus()));
+        throw smpp::InvalidSystemIdException(smpp::GetEsmeStatus(resp.getCommandStatus()));
         break;
       case smpp::ESME_RINVSRCADR:
-        throw smpp::InvalidSourceAddressException(smpp::getEsmeStatus(resp.getCommandStatus()));
+        throw smpp::InvalidSourceAddressException(smpp::GetEsmeStatus(resp.getCommandStatus()));
         break;
       case smpp::ESME_RINVDSTADR:
-        throw smpp::InvalidDestinationAddressException(smpp::getEsmeStatus(resp.getCommandStatus()));
+        throw smpp::InvalidDestinationAddressException(smpp::GetEsmeStatus(resp.getCommandStatus()));
         break;
     }
 
     if (resp.getCommandStatus() != smpp::ESME_ROK) {
-      throw smpp::SmppException(smpp::getEsmeStatus(resp.getCommandStatus()));
+      throw smpp::SmppException(smpp::GetEsmeStatus(resp.getCommandStatus()));
     }
 
     return resp;

@@ -182,9 +182,9 @@ PDU &PDU::operator<<(const std::basic_string<char> &s) {
 }
 
 PDU &PDU::operator <<(const smpp::SmppAddress s) {
-  (*this) << s.ton;
-  (*this) << s.npi;
-  (*this) << s.value;
+  (*this) << s.ton_;
+  (*this) << s.npi_;
+  (*this) << s.value_;
   return *this;
 }
 
@@ -307,8 +307,7 @@ std::ostream &smpp::operator<<(std::ostream &out, smpp::PDU &pdu) {
       "cmd id    :0x"
       << hex << pdu.getCommandId() << dec << endl << "cmd status:0x" << hex << pdu.getCommandStatus() <<
       dec << " : "
-      << smpp::getEsmeStatus(pdu.getCommandStatus()) << endl;
+      << smpp::GetEsmeStatus(pdu.getCommandStatus()) << endl;
   out << oc::tools::hexdump(reinterpret_cast<const unsigned char*>(pdu.getOctets().c_str()), static_cast<size_t>(size));
   return out;
 }
-
