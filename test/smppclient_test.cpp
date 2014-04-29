@@ -25,51 +25,51 @@ using std::string;
 TEST_F(SmppClientTest, login) {
   socket->connect(endpoint);
   ASSERT_TRUE(socket->is_open());
-  client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
-  ASSERT_TRUE(client->isBound());
-  client->unbind();
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  ASSERT_TRUE(client->IsBound());
+  client->Unbind();
   socket->close();
   socket->connect(endpoint);
   ASSERT_TRUE(socket->is_open());
-  client->bindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
-  ASSERT_TRUE(client->isBound());
-  client->unbind();
+  client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
+  ASSERT_TRUE(client->IsBound());
+  client->Unbind();
   socket->close();
 }
 
 // Test sending a basic SMS
 TEST_F(SmppClientTest, submit) {
   socket->connect(endpoint);
-  client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   //      client->setNullTerminateOctetStrings(false);
   //      client->setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message = "message to send";
-  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
-  client->unbind();
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
+  client->Unbind();
   socket->close();
 }
 
 // Test QUERY_SM feature to pull for a message status
 TEST_F(SmppClientTest, querySm) {
   socket->connect(endpoint);
-  client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message = "message to send";
-  auto smscResult = client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
+  auto smscResult = client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   string smscId = smscResult.first;
-  smpp::QuerySmResult result = client->querySm(smscId, from);
+  smpp::QuerySmResult result = client->QuerySm(smscId, from);
   ASSERT_EQ(std::get<0>(result), smscId);
-  client->unbind();
+  client->Unbind();
   socket->close();
 }
 
 // Test concatenated SMS using either split or payload method.
 TEST_F(SmppClientTest, csms) {
   socket->connect(endpoint);
-  client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   // Construct 168 char message
@@ -82,20 +82,20 @@ TEST_F(SmppClientTest, csms) {
 
   int csmsMethod = client->getCsmsMethod();
   client->setCsmsMethod(SmppClient::CSMS_PAYLOAD);
-  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
-  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   client->setCsmsMethod(SmppClient::CSMS_8BIT_UDH);
-  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message));
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
   client->setCsmsMethod(csmsMethod);
-  client->unbind();
+  client->Unbind();
   socket->close();
 }
 
 // Test the use of TLVs
 TEST_F(SmppClientTest, tlv) {
   socket->connect(endpoint);
-  client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message = "message to send";
@@ -103,15 +103,15 @@ TEST_F(SmppClientTest, tlv) {
   taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT,
                         static_cast<uint8_t>(0x01)));  // "flash sms" use-case
   taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
-  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist);
-  client->unbind();
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist);
+  client->Unbind();
   socket->close();
 }
 
 // Test combining custom TLVs with CSMS TLVs.
 TEST_F(SmppClientTest, tlvExtended) {
   socket->connect(endpoint);
-  client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message;
@@ -126,9 +126,9 @@ TEST_F(SmppClientTest, tlvExtended) {
   taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
   int csmsMethod = client->getCsmsMethod();
   client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
-  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist);
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist);
   client->setCsmsMethod(csmsMethod);
-  client->unbind();
+  client->Unbind();
   socket->close();
 }
 
@@ -139,7 +139,7 @@ TEST_F(SmppClientTest, submitExtended) {
   using boost::local_time::posix_time_zone;
   using boost::local_time::local_date_time;
   socket->connect(endpoint);
-  client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message = "message to send";
@@ -154,25 +154,25 @@ TEST_F(SmppClientTest, submitExtended) {
   string vt = smpp::timeformat::ToSmppTimeString(std::chrono::hours(1));  // valid for one hour
   uint8_t regdlr = client->getRegisteredDelivery();
   client->setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);
-  client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist, 0x01, sdt, vt,
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist, 0x01, sdt, vt,
                   smpp::DATA_CODING_ISO8859_1);
   client->setRegisteredDelivery(regdlr);
-  client->unbind();
+  client->Unbind();
   socket->close();
 }
 
 TEST_F(SmppClientTest, receive) {
   socket->connect(endpoint);
-  client->bindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
+  client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
   LOG(INFO) << "Waiting for smpp connection to send message";
-  smpp::SMS sms = client->readSms();
+  smpp::SMS sms = client->ReadSms();
 }
 
 TEST_F(SmppClientTest, logging) {
   client->setVerbose(true);
   socket->connect(endpoint);
-  client->bindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
-  client->unbind();
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  client->Unbind();
   socket->close();
 }
 

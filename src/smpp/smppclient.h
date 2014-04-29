@@ -100,19 +100,19 @@ class SmppClient {
    * @param login SMSC login.
    * @param password SMS password.
    */
-  void bindTransmitter(const std::string &login, const std::string &password);
+  void BindTransmitter(const std::string &login, const std::string &password);
 
   /**
    * Binds the client in receiver mode.
    * @param login SMSC login
    * @param password SMSC password.
    */
-  void bindReceiver(const std::string &login, const std::string &password);
+  void BindReceiver(const std::string &login, const std::string &password);
 
   /**
    * Unbinds the client.
    */
-  void unbind();
+  void Unbind();
 
   /**
    * Sends an SMS to the SMSC.
@@ -129,7 +129,7 @@ class SmppClient {
    * @param dataCoding
    * @return SMSC sms id.
    */
-  std::pair<std::string, int> sendSms(const SmppAddress &sender, const SmppAddress &receiver,
+  std::pair<std::string, int> SendSms(const SmppAddress &sender, const SmppAddress &receiver,
                                       const std::string &shortMessage,
                                       std::list<TLV> tags = std::list<TLV>(),
                                       const uint8_t priority_flag = 0,
@@ -140,7 +140,7 @@ class SmppClient {
    * Returns the first SMS in the PDU queue,
    * or does a blocking read on the socket until we receive an SMS from the SMSC.
    */
-  smpp::SMS readSms();
+  smpp::SMS ReadSms();
 
   /**
    * Query the SMSC about current state/status of a previous sent SMS.
@@ -153,24 +153,24 @@ class SmppClient {
    * @param source
    * @return QuerySmResult
    */
-  QuerySmResult querySm(std::string messageid, SmppAddress source);
+  QuerySmResult QuerySm(std::string messageid, SmppAddress source);
 
   /**
    * Sends an enquire link command to SMSC and blocks until we a response.
    */
-  void enquireLink();
+  void EnquireLink();
 
   /**
    * Checks if the SMSC has sent us a enquire link command.
    * If they have, a response is sent.
    */
-  void enquireLinkRespond();
+  void EnquireLinkRespond();
 
   /**
    * Returns true if the client is bound.
    * @return
    */
-  bool isBound() {
+  bool IsBound() {
     return state != OPEN;
   }
 
@@ -334,7 +334,7 @@ class SmppClient {
    * @param login SMSC login.
    * @param password SMSC password.
    */
-  void bind(uint32_t mode, const std::string &login, const std::string &password);
+  void Bind(uint32_t mode, const std::string &login, const std::string &password);
 
   /**
    * Constructs a PDU for binding the client.
@@ -343,7 +343,7 @@ class SmppClient {
    * @param password SMSC password.
    * @return PDU for binding the client.
    */
-  smpp::PDU setupBindPdu(uint32_t mode, const std::string &login, const std::string &password);
+  smpp::PDU SetupBindPdu(uint32_t mode, const std::string &login, const std::string &password);
 
   /**
    * Runs through the PDU queue and returns the first sms it finds, and sends a reponse to the SMSC.
@@ -351,7 +351,7 @@ class SmppClient {
    *
    * @return First sms found in the PDU queue or a null sms if there was no smses.
    */
-  smpp::SMS parseSms();
+  smpp::SMS ParseSms();
 
   /**
    * Splits a string, without leaving a dangling escape character, into an vector of substrings of a given length,
@@ -360,7 +360,7 @@ class SmppClient {
    * @param split How long each substring should be.
    * @return Vector of substrings.
    */
-  std::vector<std::string> split(const std::string &shortMessage, const int split);
+  std::vector<std::string> Split(const std::string &short_message, const int split);
 
   /**
    * Sends a SUBMIT_SM pdu with the required details for sending an SMS to the SMSC.
@@ -376,7 +376,7 @@ class SmppClient {
    * @param esmClassOpts;
    * @return SMSC sms id.
    */
-  std::string submitSm(const SmppAddress &sender, const SmppAddress &receiver,
+  std::string SubmitSm(const SmppAddress &sender, const SmppAddress &receiver,
                        const std::string &shortMessage,
                        std::list<TLV> tags, const uint8_t priority_flag, const std::string &schedule_delivery_time,
                        const std::string &validity_period, const int esmClassOpts, const int dataCoding =
@@ -386,46 +386,46 @@ class SmppClient {
    * @return Returns the next sequence number.
    * @throw SmppException Throws an SmppException if we run out of sequence numbers.
    */
-  uint32_t nextSequenceNumber();
+  uint32_t NextSequenceNumber();
 
   /**
    * Sends one PDU to the SMSC.
    */
-  void sendPdu(PDU &pdu);
+  void SendPdu(PDU &pdu);
 
   /**
    * Sends one PDU to the SMSC and blocks until we a response to it.
    * @param pdu PDU to send.
    * @return PDU PDU response to the one we sent.
    */
-  smpp::PDU sendCommand(PDU &pdu);
+  smpp::PDU SendCommand(PDU &pdu);
 
   /**
    * Returns one PDU from SMSC.
    */
-  PDU readPdu(const bool &);
+  PDU ReadPdu(const bool &);
 
-  void readPduBlocking();
+  void ReadPduBlocking();
 
-  void handleTimeout(bool *had_error, const asio::error_code &error);
+  void HandleTimeout(bool *had_error, const asio::error_code &error);
 
   /**
    * Async write handler.
    * @param
    * @throw TransportException if an error occurred.
    */
-  void writeHandler(bool *had_error, const asio::error_code &error);
+  void WriteHandler(bool *had_error, const asio::error_code &error);
 
   /**
    * Peeks at the socket and returns true if there is data to be read.
    * @return True if there is data to be read.
    */
-  bool socketPeek();
+  bool SocketPeek();
 
   /**
    * Executes any pending async operations on the socket.
    */
-  void socketExecute();
+  void SocketExecute();
 
   /**
    * Handler for reading a PDU header.
@@ -433,10 +433,10 @@ class SmppClient {
    * @param error Boost error code
    * @param read Bytes read
    */
-  void readPduHeaderHandler(const asio::error_code &error, size_t read,
+  void ReadPduHeaderHandler(const asio::error_code &error, size_t read,
                             const PduLengthHeader *pduLength);
 
-  void readPduHeaderHandlerBlocking(bool *had_error,
+  void ReadPduHeaderHandlerBlocking(bool *had_error,
                                     const asio::error_code &error, size_t read,
                                     const PduLengthHeader *pduLength);
 
@@ -447,7 +447,7 @@ class SmppClient {
    * @param error Boost error code
    * @param read Bytes read
    */
-  void readPduBodyHandler(const asio::error_code &error, size_t read,
+  void ReadPduBodyHandler(const asio::error_code &error, size_t read,
                           const PduLengthHeader *pduLength,
                           const PduData *pduBuffer);
 
@@ -462,13 +462,13 @@ class SmppClient {
    * @param commandId Command id to look for.
    * @return PDU response to PDU with the given sequence number and command id.
    */
-  PDU readPduResponse(const uint32_t &sequence, const uint32_t &commandId);
+  PDU ReadPduResponse(const uint32_t &sequence, const uint32_t &commandId);
 
   /**
    * Checks the connection.
    * @throw TransportException if there was an problem with the connection.
    */
-  void checkConnection();
+  void CheckConnection();
 
   /**
    * Checks if the client is in the desired state.
@@ -476,7 +476,7 @@ class SmppClient {
    * @throw SmppException if the client is not in the desired state.
    */
 
-  void checkState(const int state);
+  void CheckState(const int state);
 
   /**
    * Default implementation for msgRefCallback.
@@ -484,14 +484,14 @@ class SmppClient {
    * Returns a modulo 0xffff int.
    * @return
    */
-  static uint16_t defaultMessageRef();
+  static uint16_t DefaultMessageRef();
 
   /**
    * Calls io_service or get_io_service on the current socket.
    */
-  asio::io_service &getIoService() const {
-    return socket->get_io_service();
-  }
+  //asio::io_service &getIoService() const {
+  //  return socket->get_io_service();
+  //}
 };
 }  // namespace smpp
 #endif  // SMPP_SMPPCLIENT_H_

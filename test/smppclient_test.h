@@ -32,8 +32,8 @@ class SmppClientTest: public testing::Test {
   }
 
   virtual void TearDown() {
-    if (client->isBound()) {
-      client->unbind();
+    if (client->IsBound()) {
+      client->Unbind();
     }
 
     socket->close();
