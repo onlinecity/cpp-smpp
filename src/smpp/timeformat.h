@@ -57,7 +57,7 @@ std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::
  * @param ldt
  * @return
  */
-//std::string getTimeString(const boost::local_time::local_date_time &ldt);
+std::string ToSmppTimeString(const struct tm &tm);
 
 /**
  * Returns a relative timestamp created from the time_duration. Since a time_duration does not handle

@@ -108,28 +108,29 @@ ChronoDatePair ParseSmppTimestamp(const string &time) {
   throw smpp::SmppException(string("Timestamp \"") + time + "\" has the wrong format.");
 }
 
-string getTimeString(const local_date_time &ldt) {
-  time_zone_ptr zone = ldt.zone();
-  ptime t = ldt.local_time();
-  time_duration td = t.time_of_day();
-  stringstream output;
-  time_duration offset = zone->base_utc_offset();
-
-  if (ldt.is_dst()) {
-    offset += zone->dst_offset();
-  }
-
-  string p = offset.is_negative() ? "-" : "+";
-  int nn = abs((offset.hours() * 4) + (offset.minutes() / 15));
-  string d = to_iso_string(t.date());
-  output << d.substr(2, 6) << setw(2) << setfill('0') << td.hours() << setw(
-           2) << td.minutes() << setw(2)
-         << td.seconds() << "0" << setw(2) << nn << p;
-  return output.str();
+string ToSmppTimeString(const struct tm &tm) {
+  int yy = tm.tm_year % 100;
+  int mm = tm.tm_mon + 1;
+  int dd = tm.tm_mday;
+  int h = tm.tm_hour;
+  int m = tm.tm_min;
+  int s = tm.tm_sec;
+  string p = tm.tm_gmtoff < 0 ? "-" : "+";
+  // nn is time difference in quarter hours and gmtoff is in seconds
+  int nn = tm.tm_gmtoff == 0 ? 0 : (abs(tm.tm_gmtoff) / 60)  / 15;
+  char buf[16];
+  //            YY  MM  DD  hh   mm   ss  000R
+  sprintf(buf, "%02i%02i%02i%02i%02i%02i0%02i%s", yy, mm, dd, h, m, s, nn, p.c_str());
+  return string(buf);
 }
 
 string ToSmppTimeString(const std::chrono::time_point<std::chrono::system_clock> &tp) {
+  namespace sc = std::chrono;
+  auto t = sc::system_clock::to_time_t(tp);
+  using std::cout;
+  using std::endl;
 
+  cout << std::ctime(&t) << endl;
   return "hello";
 }
 

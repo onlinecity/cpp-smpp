@@ -22,7 +22,7 @@ namespace sc = std::chrono;
 void print(const std::string &tp_id, const sc::time_point<sc::system_clock> &tp) {
   auto t = sc::system_clock::to_time_t(tp);
   std::cout << tp_id << ":"
-  << std::put_time(std::localtime(&t), "%C %F %T %Z %z")
+  << std::put_time(std::gmtime(&t), "%C %F %T %Z %z")
   << std::endl;
 }
 
@@ -37,6 +37,19 @@ sc::time_point<sc::system_clock> MakeTimePoint(int yy, int mon, int mday, int ho
   tm.tm_isdst = -1;
   tm.tm_gmtoff = gmtoff * 60;
   return sc::system_clock::from_time_t(std::mktime(&tm));
+}
+
+struct tm MakeTm(int yy, int mon, int mday, int hour, int min, int sec, long gmtoff) {
+  struct tm tm;
+  tm.tm_year = yy - 1900;
+  tm.tm_mon = mon - 1;
+  tm.tm_mday = mday;
+  tm.tm_hour = hour;
+  tm.tm_min = min;
+  tm.tm_sec = sec;
+  tm.tm_isdst = -1;
+  tm.tm_gmtoff = gmtoff * 60;
+  return tm;
 }
 
 TEST(TimeTest, ParseAbsolute) {
@@ -98,35 +111,19 @@ TEST(TimeTest, ParseDlrTimestamp) {
 }
 
 
-//TEST(TimeTest, formatAbsolute) {
-//  // From /usr/share/zoneinfo/Europe/Copenhagen
-//  time_zone_ptr copenhagen(new posix_time_zone("CET+1CEST,M3.5.0,M10.5.0/3"));
-//  local_date_time ldt1(ptime(date(2011, boost::gregorian::Oct, 19), time_duration(7, 30, 0)),
-//                       copenhagen);
-//  ASSERT_EQ(getTimeString(ldt1), string("111019093000008+"));
-//}
-
-//TEST(TimeTest, formatRelative) {
-//  ASSERT_EQ(getTimeString(time_duration(48, 0, 0)), string("000002000000000R"));
-//  ASSERT_EQ(getTimeString(time_duration(875043, 34, 29)), string("991025033429000R"));
-  /*
-   * 876143 would overflow 99 years, but can technically be represented by using more than 11 months as the next field
-   */
-//  EXPECT_THROW(getTimeString(time_duration(876143, 34, 29)),
-//               smpp::SmppException);  // 876143 would overflow 99 years
-//}
+TEST(TimeTest, FormatAbsolute) {
+  string s = smpp::timeformat::ToSmppTimeString(MakeTm(2011, 10, 19, 9, 30, 0, 60));
+  EXPECT_EQ(s, string("111019093000004+"));
+}
 
 TEST(TimeTest, FormatRelative) {
   using smpp::timeformat::ToSmppTimeString;
-//  smpp::timeformat::ToSmppTimeString(sc::hours(4));
-  //smpp::timeformat::ToSmppTimeString(sc::hours(48) + sc::minutes(65));
   smpp::timeformat::ToSmppTimeString(sc::hours(48) + sc::minutes(65));
   EXPECT_EQ(ToSmppTimeString(sc::hours(48)), string("000002000000000R"));
   EXPECT_EQ(ToSmppTimeString(sc::hours(875043) + sc::minutes(34) + sc::seconds(29)), string("991025033429000R"));
   EXPECT_THROW(ToSmppTimeString(sc::hours(876143) + sc::minutes(34) + sc::seconds(29)),
                smpp::SmppException);  // 876143 would overflow 99 years
 }
-
 
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
