@@ -148,18 +148,10 @@ TEST_F(SmppClientTest, submitExtended) {
                         static_cast<uint8_t>(0x01)));  // "flash sms" use-case
   taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
 
-
-
- // time_zone_ptr gmt(new posix_time_zone("GMT"));
-//  local_date_time ldt(boost::local_time::local_sec_clock::local_time(gmt));
-//  ldt += time_duration(0, 5, 0);
-//  string sdt = getTimeString(ldt);  // send in five minutes
-  string sdt = "";
- // string vt = getTimeString(time_duration(1, 0, 0));  // valid for one hour
-
-
-  string vt = ""; // valid for one hour
-
+  time_t now = time(0);
+  struct tm *tm = localtime(&now);
+  string std = smpp::timeformat::ToSmppTimeString(*tm);
+  string vt = smpp::timeformat::ToSmppTimeString(std::chrono::hours(1));  // valid for one hour
   uint8_t regdlr = client->getRegisteredDelivery();
   client->setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);
   client->sendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist, 0x01, sdt, vt,
