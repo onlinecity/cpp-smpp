@@ -150,7 +150,7 @@ TEST_F(SmppClientTest, submitExtended) {
 
   time_t now = time(0);
   struct tm *tm = localtime(&now);
-  string std = smpp::timeformat::ToSmppTimeString(*tm);
+  string sdt = smpp::timeformat::ToSmppTimeString(*tm);
   string vt = smpp::timeformat::ToSmppTimeString(std::chrono::hours(1));  // valid for one hour
   uint8_t regdlr = client->getRegisteredDelivery();
   client->setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);
