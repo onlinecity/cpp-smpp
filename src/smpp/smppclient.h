@@ -485,13 +485,6 @@ class SmppClient {
    * @return
    */
   static uint16_t DefaultMessageRef();
-
-  /**
-   * Calls io_service or get_io_service on the current socket.
-   */
-  //asio::io_service &getIoService() const {
-  //  return socket->get_io_service();
-  //}
 };
 }  // namespace smpp
 #endif  // SMPP_SMPPCLIENT_H_

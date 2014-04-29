@@ -28,26 +28,26 @@ using asio::buffer;
 
 namespace smpp {
   SmppClient::SmppClient(shared_ptr<tcp::socket> _socket) :
-    systemType("WWW"), /**/
-    interfaceVersion(0x34), /**/
-    addrTon(0), /**/
-    addrNpi(0), /**/
-    addrRange(""), /**/
-    serviceType(""), /**/
-    esmClass(0), /**/
-    protocolId(0), /**/
-    registeredDelivery(0), /**/
-    replaceIfPresentFlag(0), /**/
-    smDefaultMsgId(0), /**/
-    nullTerminateOctetStrings(true), /**/
-    csmsMethod(SmppClient::CSMS_16BIT_TAGS), /**/
-    msgRefCallback(&SmppClient::DefaultMessageRef), /**/
-    state(OPEN), /**/
-    socket(_socket), /**/
-    seqNo(0), /**/
-    pdu_queue(), /**/
-    socketWriteTimeout(5000), /**/
-    socketReadTimeout(30000), /**/
+    systemType("WWW"),
+    interfaceVersion(0x34),
+    addrTon(0),
+    addrNpi(0),
+    addrRange(""),
+    serviceType(""),
+    esmClass(0),
+    protocolId(0),
+    registeredDelivery(0),
+    replaceIfPresentFlag(0),
+    smDefaultMsgId(0),
+    nullTerminateOctetStrings(true),
+    csmsMethod(SmppClient::CSMS_16BIT_TAGS),
+    msgRefCallback(&SmppClient::DefaultMessageRef),
+    state(OPEN),
+    socket(_socket),
+    seqNo(0),
+    pdu_queue(),
+    socketWriteTimeout(5000),
+    socketReadTimeout(30000),
     verbose(false) {
     }
 

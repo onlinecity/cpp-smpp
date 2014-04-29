@@ -7,9 +7,6 @@
 #ifndef SMPP_SMS_H_
 #define SMPP_SMS_H_
 
-///#include <boost/shared_array.hpp>
-//#include <boost/date_time.hpp>
-//#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include <chrono>

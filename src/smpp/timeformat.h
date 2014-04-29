@@ -65,7 +65,6 @@ std::string ToSmppTimeString(const struct tm &tm);
  * @param td time_duration to be calculated.
  * @return
  */
-//std::string getTimeString(const boost::posix_time::time_duration &td);
 std::string ToSmppTimeString(const std::chrono::seconds &d);
 
 }  // namespace timeformat
