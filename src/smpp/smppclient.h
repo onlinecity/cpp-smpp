@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 OnlineCity
+ * Copyright (C) 2011-2014 OnlineCity
  * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
  * @author hd@onlinecity.dk & td@onlinecity.dk
  */
@@ -26,6 +26,7 @@
 #include "smpp/exceptions.h"
 #include "smpp/pdu.h"
 #include "smpp/smpp.h"
+#include "smpp/smpp_params.h"
 #include "smpp/sms.h"
 #include "smpp/timeformat.h"
 #include "smpp/time_traits.h"
@@ -61,21 +62,12 @@ class SmppClient {
   uint8_t addrNpi;  // addrNpi = 0;
   std::string addrRange;
 
-  // ESME transmitter parameters
-  std::string serviceType;
-  uint8_t esmClass;
-  uint8_t protocolId;
-  uint8_t registeredDelivery;
-  uint8_t replaceIfPresentFlag;
-  uint8_t smDefaultMsgId;
-
   // Extra options;
   bool nullTerminateOctetStrings;
   // Method to use when dealing with concatenated messages.
   int csmsMethod;
 
   std::function<uint16_t()> msgRefCallback;
-
   int state;
   std::shared_ptr<asio::ip::tcp::socket> socket;
   uint32_t seqNo;
@@ -114,28 +106,20 @@ class SmppClient {
    */
   void Unbind();
 
-  /**
-   * Sends an SMS to the SMSC.
-   * The SMS is split into multiple if it doesn't into one.
-   * Returns smsc id and number of smses sent.
-   *
-   * @param sender
-   * @param receiver
-   * @param shortMessage
-   * @param tags
-   * @param priority_flag
-   * @param schedule_delivery_time
-   * @param validity_period
-   * @param dataCoding
-   * @return SMSC sms id.
-   */
+  // Sends an SMS to the SMSC
+  // The SMS is split into multiple messages if it dosen't into one.
+  // Returns smsc id and number of smses sent.
+  std::pair<std::string, int> SendSms(const SmppAddress &sender, const SmppAddress &receiver,
+                                      const std::string &short_message,
+                                      const SmppParams &params);
+
+  // Sends an SMS to the SMSC
+  // The SMS is split into multiple messages if it dosen't into one.
+  // Returns smsc id and number of smses sent.
   std::pair<std::string, int> SendSms(const SmppAddress &sender, const SmppAddress &receiver,
                                       const std::string &shortMessage,
-                                      std::list<TLV> tags = std::list<TLV>(),
-                                      const uint8_t priority_flag = 0,
-                                      const std::string &schedule_delivery_time = "",
-                                      const std::string &validity_period = "",
-                                      const int dataCoding = smpp::DATA_CODING_DEFAULT);
+                                      const SmppParams &params,
+                                      std::list<TLV> tags);
   /**
    * Returns the first SMS in the PDU queue,
    * or does a blocking read on the socket until we receive an SMS from the SMSC.
@@ -212,54 +196,6 @@ class SmppClient {
 
   std::string getAddrRange() const {
     return addrRange;
-  }
-
-  void setServiceType(const std::string &s) {
-    serviceType = s;
-  }
-
-  std::string getServiceType() const {
-    return serviceType;
-  }
-
-  void setEsmClass(const uint8_t i) {
-    esmClass = i;
-  }
-
-  uint8_t getEsmClass() const {
-    return esmClass;
-  }
-
-  void setProtocolId(const uint8_t i) {
-    protocolId = i;
-  }
-
-  uint8_t getProtocolId() const {
-    return protocolId;
-  }
-
-  void setRegisteredDelivery(const uint8_t i) {
-    registeredDelivery = i;
-  }
-
-  uint8_t getRegisteredDelivery() const {
-    return registeredDelivery;
-  }
-
-  void setReplaceIfPresentFlag(const uint8_t i) {
-    replaceIfPresentFlag = i;
-  }
-
-  uint8_t getReplaceIfPresentFlag() const {
-    return replaceIfPresentFlag;
-  }
-
-  void setSmDefaultMsgId(const uint8_t i) {
-    smDefaultMsgId = i;
-  }
-
-  uint8_t getSmDefaultMsgId() const {
-    return smDefaultMsgId;
   }
 
   void setNullTerminateOctetStrings(const bool b) {
@@ -368,20 +304,16 @@ class SmppClient {
    *
    * @param sender
    * @param receiver
-   * @param shortMessage
+   * @param short_message
+   * @param params
    * @param tags
-   * @param priority_flag
-   * @param schedule_delivery_time
-   * @param validity_period
-   * @param esmClassOpts;
    * @return SMSC sms id.
    */
-  std::string SubmitSm(const SmppAddress &sender, const SmppAddress &receiver,
-                       const std::string &shortMessage,
-                       std::list<TLV> tags, const uint8_t priority_flag, const std::string &schedule_delivery_time,
-                       const std::string &validity_period, const int esmClassOpts, const int dataCoding =
-                         smpp::DATA_CODING_DEFAULT);
-
+  std::string SubmitSm(const SmppAddress &sender,
+      const SmppAddress &receiver,
+      const std::string &short_message,
+      const struct SmppParams &params,
+      std::list<TLV> tags);
   /**
    * @return Returns the next sequence number.
    * @throw SmppException Throws an SmppException if we run out of sequence numbers.

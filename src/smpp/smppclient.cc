@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 OnlineCity
+ * Copyright (C) 2011-2014 OnlineCity
  * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
  * @author hd@onlinecity.dk & td@onlinecity.dk
  */
@@ -13,12 +13,12 @@
 #include <cassert>
 #include <functional>
 
+namespace smpp {
 using std::string;
 using std::vector;
 using std::list;
 using std::pair;
 using std::shared_ptr;
-
 using asio::system_error;
 using asio::error_code;
 using boost::numeric_cast;
@@ -26,19 +26,12 @@ using asio::ip::tcp;
 using asio::async_write;
 using asio::buffer;
 
-namespace smpp {
   SmppClient::SmppClient(shared_ptr<tcp::socket> _socket) :
     systemType("WWW"),
     interfaceVersion(0x34),
     addrTon(0),
     addrNpi(0),
     addrRange(""),
-    serviceType(""),
-    esmClass(0),
-    protocolId(0),
-    registeredDelivery(0),
-    replaceIfPresentFlag(0),
-    smDefaultMsgId(0),
     nullTerminateOctetStrings(true),
     csmsMethod(SmppClient::CSMS_16BIT_TAGS),
     msgRefCallback(&SmppClient::DefaultMessageRef),
@@ -110,17 +103,26 @@ namespace smpp {
     state = OPEN;
   }
 
-  /**
-   * Send an sms to the smsc.
-   */
-  pair<string, int> SmppClient::SendSms(const SmppAddress &sender, const SmppAddress &receiver, const string &shortMessage,
-      list<TLV> tags, const uint8_t priority_flag, const string &schedule_delivery_time,
-      const string &validity_period, const int dataCoding) {
-    int messageLen = shortMessage.length();
+  pair<string, int> SmppClient::SendSms(
+      const SmppAddress &sender,
+      const SmppAddress &receiver,
+      const string &short_message,
+      const struct SmppParams &params) {
+    return SendSms(sender, receiver, short_message, params, list<TLV>());
+  }
+
+  pair<string, int> SmppClient::SendSms(
+      const SmppAddress &sender,
+      const SmppAddress &receiver,
+      const string &short_message,
+      const struct SmppParams &params,
+      list<TLV> tags)
+  {
+    int messageLen = short_message.length();
     int singleSmsOctetLimit = 254;  // Default SMPP standard
     int csmsSplit = -1;  // where to split
 
-    switch (dataCoding) {
+    switch (params.data_coding) {
       case smpp::DATA_CODING_UCS2:
         singleSmsOctetLimit = 140;
         csmsSplit = 132;
@@ -134,13 +136,12 @@ namespace smpp {
 
     // submit_sm if the short message could fit into one pdu.
     if (messageLen <= singleSmsOctetLimit || csmsMethod == CSMS_PAYLOAD) {
-      string smscId = SubmitSm(sender, receiver, shortMessage, tags, priority_flag, schedule_delivery_time, validity_period,
-          esmClass, dataCoding);
+      string smscId = SubmitSm(sender, receiver, short_message, params, tags);
       return std::make_pair(smscId, 1);
     }
 
     // CSMS -> split message
-    vector<string> parts = Split(shortMessage, csmsSplit);
+    vector<string> parts = Split(short_message, csmsSplit);
     vector<string>::iterator itr = parts.begin();
 
     if (csmsMethod == CSMS_8BIT_UDH) {
@@ -164,10 +165,8 @@ namespace smpp {
         // concatenate with message part
         copy((*itr).begin(), (*itr).end(), &udh[6]);
         string message(reinterpret_cast<char*>(udh.get()), size);
-        smsId = SubmitSm(sender, receiver, message, tags, priority_flag, schedule_delivery_time, validity_period,
-            esmClass | 0x40, dataCoding);
+        smsId = SubmitSm(sender, receiver, message, params, tags);
       }
-
       return std::make_pair(smsId, segments);
     } else {  // csmsMethod == CSMS_16BIT_TAGS)
       tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
@@ -175,10 +174,9 @@ namespace smpp {
       int segment = 0;
       string smsId;
 
-      for (; itr < parts.end(); itr++) {
+      for (; itr < parts.end(); ++itr) {
         tags.push_back(TLV(smpp::tags::SAR_SEGMENT_SEQNUM, ++segment));
-        smsId = SubmitSm(sender, receiver, (*itr), tags, priority_flag, schedule_delivery_time, validity_period,
-            esmClass, dataCoding);
+        smsId = SubmitSm(sender, receiver, (*itr), params, tags);
         // pop SAR_SEGMENT_SEQNUM tag
         tags.pop_back();
       }
@@ -318,31 +316,33 @@ namespace smpp {
     return parts;
   }
 
-  string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiver, const string &shortMessage,
-      list<TLV> tags, const uint8_t priority_flag, const string &schedule_delivery_time,
-      const string &validity_period, const int esmClassOpt, const int dataCoding) {
+  string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiver, const string &short_message, const struct SmppParams &params, list<TLV> tags) {
     CheckState(BOUND_TX);
     PDU pdu(smpp::SUBMIT_SM, 0, NextSequenceNumber());
-    pdu << serviceType;
+    pdu << params.service_type;
     pdu << sender;
     pdu << receiver;
-    pdu << esmClassOpt;
-    pdu << protocolId;
-    pdu << priority_flag;
-    pdu << schedule_delivery_time;
-    pdu << validity_period;
-    pdu << registeredDelivery;
-    pdu << replaceIfPresentFlag;
-    pdu << dataCoding;
-    pdu << smDefaultMsgId;
+    if (csmsMethod == CSMS_8BIT_UDH) {
+      pdu << (params.esm_class | ESM_UHDI);  // Set UHDI bit
+    } else {
+      pdu << params.esm_class;
+    }
+    pdu << params.protocol_id;
+    pdu << params.priority_flag;
+    pdu << params.schedule_delivery_time;
+    pdu << params.validity_period;
+    pdu << params.registered_delivery;
+    pdu << params.replace_if_present_flag;
+    pdu << params.data_coding;
+    pdu << params.sm_default_msg_id;
 
     if (csmsMethod == CSMS_PAYLOAD) {
       pdu << 0;  // sm_length = 0
-      pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, shortMessage);
+      pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, short_message);
     } else {
       pdu.setNullTerminateOctetStrings(nullTerminateOctetStrings);
-      pdu << boost::numeric_cast<uint8_t>(shortMessage.length()) + (nullTerminateOctetStrings ? 1 : 0);
-      pdu << shortMessage;
+      pdu << boost::numeric_cast<uint8_t>(short_message.length()) + (nullTerminateOctetStrings ? 1 : 0);
+      pdu << short_message;
       pdu.setNullTerminateOctetStrings(true);
     }
 
@@ -484,9 +484,6 @@ namespace smpp {
 
   void SmppClient::HandleTimeout(bool *had_error, const error_code &error) {
     *had_error = true;
-   // if (error) {
-   //   *had_error = true;
-   // }
   }
 
   void SmppClient::WriteHandler(bool *had_error, const error_code &error) {
