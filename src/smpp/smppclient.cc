@@ -54,16 +54,17 @@ using asio::buffer;
   }
 
   void SmppClient::BindTransmitter(const string &login, const string &pass) {
-    bind(smpp::BIND_TRANSMITTER, login, pass);
+    Bind(smpp::BIND_TRANSMITTER, login, pass);
   }
 
   void SmppClient::BindReceiver(const string &login, const string &pass) {
-    bind(smpp::BIND_RECEIVER, login, pass);
+    Bind(smpp::BIND_RECEIVER, login, pass);
   }
 
   void SmppClient::Bind(uint32_t mode, const string &login, const string &password) {
     CheckConnection();
     CheckState(OPEN);
+
     PDU pdu = SetupBindPdu(mode, login, password);
     SendCommand(pdu);
 
@@ -101,6 +102,14 @@ using asio::buffer;
     }
 
     state = OPEN;
+  }
+
+  pair<string, int> SmppClient::SendSms(
+      const SmppAddress &sender,
+      const SmppAddress &receiver,
+      const string &short_message) {
+    struct SmppParams params;
+    return SendSms(sender, receiver, short_message, params, list<TLV>());
   }
 
   pair<string, int> SmppClient::SendSms(

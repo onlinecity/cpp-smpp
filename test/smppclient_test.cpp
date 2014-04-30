@@ -11,30 +11,40 @@
 #include "gtest/gtest.h"
 #include "smpp/gsmencoding.h"
 #include "smpp/timeformat.h"
+#include "smpp/smpp_params.h"
 #include "smppclient_test.h"
 
 using oc::tools::GsmEncoder;
 using smpp::SmppAddress;
 using smpp::SmppClient;
 using smpp::TLV;
-//using smpp::timeformat::getTimeString;
 using std::list;
 using std::string;
 
 //  Test login of either transmitter or receiver
-TEST_F(SmppClientTest, login) {
-  socket->connect(endpoint);
-  ASSERT_TRUE(socket->is_open());
-  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
-  ASSERT_TRUE(client->IsBound());
-  client->Unbind();
-  socket->close();
+TEST_F(SmppClientTest, BindReceiver) {
   socket->connect(endpoint);
   ASSERT_TRUE(socket->is_open());
   client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
   ASSERT_TRUE(client->IsBound());
   client->Unbind();
   socket->close();
+}
+
+TEST_F(SmppClientTest, BindTransmitter) {
+  socket->connect(endpoint);
+  ASSERT_TRUE(socket->is_open());
+  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+  ASSERT_TRUE(client->IsBound());
+  client->Unbind();
+  socket->close();
+}
+
+TEST_F(SmppClientTest, LoginError) {
+  socket->connect(endpoint);
+  ASSERT_TRUE(socket->is_open());
+  EXPECT_THROW(client->BindTransmitter("WRONG_USERNAME", SMPP_PASSWORD), smpp::InvalidSystemIdException);
+  EXPECT_THROW(client->BindTransmitter(SMPP_USERNAME, "I_FORGET_PASWD"), smpp::SmppException);
 }
 
 // Test sending a basic SMS
@@ -99,11 +109,12 @@ TEST_F(SmppClientTest, tlv) {
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message = "message to send";
+  struct smpp::SmppParams params;
   list<TLV> taglist;
   taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT,
                         static_cast<uint8_t>(0x01)));  // "flash sms" use-case
   taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
-  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist);
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), params, taglist);
   client->Unbind();
   socket->close();
 }
@@ -121,12 +132,13 @@ TEST_F(SmppClientTest, tlvExtended) {
     message += "lorem ipsum ";
   }
 
+  struct smpp::SmppParams params;
   list<TLV> taglist;
   taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT, static_cast<uint8_t>(0x01)));
   taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
   int csmsMethod = client->getCsmsMethod();
   client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
-  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist);
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), params, taglist);
   client->setCsmsMethod(csmsMethod);
   client->Unbind();
   socket->close();
@@ -143,20 +155,23 @@ TEST_F(SmppClientTest, submitExtended) {
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
   SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
   string message = "message to send";
-  list<TLV> taglist;
-  taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT,
-                        static_cast<uint8_t>(0x01)));  // "flash sms" use-case
-  taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
+
+  struct smpp::SmppParams params;
+  params.priority_flag = 0x01;
+  params.registered_delivery = smpp::REG_DELIVERY_SMSC_BOTH;
 
   time_t now = time(0);
   struct tm *tm = localtime(&now);
-  string sdt = smpp::timeformat::ToSmppTimeString(*tm);
-  string vt = smpp::timeformat::ToSmppTimeString(std::chrono::hours(1));  // valid for one hour
-  uint8_t regdlr = client->getRegisteredDelivery();
-  client->setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);
-  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), taglist, 0x01, sdt, vt,
-                  smpp::DATA_CODING_ISO8859_1);
-  client->setRegisteredDelivery(regdlr);
+  params.schedule_delivery_time = smpp::timeformat::ToSmppTimeString(*tm);
+  params.validity_period = smpp::timeformat::ToSmppTimeString(std::chrono::hours(1));  // valid for one hour
+  params.data_coding = smpp::DATA_CODING_ISO8859_1;
+
+  list<TLV> tags;
+  tags.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT,
+                        static_cast<uint8_t>(0x01)));  // "flash sms" use-case
+  tags.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
+
+  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), params, tags);
   client->Unbind();
   socket->close();
 }
