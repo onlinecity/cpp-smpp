@@ -18,7 +18,7 @@
 namespace smpp {
 
 const int HEADERFIELD_SIZE = 4;
-const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
+//const int HEADER_SIZE = HEADERFIELD_SIZE * 4;
 
 typedef std::string PduData;
 typedef std::array<char, HEADERFIELD_SIZE> PduLengthHeader;
@@ -27,16 +27,8 @@ typedef std::array<char, HEADERFIELD_SIZE> PduLengthHeader;
  * Class for representing a PDU.
  */
 class PDU {
- private:
-  std::stringbuf sb;
-  std::iostream buf;
-  uint32_t cmdId;
-  uint32_t cmdStatus;
-  uint32_t seqNo;
-  bool nullTerminateOctetStrings;
 
  public:
-  bool null;
 
   /**
    * Construct an empty PDU, ie. a null PDU
@@ -77,28 +69,42 @@ class PDU {
   /**
    * @return PDU command id.
    */
-  uint32_t getCommandId() const;
+  uint32_t command_id() const {
+    return command_id_;
+  }
 
   /**
    * @return PDU command status.
    */
-  uint32_t getCommandStatus() const;
+  uint32_t command_status() const {
+    return command_status_;
+  }
 
   /**
    * @return PDU sequence number.
    */
-  uint32_t getSequenceNo() const;
+  uint32_t sequence_no() const {
+    return seq_no_;
+  }
 
   /**
    * @return True if null termination is on.
    */
-  bool isNullTerminating() const;
+  bool null_terminate_octet_strings() const {
+    return null_terminate_octet_strings_;
+  }
 
   /**
    * Turns null termination on or off.
    * @param True if null termination is on.
    */
-  void setNullTerminateOctetStrings(const bool &);
+  void set_null_terminate_octet_strings(const bool null_terminate_octet_strings) {
+    null_terminate_octet_strings_ = null_terminate_octet_strings;
+  }
+
+  bool null() const {
+    return null_;
+  }
 
   /** Adds an integer as an unsigned 8 bit. */
   PDU &operator<<(const int &);
@@ -141,6 +147,14 @@ class PDU {
   bool HasMoreData();
 
   static uint32_t GetPduLength(const PduLengthHeader &pduHeader);
+
+  std::stringbuf sb_;
+  std::iostream buf_;
+  uint32_t command_id_;
+  uint32_t command_status_;
+  uint32_t seq_no_;
+  bool null_terminate_octet_strings_;
+  bool null_;
 };
 // PDU
 std::ostream &operator<<(std::ostream &, smpp::PDU &);

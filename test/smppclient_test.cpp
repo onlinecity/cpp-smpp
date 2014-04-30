@@ -90,14 +90,14 @@ TEST_F(SmppClientTest, csms) {
     message += "lorem ipsum ";
   }
 
-  int csmsMethod = client->getCsmsMethod();
-  client->setCsmsMethod(SmppClient::CSMS_PAYLOAD);
+  int csmsMethod = client->csms_method();
+  client->set_csms_method(SmppClient::CSMS_PAYLOAD);
   client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
-  client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
+  client->set_csms_method(SmppClient::CSMS_16BIT_TAGS);
   client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
-  client->setCsmsMethod(SmppClient::CSMS_8BIT_UDH);
+  client->set_csms_method(SmppClient::CSMS_8BIT_UDH);
   client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
-  client->setCsmsMethod(csmsMethod);
+  client->set_csms_method(csmsMethod);
   client->Unbind();
   socket->close();
 }
@@ -136,10 +136,10 @@ TEST_F(SmppClientTest, tlvExtended) {
   list<TLV> taglist;
   taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT, static_cast<uint8_t>(0x01)));
   taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
-  int csmsMethod = client->getCsmsMethod();
-  client->setCsmsMethod(SmppClient::CSMS_16BIT_TAGS);
+  int csms_method = client->csms_method();
+  client->set_csms_method(SmppClient::CSMS_16BIT_TAGS);
   client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), params, taglist);
-  client->setCsmsMethod(csmsMethod);
+  client->set_csms_method(csms_method);
   client->Unbind();
   socket->close();
 }
@@ -184,7 +184,7 @@ TEST_F(SmppClientTest, receive) {
 }
 
 TEST_F(SmppClientTest, logging) {
-  client->setVerbose(true);
+  client->set_verbose(true);
   socket->connect(endpoint);
   client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   client->Unbind();

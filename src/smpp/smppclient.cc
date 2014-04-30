@@ -32,21 +32,21 @@ using asio::buffer;
     addr_ton_(0),
     addr_npi_(0),
     addr_range_(""),
-    nullTerminateOctetStrings(true),
-    csmsMethod(SmppClient::CSMS_16BIT_TAGS),
-    msgRefCallback(&SmppClient::DefaultMessageRef),
-    state(OPEN),
+    null_terminate_octet_strings_(true),
+    csms_method_(SmppClient::CSMS_16BIT_TAGS),
+    msg_ref_callback_(&SmppClient::DefaultMessageRef),
+    state_(OPEN),
     socket_(socket),
-    seqNo(0),
-    pdu_queue(),
-    socketWriteTimeout(5000),
-    socketReadTimeout(30000),
-    verbose(false) {
+    seq_no_(0),
+    pdu_queue_(),
+    socket_write_timeout_(5000),
+    socket_read_timeout_(30000),
+    verbose_(false) {
     }
 
   SmppClient::~SmppClient() {
     try {
-      if (state != OPEN) {
+      if (state_ != OPEN) {
         Unbind();
       }
     } catch (std::exception &e) {
@@ -70,11 +70,11 @@ using asio::buffer;
 
     switch (mode) {
       case smpp::BIND_RECEIVER:
-        state = BOUND_RX;
+        state_ = BOUND_RX;
         break;
 
       case smpp::BIND_TRANSMITTER:
-        state = BOUND_TX;
+        state_ = BOUND_TX;
         break;
     }
   }
@@ -95,13 +95,13 @@ using asio::buffer;
     CheckConnection();
     PDU pdu(smpp::UNBIND, 0, NextSequenceNumber());
     PDU resp = SendCommand(pdu);
-    uint32_t pduStatus = resp.getCommandStatus();
+    uint32_t pduStatus = resp.command_status();
 
     if (pduStatus != smpp::ESME_ROK) {
       throw smpp::SmppException(smpp::GetEsmeStatus(pduStatus));
     }
 
-    state = OPEN;
+    state_ = OPEN;
   }
 
   pair<string, int> SmppClient::SendSms(
@@ -144,7 +144,7 @@ using asio::buffer;
     }
 
     // submit_sm if the short message could fit into one pdu.
-    if (messageLen <= singleSmsOctetLimit || csmsMethod == CSMS_PAYLOAD) {
+    if (messageLen <= singleSmsOctetLimit || csms_method_ == CSMS_PAYLOAD) {
       string smscId = SubmitSm(sender, receiver, short_message, params, tags);
       return std::make_pair(smscId, 1);
     }
@@ -153,12 +153,12 @@ using asio::buffer;
     vector<string> parts = Split(short_message, csmsSplit);
     vector<string>::iterator itr = parts.begin();
 
-    if (csmsMethod == CSMS_8BIT_UDH) {
+    if (csms_method_ == CSMS_8BIT_UDH) {
       // encode an udh with an 8bit csms reference
       uint8_t segment = 0;
       uint8_t segments = numeric_cast<uint8_t>(parts.size());
       string smsId;
-      uint8_t csmsRef = static_cast<uint8_t>(msgRefCallback() & 0xff);
+      uint8_t csmsRef = static_cast<uint8_t>(msg_ref_callback_() & 0xff);
 
       for (; itr < parts.end(); itr++) {
         // encode udh
@@ -178,7 +178,7 @@ using asio::buffer;
       }
       return std::make_pair(smsId, segments);
     } else {  // csmsMethod == CSMS_16BIT_TAGS)
-      tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
+      tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msg_ref_callback_())));
       tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
       int segment = 0;
       string sms_id;
@@ -203,7 +203,7 @@ using asio::buffer;
     CheckState(BOUND_RX);
 
     // if  there are any messages in the queue pop the first usable one off and return it
-    if (!pdu_queue.empty()) {
+    if (!pdu_queue_.empty()) {
       return ParseSms();
     }
 
@@ -214,21 +214,21 @@ using asio::buffer;
       while (!b) {
         PDU pdu = ReadPdu(true);
 
-        if (pdu.getCommandId() == ENQUIRE_LINK) {
-          PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.getSequenceNo());
+        if (pdu.command_id() == ENQUIRE_LINK) {
+          PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.sequence_no());
           SendPdu(resp);
           continue;
         }
 
-        if (pdu.null) {
+        if (pdu.null()) {
           break;
         }
 
-        if (!pdu.null) {
-          pdu_queue.push_back(pdu);    // save pdu for reading later
+        if (!pdu.null()) {
+          pdu_queue_.push_back(pdu);    // save pdu for reading later
         }
 
-        b = pdu.getCommandId() == DELIVER_SM;
+        b = pdu.command_id() == DELIVER_SM;
       }
     } catch (std::exception &e) {
       throw smpp::TransportException(e.what());
@@ -268,34 +268,34 @@ using asio::buffer;
   }
 
   SMS SmppClient::ParseSms() {
-    if (pdu_queue.empty()) {
+    if (pdu_queue_.empty()) {
       return SMS();
     }
 
-    list<PDU>::iterator it = pdu_queue.begin();
+    list<PDU>::iterator it = pdu_queue_.begin();
 
-    while (it != pdu_queue.end()) {
-      if ((*it).getCommandId() == DELIVER_SM) {
+    while (it != pdu_queue_.end()) {
+      if ((*it).command_id() == DELIVER_SM) {
         SMS sms(*it);
         // send response to smsc
-        PDU resp = PDU(DELIVER_SM_RESP, 0x0, (*it).getSequenceNo());
+        PDU resp = PDU(DELIVER_SM_RESP, 0x0, (*it).sequence_no());
         resp << 0x0;
         SendPdu(resp);
         // remove sms from queue
-        pdu_queue.erase(it);
+        pdu_queue_.erase(it);
         return sms;
       }
 
-      if ((*it).getCommandId() == ALERT_NOTIFICATION) {
-        it = pdu_queue.erase(it);
+      if ((*it).command_id() == ALERT_NOTIFICATION) {
+        it = pdu_queue_.erase(it);
         continue;
       }
 
-      if ((*it).getCommandId() == DATA_SM) {
-        PDU resp = PDU(DATA_SM_RESP, 0x0, (*it).getSequenceNo());
+      if ((*it).command_id() == DATA_SM) {
+        PDU resp = PDU(DATA_SM_RESP, 0x0, (*it).sequence_no());
         resp << 0x0;
         SendPdu(resp);
-        it = pdu_queue.erase(it);
+        it = pdu_queue_.erase(it);
         continue;
       }
       ++it;
@@ -331,7 +331,7 @@ using asio::buffer;
     pdu << params.service_type;
     pdu << sender;
     pdu << receiver;
-    if (csmsMethod == CSMS_8BIT_UDH) {
+    if (csms_method_ == CSMS_8BIT_UDH) {
       pdu << (params.esm_class | ESM_UHDI);  // Set UHDI bit
     } else {
       pdu << params.esm_class;
@@ -345,14 +345,14 @@ using asio::buffer;
     pdu << params.data_coding;
     pdu << params.sm_default_msg_id;
 
-    if (csmsMethod == CSMS_PAYLOAD) {
+    if (csms_method_ == CSMS_PAYLOAD) {
       pdu << 0;  // sm_length = 0
       pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, short_message);
     } else {
-      pdu.setNullTerminateOctetStrings(nullTerminateOctetStrings);
-      pdu << boost::numeric_cast<uint8_t>(short_message.length()) + (nullTerminateOctetStrings ? 1 : 0);
+      pdu.set_null_terminate_octet_strings(null_terminate_octet_strings_);
+      pdu << boost::numeric_cast<uint8_t>(short_message.length()) + (null_terminate_octet_strings_ ? 1 : 0);
       pdu << short_message;
-      pdu.setNullTerminateOctetStrings(true);
+      pdu.set_null_terminate_octet_strings(true);
     }
 
     // add  optional tags.
@@ -367,10 +367,10 @@ using asio::buffer;
   }
 
   uint32_t SmppClient::NextSequenceNumber() {
-    if (++seqNo > 0x7FFFFFFF) {
+    if (++seq_no_ > 0x7FFFFFFF) {
       throw SmppException("Ran out of sequence numbers");
     }
-    return seqNo;
+    return seq_no_;
   }
 
   void SmppClient::SendPdu(PDU &pdu) {
@@ -378,12 +378,12 @@ using asio::buffer;
     bool ioResult = false;
     bool timerResult = false;
 
-    if (verbose) {
+    if (verbose_) {
       LOG(INFO) << pdu;
     }
 
     smpp::ChronoDeadlineTimer timer(socket_->get_io_service());
-    timer.expires_from_now(std::chrono::milliseconds(socketWriteTimeout));
+    timer.expires_from_now(std::chrono::milliseconds(socket_write_timeout_));
     timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timerResult, std::placeholders::_1));
 
     async_write(*socket_,
@@ -404,25 +404,25 @@ using asio::buffer;
 
   PDU SmppClient::SendCommand(PDU &pdu) {
     SendPdu(pdu);
-    PDU resp = ReadPduResponse(pdu.getSequenceNo(), pdu.getCommandId());
+    PDU resp = ReadPduResponse(pdu.sequence_no(), pdu.command_id());
 
-    switch (resp.getCommandStatus()) {
+    switch (resp.command_status()) {
       case smpp::ESME_RINVPASWD:
-        throw smpp::InvalidPasswordException(smpp::GetEsmeStatus(resp.getCommandStatus()));
+        throw smpp::InvalidPasswordException(smpp::GetEsmeStatus(resp.command_status()));
         break;
       case smpp::ESME_RINVSYSID:
-        throw smpp::InvalidSystemIdException(smpp::GetEsmeStatus(resp.getCommandStatus()));
+        throw smpp::InvalidSystemIdException(smpp::GetEsmeStatus(resp.command_status()));
         break;
       case smpp::ESME_RINVSRCADR:
-        throw smpp::InvalidSourceAddressException(smpp::GetEsmeStatus(resp.getCommandStatus()));
+        throw smpp::InvalidSourceAddressException(smpp::GetEsmeStatus(resp.command_status()));
         break;
       case smpp::ESME_RINVDSTADR:
-        throw smpp::InvalidDestinationAddressException(smpp::GetEsmeStatus(resp.getCommandStatus()));
+        throw smpp::InvalidDestinationAddressException(smpp::GetEsmeStatus(resp.command_status()));
         break;
     }
 
-    if (resp.getCommandStatus() != smpp::ESME_ROK) {
-      throw smpp::SmppException(smpp::GetEsmeStatus(resp.getCommandStatus()));
+    if (resp.command_status() != smpp::ESME_ROK) {
+      throw smpp::SmppException(smpp::GetEsmeStatus(resp.command_status()));
     }
 
     return resp;
@@ -437,15 +437,15 @@ using asio::buffer;
     ReadPduBlocking();
 
     // There are no pdus to be read return a null pdu.
-    if (pdu_queue.empty()) {
+    if (pdu_queue_.empty()) {
       return PDU();
     }
 
     // Return last the pdu inserted into the queue.
-    PDU pdu = pdu_queue.back();
-    pdu_queue.pop_back();
+    PDU pdu = pdu_queue_.back();
+    pdu_queue_.pop_back();
 
-    if (verbose) {
+    if (verbose_) {
       LOG(INFO) << pdu;
     }
 
@@ -478,7 +478,7 @@ using asio::buffer;
           &pduHeader));
 
     smpp::ChronoDeadlineTimer timer(socket_->get_io_service());
-    timer.expires_from_now(std::chrono::milliseconds(socketReadTimeout));
+    timer.expires_from_now(std::chrono::milliseconds(socket_read_timeout_));
     timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timerResult, std::placeholders::_1));
     SocketExecute();
 
@@ -555,18 +555,18 @@ using asio::buffer;
       throw TransportException(system_error(error).what());
     }
 
-    pdu_queue.emplace_back(*pduLength, *pduBuffer);
+    pdu_queue_.emplace_back(*pduLength, *pduBuffer);
   }
 
   // blocks until response is read
   PDU SmppClient::ReadPduResponse(const uint32_t &sequence, const uint32_t &commandId) {
     uint32_t response = GENERIC_NACK | commandId;
-    list<PDU>::iterator it = pdu_queue.begin();
+    list<PDU>::iterator it = pdu_queue_.begin();
 
-    while (it != pdu_queue.end()) {
+    while (it != pdu_queue_.end()) {
       PDU pdu = (*it);
-      if (pdu.getSequenceNo() == sequence && pdu.getCommandId() == response) {
-        it = pdu_queue.erase(it);
+      if (pdu.sequence_no() == sequence && pdu.command_id() == response) {
+        it = pdu_queue_.erase(it);
         return pdu;
       }
 
@@ -575,10 +575,10 @@ using asio::buffer;
 
     while (true) {
       PDU pdu = ReadPdu(true);
-      if (!pdu.null) {
-        if ((pdu.getSequenceNo() == sequence && (pdu.getCommandId() == response
-                || pdu.getCommandId() == GENERIC_NACK))
-            || (pdu.getSequenceNo() == 0 && pdu.getCommandId() == GENERIC_NACK)) {
+      if (!pdu.null()) {
+        if ((pdu.sequence_no() == sequence && (pdu.command_id() == response
+                || pdu.command_id() == GENERIC_NACK))
+            || (pdu.sequence_no() == 0 && pdu.command_id() == GENERIC_NACK)) {
           return pdu;
         }
       }
@@ -589,12 +589,12 @@ using asio::buffer;
   }
 
   void smpp::SmppClient::EnquireLinkRespond() {
-    list<PDU>::iterator it = pdu_queue.begin();
+    list<PDU>::iterator it = pdu_queue_.begin();
 
-    while (it != pdu_queue.end()) {
+    while (it != pdu_queue_.end()) {
       PDU pdu = (*it);
-      if (pdu.getCommandId() == ENQUIRE_LINK) {
-        PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.getSequenceNo());
+      if (pdu.command_id() == ENQUIRE_LINK) {
+        PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.sequence_no());
         SendCommand(resp);
       }
       it++;
@@ -602,8 +602,8 @@ using asio::buffer;
 
     PDU pdu = ReadPdu(false);
 
-    if (!pdu.null && pdu.getCommandId() == ENQUIRE_LINK) {
-      PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.getSequenceNo());
+    if (!pdu.null() && pdu.command_id() == ENQUIRE_LINK) {
+      PDU resp = PDU(ENQUIRE_LINK_RESP, 0, pdu.sequence_no());
       SendPdu(resp);
     }
   }
@@ -615,7 +615,7 @@ using asio::buffer;
   }
 
   void SmppClient::CheckState(int state) {
-    if (this->state != state) {
+    if (this->state_ != state) {
       throw smpp::SmppException("Client in wrong state");
     }
   }

@@ -107,7 +107,7 @@ class SmppClient {
 
   // Returns true if the client is bound.
   bool IsBound() {
-    return state != OPEN;
+    return state_ != OPEN;
   }
 
   void set_system_type(const std::string &system_type) {
@@ -150,59 +150,59 @@ class SmppClient {
     return addr_range_;
   }
 
-  void setNullTerminateOctetStrings(const bool b) {
-    nullTerminateOctetStrings = b;
+  void set_null_terminate_octet_strings(const bool null_terminate_octet_strings) {
+    null_terminate_octet_strings_ = null_terminate_octet_strings;
   }
 
-  bool getNullTerminateOctetStrings() const {
-    return nullTerminateOctetStrings;
+  bool null_terminate_octet_strings() const {
+    return null_terminate_octet_strings_;
   }
 
-  void setCsmsMethod(const int &method) {
-    csmsMethod = method;
+  void set_csms_method(const int csms_method) {
+    csms_method_ = csms_method;
   }
 
-  int getCsmsMethod() const {
-    return csmsMethod;
+  int csms_method() const {
+    return csms_method_;
   }
 
   // Sets the socket read timeout in milliseconds. Default is 5000 milliseconds.
   // @param timeout Socket read timeout in milliseconds.
-  void setSocketReadTimeout(const int &timeout) {
-    socketReadTimeout = timeout;
+  void set_socket_read_timeout(const int socket_read_timeout) {
+    socket_read_timeout_ = socket_read_timeout;
   }
 
   // Returns the socket read timeout.
   // @return Socket read timeout in milliseconds.
-  int getSocketReadTimeout() const {
-    return socketReadTimeout;
+  int socket_read_timeout() const {
+    return socket_read_timeout_;
   }
 
   // Sets the socket write timeout in milliseconds. Default is 30000 milliseconds.
   // @param timeout Socket write timeout in milliseconds.
-  void setSocketWriteTimeout(const int &timeout) {
-    socketWriteTimeout = timeout;
+  void set_socket_write_timeout(const int &socket_write_timeout) {
+    socket_write_timeout_ = socket_write_timeout;
   }
 
   // Returns the socket write timeout in milliseconds.
   // @return Socket write timeout in milliseconds.
-  int getSocketWriteTimeout() const {
-    return socketWriteTimeout;
+  int socket_write_timeout() const {
+    return socket_write_timeout_;
   }
 
-  void setVerbose(const bool b) {
-    verbose = b;
+  void set_verbose(const bool verbose) {
+    verbose_ = verbose;
   }
 
-  bool isVerbose() const {
-    return verbose;
+  bool verbose() const {
+    return verbose_;
   }
 
   // Set callback method for generating message references.
   // The returned integer must be modulo 65535 (0xffff)
   // @param cb
-  void setMsgRefCallback(std::function<uint16_t()> cb) {
-    msgRefCallback = cb;
+  void set_msg_ref_callback(std::function<uint16_t()> msg_ref_callback) {
+    msg_ref_callback_ = msg_ref_callback;
   }
 
  private:
@@ -335,21 +335,21 @@ class SmppClient {
   std::string addr_range_;
 
   // Extra options;
-  bool nullTerminateOctetStrings;
+  bool null_terminate_octet_strings_;
   // Method to use when dealing with concatenated messages.
-  int csmsMethod;
+  int csms_method_;
 
-  std::function<uint16_t()> msgRefCallback;
-  int state;
+  std::function<uint16_t()> msg_ref_callback_;
+  int state_;
   std::shared_ptr<asio::ip::tcp::socket> socket_;
-  uint32_t seqNo;
-  std::list<PDU> pdu_queue;
+  uint32_t seq_no_;
+  std::list<PDU> pdu_queue_;
   // Socket write timeout in milliseconds. Default is 5000 milliseconds.
-  int socketWriteTimeout;
+  int socket_write_timeout_;
   // Socket read timeout in milliseconds. Default is 30000 milliseconds.
-  int socketReadTimeout;
-
-  bool verbose;
+  int socket_read_timeout_;
+  // Verbose output
+  bool verbose_;
 
 };
 }  // namespace smpp

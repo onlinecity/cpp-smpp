@@ -28,7 +28,7 @@ class SmppClientTest: public testing::Test {
   }
 
   virtual void SetUp() {
-    client->setVerbose(false);
+    client->set_verbose(false);
   }
 
   virtual void TearDown() {
