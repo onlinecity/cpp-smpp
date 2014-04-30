@@ -45,36 +45,6 @@ class SmppClient {
     CSMS_PAYLOAD, CSMS_16BIT_TAGS, CSMS_8BIT_UDH
   };
 
- private:
-  enum {
-    OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
-  };
-
-  // SMPP bind parameters
-  std::string systemType;
-  uint8_t interfaceVersion;  // interfaceVersion = 0x34;
-  uint8_t addrTon;  // addrTon = 0;
-  uint8_t addrNpi;  // addrNpi = 0;
-  std::string addrRange;
-
-  // Extra options;
-  bool nullTerminateOctetStrings;
-  // Method to use when dealing with concatenated messages.
-  int csmsMethod;
-
-  std::function<uint16_t()> msgRefCallback;
-  int state;
-  std::shared_ptr<asio::ip::tcp::socket> socket;
-  uint32_t seqNo;
-  std::list<PDU> pdu_queue;
-  // Socket write timeout in milliseconds. Default is 5000 milliseconds.
-  int socketWriteTimeout;
-  // Socket read timeout in milliseconds. Default is 30000 milliseconds.
-  int socketReadTimeout;
-
-  bool verbose;
-
- public:
   explicit SmppClient(std::shared_ptr<asio::ip::tcp::socket>);
   ~SmppClient();
 
@@ -140,44 +110,44 @@ class SmppClient {
     return state != OPEN;
   }
 
-  void setSystemType(const std::string s) {
-    systemType = s;
+  void set_system_type(const std::string &system_type) {
+    system_type_ = system_type;
   }
 
-  std::string getSystemType() const {
-    return systemType;
+  std::string system_type() const {
+    return system_type_;
   }
 
-  void setInterfaceVersion(const uint8_t i) {
-    interfaceVersion = i;
+  void set_interface_version(const uint8_t interface_version) {
+    interface_version_ = interface_version;
   }
 
-  uint8_t getInterfaceVersion() const {
-    return interfaceVersion;
+  uint8_t interface_version() const {
+    return interface_version();
   }
 
-  void setAddrTon(const uint8_t i) {
-    addrTon = i;
+  void set_addr_ton(const uint8_t addr_ton) {
+    addr_ton_ = addr_ton;
   }
 
-  uint8_t getAddrTon() const {
-    return addrTon;
+  uint8_t addr_ton() const {
+    return addr_ton_;
   }
 
-  void setAddrNpi(const uint8_t i) {
-    addrNpi = i;
+  void set_addr_npi(const uint8_t addr_npi) {
+    addr_npi_ = addr_npi;
   }
 
-  uint8_t getAddrNpi() const {
-    return addrNpi;
+  uint8_t addr_npi() const {
+    return addr_npi_;
   }
 
-  void setAddrRange(const std::string &s) {
-    addrRange = s;
+  void set_addr_range(const std::string &addr_range) {
+    addr_range_ = addr_range;
   }
 
-  std::string getAddrRange() const {
-    return addrRange;
+  std::string addr_range() const {
+    return addr_range_;
   }
 
   void setNullTerminateOctetStrings(const bool b) {
@@ -258,7 +228,7 @@ class SmppClient {
   // @param shortMessage String to split.
   // @param split How long each substring should be.
   // @return Vector of substrings.
-  std::vector<std::string> Split(const std::string &short_message, const int split);
+  static std::vector<std::string> Split(const std::string &short_message, const int split);
 
   // Sends a SUBMIT_SM pdu with the required details for sending an SMS to the SMSC.
   // It blocks until it gets a response from the SMSC.
@@ -350,5 +320,36 @@ class SmppClient {
   // Returns a modulo 0xffff int.
   // @return
   static uint16_t DefaultMessageRef();
+
+
+ private:
+  enum {
+    OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
+  };
+
+  // SMPP bind parameters
+  std::string system_type_;
+  uint8_t interface_version_;  // interfaceVersion = 0x34;
+  uint8_t addr_ton_;  // addrTon = 0;
+  uint8_t addr_npi_;  // addrNpi = 0;
+  std::string addr_range_;
+
+  // Extra options;
+  bool nullTerminateOctetStrings;
+  // Method to use when dealing with concatenated messages.
+  int csmsMethod;
+
+  std::function<uint16_t()> msgRefCallback;
+  int state;
+  std::shared_ptr<asio::ip::tcp::socket> socket_;
+  uint32_t seqNo;
+  std::list<PDU> pdu_queue;
+  // Socket write timeout in milliseconds. Default is 5000 milliseconds.
+  int socketWriteTimeout;
+  // Socket read timeout in milliseconds. Default is 30000 milliseconds.
+  int socketReadTimeout;
+
+  bool verbose;
+
 };
 }  // namespace smpp

@@ -26,17 +26,17 @@ using asio::ip::tcp;
 using asio::async_write;
 using asio::buffer;
 
-  SmppClient::SmppClient(shared_ptr<tcp::socket> _socket) :
-    systemType("WWW"),
-    interfaceVersion(0x34),
-    addrTon(0),
-    addrNpi(0),
-    addrRange(""),
+  SmppClient::SmppClient(shared_ptr<tcp::socket> socket) :
+    system_type_("WWW"),
+    interface_version_(0x34),
+    addr_ton_(0),
+    addr_npi_(0),
+    addr_range_(""),
     nullTerminateOctetStrings(true),
     csmsMethod(SmppClient::CSMS_16BIT_TAGS),
     msgRefCallback(&SmppClient::DefaultMessageRef),
     state(OPEN),
-    socket(_socket),
+    socket_(socket),
     seqNo(0),
     pdu_queue(),
     socketWriteTimeout(5000),
@@ -83,11 +83,11 @@ using asio::buffer;
     PDU pdu(mode, 0, NextSequenceNumber());
     pdu << login;
     pdu << password;
-    pdu << systemType;
-    pdu << interfaceVersion;
-    pdu << addrTon;
-    pdu << addrNpi;
-    pdu << addrRange;
+    pdu << system_type_;
+    pdu << interface_version_;
+    pdu << addr_ton_;
+    pdu << addr_npi_;
+    pdu << addr_range_;
     return pdu;
   }
 
@@ -181,11 +181,11 @@ using asio::buffer;
       tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msgRefCallback())));
       tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
       int segment = 0;
-      string smsId;
+      string sms_id;
 
       for (; itr < parts.end(); ++itr) {
         tags.push_back(TLV(smpp::tags::SAR_SEGMENT_SEQNUM, ++segment));
-        smsId = SubmitSm(sender, receiver, (*itr), params, tags);
+        sms_id = SubmitSm(sender, receiver, (*itr), params, tags);
         // pop SAR_SEGMENT_SEQNUM tag
         tags.pop_back();
       }
@@ -194,7 +194,7 @@ using asio::buffer;
       tags.pop_back();
       // pop SAR_MSG_REF_NUM tag
       tags.pop_back();
-      return std::make_pair(smsId, segment);
+      return std::make_pair(sms_id, segment);
     }
   }
 
@@ -303,18 +303,18 @@ using asio::buffer;
     return SMS();
   }
 
-  vector<string> SmppClient::Split(const string &shortMessage, const int split) {
+  vector<string> SmppClient::Split(const string &short_message, const int split) {
     vector<string> parts;
-    int len = shortMessage.length();
+    int len = short_message.length();
     int pos = 0;
     int n = split;
 
     while (pos < len) {
-      if (static_cast<int>(shortMessage[pos + n - 1]) == 0x1b) {  // do not split at escape char
+      if (static_cast<int>(short_message[pos + n - 1]) == 0x1b) {  // do not split at escape char
         n--;
       }
 
-      parts.push_back(shortMessage.substr(pos, n));
+      parts.push_back(short_message.substr(pos, n));
       pos += n;
       n = split;
 
