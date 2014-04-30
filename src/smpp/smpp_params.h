@@ -14,7 +14,7 @@ namespace smpp {
 struct SmppParams {
   SmppParams() :
     service_type(""),
-    esm_class(0),
+    esm_class(smpp::ESM_SUBMIT_MODE_SMSC_DEFAULT),
     protocol_id(0),
     priority_flag(0),
     schedule_delivery_time(""),
