@@ -4,7 +4,7 @@
 INCLUDE(ExternalProject)
 
 # Set default ExternalProject root directory
-SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/third_party)
+SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/ext)
 
 # Add gtest
 # http://stackoverflow.com/questions/9689183/cmake-googletest

@@ -3,10 +3,11 @@ find_library(gtest_main_LIB gtest_main HINTS ${GTEST_LIB_DIR} DOC "GTest main() 
 
 # Add a single gtest
 function(add_gtest name libs)
-  add_executable(${name} $<TARGET_OBJECTS:compiled> ${name}_test.cc ${ARGN})
-  target_link_libraries(${name} ${link_libs})
+  set (test_bin ${name}_test)
+  add_executable(${test_bin} $<TARGET_OBJECTS:compiled> ${name}_test.cc ${ARGN})
+  target_link_libraries(${test_bin} ${link_libs})
   foreach (lib "${libs}")
-    target_link_libraries(${name} ${lib})
+    target_link_libraries(${test_bin} ${lib})
   endforeach()
 endfunction()
 
