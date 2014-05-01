@@ -23,7 +23,9 @@ SET(sources
 )
 
 
-ADD_LIBRARY(smpp SHARED ${headers} ${sources})
+ADD_LIBRARY(compiled OBJECT ${sources} ${headers})
+#ADD_LIBRARY(smpp SHARED ${headers} ${sources})
+ADD_LIBRARY(smpp SHARED $<TARGET_OBJECTS:compiled>)
 SET_TARGET_PROPERTIES(smpp PROPERTIES VERSION 1.0.0 SOVERSION 1 PUBLIC_HEADER "${headers}")
 TARGET_LINK_LIBRARIES(smpp ${link_libs})
 

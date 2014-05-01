@@ -17,11 +17,3 @@ TEST(GsmEncoder, EncodeDecode) {
   std::string o3 = oc::tools::GsmEncoder::EncodeUtf8(o1);
   ASSERT_EQ(i1, o3);
 }
-
-int main(int argc, char **argv) {
-  google::ParseCommandLineFlags(&argc, &argv, true);
-  google::InitGoogleLogging(argv[0]);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
-

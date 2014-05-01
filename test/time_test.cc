@@ -124,10 +124,3 @@ TEST(TimeTest, FormatRelative) {
   EXPECT_THROW(ToSmppTimeString(sc::hours(876143) + sc::minutes(34) + sc::seconds(29)),
                smpp::SmppException);  // 876143 would overflow 99 years
 }
-
-int main(int argc, char **argv) {
-  google::ParseCommandLineFlags(&argc, &argv, true);
-  google::InitGoogleLogging(argv[0]);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
