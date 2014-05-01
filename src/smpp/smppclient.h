@@ -310,7 +310,6 @@ class SmppClient {
   // @return
   static uint16_t DefaultMessageRef();
 
-
  private:
   enum {
     OPEN, BOUND_TX, BOUND_RX, BOUND_TRX

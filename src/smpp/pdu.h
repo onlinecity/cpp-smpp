@@ -33,8 +33,8 @@ class PDU {
 
   PDU(const PDU &rhs);
 
-  // @return All data in this PDU as array of unsigned char array.
-  const PduData getOctets();
+  // Returns a copy of all data in this PDU as array of unsigned char array.
+  const PduData GetOctets();
 
   // @return PDU size in octets.
   int Size();

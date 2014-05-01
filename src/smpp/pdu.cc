@@ -91,7 +91,7 @@ PDU::PDU(const PDU &rhs) :
   ResetMarker();  // remember to reset the marker after copying.
 }
 
-const PduData PDU::getOctets() {
+const PduData PDU::GetOctets() {
   uint32_t size = Size();
   uint32_t beSize = htonl(size);
   buf_.seekp(0, ios::beg);
@@ -307,6 +307,6 @@ std::ostream &smpp::operator<<(std::ostream &out, smpp::PDU &pdu) {
       << hex << pdu.command_id() << dec << endl << "cmd status:0x" << hex << pdu.command_status() <<
       dec << " : "
       << smpp::GetEsmeStatus(pdu.command_status()) << endl;
-  out << oc::tools::hexdump(reinterpret_cast<const unsigned char*>(pdu.getOctets().c_str()), static_cast<size_t>(size));
+  out << oc::tools::hexdump(reinterpret_cast<const unsigned char*>(pdu.GetOctets().c_str()), static_cast<size_t>(size));
   return out;
 }

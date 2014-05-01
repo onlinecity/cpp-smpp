@@ -16,6 +16,8 @@ using std::string;
 using std::vector;
 using std::list;
 using std::pair;
+using std::placeholders::_1;
+using std::placeholders::_2;
 using std::shared_ptr;
 using asio::system_error;
 using asio::error_code;
@@ -382,12 +384,12 @@ void SmppClient::SendPdu(PDU &pdu) {
 
   smpp::ChronoDeadlineTimer timer(socket_->get_io_service());
   timer.expires_from_now(std::chrono::milliseconds(socket_write_timeout_));
-  timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, std::placeholders::_1));
+  timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
 
   async_write(*socket_,
-      buffer(static_cast<const void*>(pdu.getOctets().c_str()),
+      buffer(static_cast<const void*>(pdu.GetOctets().c_str()),
       pdu.Size()),
-      std::bind(&SmppClient::WriteHandler, this, &io_result, std::placeholders::_1));
+      std::bind(&SmppClient::WriteHandler, this, &io_result, _1));
 
   SocketExecute();
 
@@ -454,7 +456,7 @@ bool SmppClient::SocketPeek() {
   // prepare our read
   PduLengthHeader pdu_header;
   async_read(*socket_, asio::buffer(pdu_header),
-      std::bind(&smpp::SmppClient::ReadPduHeaderHandler, this, std::placeholders::_1,std::placeholders::_2, &pdu_header));
+      std::bind(&smpp::SmppClient::ReadPduHeaderHandler, this, _1, _2, &pdu_header));
   size_t handlers_called = socket_->get_io_service().poll_one();
   socket_->get_io_service().reset();
   socket_->cancel();
@@ -471,13 +473,13 @@ void SmppClient::ReadPduBlocking() {
       std::bind(&SmppClient::ReadPduHeaderHandlerBlocking,
         this,
         &io_result,
-        std::placeholders::_1,
-        std::placeholders::_2,
+        _1,
+        _2,
         &pdu_header));
 
   smpp::ChronoDeadlineTimer timer(socket_->get_io_service());
   timer.expires_from_now(std::chrono::milliseconds(socket_read_timeout_));
-  timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, std::placeholders::_1));
+  timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
   SocketExecute();
 
   if (io_result) {
@@ -523,7 +525,7 @@ void SmppClient::ReadPduHeaderHandler(const error_code &error, size_t len, const
   // start reading after the size mark of the pdu
   async_read(*socket_,
       buffer(&*pdu_buffer.begin(), i - 4),
-      std::bind(&smpp::SmppClient::ReadPduBodyHandler, this, std::placeholders::_1, std::placeholders::_2, pduLength, &pdu_buffer));
+      std::bind(&smpp::SmppClient::ReadPduBodyHandler, this, _1, _2, pduLength, &pdu_buffer));
   SocketExecute();
 }
 
@@ -544,7 +546,7 @@ void SmppClient::ReadPduHeaderHandlerBlocking(bool *had_error, const error_code 
   pdu_buffer.resize(i - 4);
   // start reading after the size mark of the pdu
   async_read(*socket_, buffer(static_cast<char*>(&*pdu_buffer.begin()), i - 4),
-      std::bind(&smpp::SmppClient::ReadPduBodyHandler, this, std::placeholders::_1, std::placeholders::_2, pduLength, &pdu_buffer));
+      std::bind(&smpp::SmppClient::ReadPduBodyHandler, this, _1, _2, pduLength, &pdu_buffer));
   SocketExecute();
 }
 
