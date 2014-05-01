@@ -26,13 +26,8 @@ ExternalProject_Add(
 
 # Specify include dir
 ExternalProject_Get_Property(googletest source_dir)
-set(GTEST_INCLUDE_DIR ${source_dir}/include)
-
-# Library
+SET(GTEST_DIR ${source_dir})
+SET(GTEST_INCLUDE_DIR ${source_dir}/include)
 ExternalProject_Get_Property(googletest binary_dir)
-set(GTEST_LIBRARY_PATH ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a)
-set(GTEST_LIBRARY gtest)
-add_library(${GTEST_LIBRARY} UNKNOWN IMPORTED)
-set_property(TARGET ${GTEST_LIBRARY} PROPERTY IMPORTED_LOCATION
-                ${GTEST_LIBRARY_PATH} )
-add_dependencies(${GTEST_LIBRARY} googletest)
+SET(GTEST_LIB_DIR "${binary_dir}")
+

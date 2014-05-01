@@ -105,7 +105,6 @@ TEST(TimeTest, ParseDlrTimestamp) {
   ASSERT_EQ(time2, exp_time2);
 }
 
-
 TEST(TimeTest, FormatAbsolute) {
   string s = smpp::timeformat::ToSmppTimeString(MakeTm(2011, 10, 19, 9, 30, 0, 60));
   EXPECT_EQ(s, string("111019093000004+"));
