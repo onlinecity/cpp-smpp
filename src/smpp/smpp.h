@@ -1,19 +1,14 @@
-/*
- * Copyright (C) 2011-2014 OnlineCity
- * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
- * @author hd@onlinecity.dk & td@onlinecity.dk
- */
+// Copyright (C) 2011-2014 OnlineCity
+// Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+// @author hd@onlinecity.dk & td@onlinecity.dk
 
-#ifndef SMPP_SMPP_H_
-#define SMPP_SMPP_H_
+#pragma once
 
 #include <cstdint>
 #include <string>
 
 namespace smpp {
-/*
- * SMPP Command ID values (table 5-1, 5.1.2.1)
- */
+// SMPP Command ID values (table 5-1, 5.1.2.1)
 const uint32_t GENERIC_NACK = 0x80000000;
 const uint32_t BIND_RECEIVER = 0x00000001;
 const uint32_t BIND_RECEIVER_RESP = 0x80000001;
@@ -212,4 +207,3 @@ struct SmppAddress {
   }
 };
 }  // namespace smpp
-#endif  // SMPP_SMPP_H_

@@ -48,16 +48,10 @@ class SmppClient {
   explicit SmppClient(std::shared_ptr<asio::ip::tcp::socket>);
   ~SmppClient();
 
-  /**
    // Binds the client in transmitter mode.
-   // @param login SMSC login.
-   // @param password SMS password.
-   */
   void BindTransmitter(const std::string &login, const std::string &password);
 
    // Binds the client in receiver mode.
-   // @param login SMSC login
-   // @param password SMSC password.
   void BindReceiver(const std::string &login, const std::string &password);
 
   // Unbinds the client.
@@ -167,25 +161,21 @@ class SmppClient {
   }
 
   // Sets the socket read timeout in milliseconds. Default is 5000 milliseconds.
-  // @param timeout Socket read timeout in milliseconds.
   void set_socket_read_timeout(const int socket_read_timeout) {
     socket_read_timeout_ = socket_read_timeout;
   }
 
   // Returns the socket read timeout.
-  // @return Socket read timeout in milliseconds.
   int socket_read_timeout() const {
     return socket_read_timeout_;
   }
 
   // Sets the socket write timeout in milliseconds. Default is 30000 milliseconds.
-  // @param timeout Socket write timeout in milliseconds.
   void set_socket_write_timeout(const int &socket_write_timeout) {
     socket_write_timeout_ = socket_write_timeout;
   }
 
   // Returns the socket write timeout in milliseconds.
-  // @return Socket write timeout in milliseconds.
   int socket_write_timeout() const {
     return socket_write_timeout_;
   }
@@ -200,7 +190,6 @@ class SmppClient {
 
   // Set callback method for generating message references.
   // The returned integer must be modulo 65535 (0xffff)
-  // @param cb
   void set_msg_ref_callback(std::function<uint16_t()> msg_ref_callback) {
     msg_ref_callback_ = msg_ref_callback;
   }

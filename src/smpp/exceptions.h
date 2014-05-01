@@ -1,19 +1,14 @@
-/*
- * Copyright (C) 2011 OnlineCity
- * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
- * @author hd@onlinecity.dk & td@onlinecity.dk
- */
+// Copyright (C) 2011-2014 OnlineCity
+// Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+// @author hd@onlinecity.dk & td@onlinecity.dk
 
-#ifndef SMPP_EXCEPTIONS_H_
-#define SMPP_EXCEPTIONS_H_
+#pragma once
 
 #include <stdexcept>
 #include <string>
 
 namespace smpp {
-/**
- * Exception thrown when there is SMPP protocol related issues.
- */
+// Exception thrown when there is SMPP protocol related issues.
 class SmppException: public std::runtime_error {
  public:
   SmppException() :
@@ -66,9 +61,7 @@ class InvalidDestinationAddressException: public SmppException {
   }
 };
 
-/**
- * Exception thrown when there is transport/connection related issues.
- */
+// Exception thrown when there is transport/connection related issues.
 class TransportException: public std::runtime_error {
  public:
   TransportException() :
@@ -79,4 +72,3 @@ class TransportException: public std::runtime_error {
   }
 };
 }  // namespace smpp
-#endif  // SMPP_EXCEPTIONS_H_

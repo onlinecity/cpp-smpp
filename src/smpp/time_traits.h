@@ -1,12 +1,9 @@
-//
-// Copyright (C) 2014 - OnlineCity
+// Copyright (C) 2014 OnlineCity
 // Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
 // Stackoverflow reference:
 // http://stackoverflow.com/questions/16721243/boostasiodeadline-timer-with-stdchrono-time-values
-//
 
-#ifndef SMPP_TIME_TRAITS_H_
-#define SMPP_TIME_TRAITS_H_
+#pragma once
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <chrono>
@@ -44,5 +41,3 @@ struct CXX11Traits {
   }
 };
 }  // namespace smpp
-
-#endif  // SMPP_TIME_TRAITS_H_

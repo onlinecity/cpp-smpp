@@ -1,11 +1,8 @@
-/*
- * Copyright (C) 2011 OnlineCity
- * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
- * @author hd@onlinecity.dk & td@onlinecity.dk
- */
+// Copyright (C) 2011-2014 OnlineCity
+// Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+// @author hd@onlinecity.dk & td@onlinecity.dk
 
-#ifndef SMPP_SMS_H_
-#define SMPP_SMS_H_
+#pragma once
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -19,9 +16,6 @@
 #include "smpp/timeformat.h"
 
 namespace smpp {
-/**
- * Class representing an SMS.
- */
 class SMS {
  public:
   std::string service_type;
@@ -59,11 +53,7 @@ class SMS {
   SMS(const SMS &sms);
 };
 std::ostream &operator<<(std::ostream &, smpp::SMS &);
-// SMS class
 
-/**
- * Class representing a Delivery Report.
- */
 class DeliveryReport: public SMS {
  public:
   std::string id;
@@ -77,13 +67,9 @@ class DeliveryReport: public SMS {
 
   DeliveryReport();
 
-  /**
-   * Constructs a delivery report from an SMS.
-   * @param sms SMS to construct delivery report from.
-   */
+  // Constructs a delivery report from an SMS.
   explicit DeliveryReport(const smpp::SMS &sms);
 
   DeliveryReport(const DeliveryReport &rhs);
 };
 }  // namespace smpp
-#endif  // SMPP_SMS_H_

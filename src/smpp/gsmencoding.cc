@@ -1,8 +1,7 @@
-/*
- * Copyright (C) 2011-2014 OnlineCity
- * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
- * @author hd@onlinecity.dk & td@onlinecity.dk
- */
+// Copyright (C) 2011-2014 OnlineCity
+// Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+// @author hd@onlinecity.dk & td@onlinecity.dk
+
 #include "smpp/gsmencoding.h"
 #include <string>
 #include <unordered_map>
@@ -123,17 +122,13 @@ string GsmEncoder::EncodeGsm0338(const string &input) {
 
   for (unsigned int i = 0; i < input.length(); i++) {
     uint8_t code = static_cast<uint8_t>(input[i]);
-    /* @ */
-    if (code == 0x40) {
+    if (code == 0x40) {  // @
       out += '\0';
-      /* ` */
-    } else if (code == 0x60) {
+    } else if (code == 0x60) {  // `
       out += '?';
-      /* $ */
-    } else if (code == 0x24) {
+    } else if (code == 0x24) {  // $
       out += "\x02";
-      /* 0x5B - 0x5F */
-    } else if (code >= 0x5B && code <= 0x5F) {
+    } else if (code >= 0x5B && code <= 0x5F) {  // 0x5B-05F
       char c[] = { input[i], '\0' };
       auto it = gsm0338_map_.find(c);
 
@@ -142,11 +137,9 @@ string GsmEncoder::EncodeGsm0338(const string &input) {
       } else {
         out += it->second;
       }
-      /* 0x20 - 0x7A (except 0x40, 0x24, 0x5B-0x5F and 0x60) */
-    } else if (code >= 0x20 && code <= 0x7A) {
+    } else if (code >= 0x20 && code <= 0x7A) {  // 0x20 - 0x7A (except 0x40, 0x24, 0x5B-0x5F and 0x60)
       out += input[i];
-      /* 0x7B - 0x7E */
-    } else if (code >= 0x7B && code <= 0x7E) {
+    } else if (code >= 0x7B && code <= 0x7E) {  // 0x7B - 0x7E
       char c[] = { input[i], '\0' };
       auto it = gsm0338_map_.find(c);
 
@@ -155,20 +148,15 @@ string GsmEncoder::EncodeGsm0338(const string &input) {
       } else {
         out += it->second;
       }
-
-      /* UTF-8 escape sequence */
-    } else if (code >= 0x7F) {
+    } else if (code >= 0x7F) {  // UTF-8 escape sequence
       std::string s;
-      /* Double byte UTF-8 */
-      if (code >= 0xC0 && code <= 0xDF) {
+      if (code >= 0xC0 && code <= 0xDF) {  // Double byte UTF-8
         char c[2] = { input[i], input[++i] };
         s = std::string(c, 2);
-        /* Triple byte UTF-8 */
-      } else if (code >= 0xE0 && code <= 0xF0) {
+      } else if (code >= 0xE0 && code <= 0xF0) {  // Triple byte UTF-8
         char c[3] = { input[i], input[++i], input[++i] };
         s = std::string(c, 3);
-        /* Quad byte UTF-8 */
-      } else {
+      } else {  // Quad byte UTF-8
         char c[4] = { input[i], input[++i], input[++i], input[++i] };
         s = std::string(c, 4);
       }
@@ -179,8 +167,7 @@ string GsmEncoder::EncodeGsm0338(const string &input) {
       } else {
         out += '?';
       }
-
-      /* Unprintable char: ignore */
+      // Unprintable char: ignore
     }
   }
   return out;

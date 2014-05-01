@@ -1,11 +1,8 @@
-/*
- * Copyright (C) 2011 OnlineCity
- * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
- * @author hd@onlinecity.dk & td@onlinecity.dk
- */
+// Copyright (C) 2011-2014 OnlineCity
+// Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+// @author hd@onlinecity.dk & td@onlinecity.dk
 
-#ifndef SMPP_TLV_H_
-#define SMPP_TLV_H_
+#pragma once
 
 #include <boost/shared_array.hpp>
 #include <iomanip>
@@ -61,20 +58,9 @@ const uint16_t ITS_REPLY_TYPE = 0x1380;
 const uint16_t ITS_SESSION_INFO = 0x1383;
 }  // namespace tags
 
-/**
- * TLV container class.
- */
+// TLV container class.
 class TLV {
- private:
-  uint16_t tag;
-  uint16_t len;
-  std::string octets;
-
  public:
-  /**
-   * Constructs a TLV with only the tag.
-   * @param _tag TLV tag.
-   */
   explicit TLV(const uint16_t &_tag) :
     tag(_tag), len(0), octets() {
   }
@@ -84,11 +70,6 @@ class TLV {
     tag(_tag), len(sizeof(value)), octets(std::to_string(value)) {
   }
 
-  /**
-   * Constructs a TLV with a string value.
-   * @param _tag TLV tag.
-   * @param value TLV value.
-   */
   TLV(const uint16_t &_tag, const std::basic_string<char> &s) :
     tag(_tag), len(s.length()), octets(s) {
   }
@@ -104,8 +85,10 @@ class TLV {
   std::string getOctets() const {
     return octets;
   }
+
+ private:
+  uint16_t tag;
+  uint16_t len;
+  std::string octets;
 };
-
 }  // namespace smpp
-
-#endif  // SMPP_TLV_H_

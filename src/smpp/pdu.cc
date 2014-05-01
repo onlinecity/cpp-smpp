@@ -1,8 +1,6 @@
-/*
- * Copyright (C) 2011 OnlineCity
- * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
- * @author hd@onlinecity.dk & td@onlinecity.dk
- */
+// Copyright (C) 2011-2014 OnlineCity
+// Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+// @author hd@onlinecity.dk & td@onlinecity.dk
 
 #include "smpp/pdu.h"
 #include <netinet/in.h>
@@ -88,13 +86,13 @@ PDU::PDU(const PDU &rhs) :
   command_id_(rhs.command_id_),
   command_status_(rhs.command_status_),
   seq_no_(rhs.seq_no_),
-  null_terminate_octet_strings_(rhs.null_terminate_octet_strings_), /**/
+  null_terminate_octet_strings_(rhs.null_terminate_octet_strings_),
   null_(rhs.null_) {
   ResetMarker();  // remember to reset the marker after copying.
 }
 
 const PduData PDU::getOctets() {
-  uint32_t size = getSize();
+  uint32_t size = Size();
   uint32_t beSize = htonl(size);
   buf_.seekp(0, ios::beg);
   buf_.write(reinterpret_cast<char*>(&beSize), sizeof(uint32_t));
@@ -118,7 +116,7 @@ const PduData PDU::getOctets() {
   return octets;
 }
 
-int PDU::getSize() {
+int PDU::Size() {
   buf_.seekp(0, ios_base::end);
   int s = buf_.tellp();
   return s;
@@ -303,8 +301,8 @@ std::ostream &smpp::operator<<(std::ostream &out, smpp::PDU &pdu) {
     return out;
   }
 
-  int size = pdu.getSize();
-  out << "size      :" << pdu.getSize() << endl << "sequence  :" << pdu.sequence_no() << endl <<
+  int size = pdu.Size();
+  out << "size      :" << pdu.Size() << endl << "sequence  :" << pdu.sequence_no() << endl <<
       "cmd id    :0x"
       << hex << pdu.command_id() << dec << endl << "cmd status:0x" << hex << pdu.command_status() <<
       dec << " : "
