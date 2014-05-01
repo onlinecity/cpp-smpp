@@ -10,13 +10,8 @@
 #include "smpp/timeformat.h"
 
 using std::string;
-
 using smpp::timeformat::ChronoDatePair;
 using smpp::timeformat::ParseSmppTimestamp;
-
-//using boost::gregorian::date;
-//using boost::posix_time::time_duration;
-//using boost::posix_time::ptime;
 namespace sc = std::chrono;
 
 void print(const std::string &tp_id, const sc::time_point<sc::system_clock> &tp) {
