@@ -191,18 +191,24 @@ const uint8_t STATE_REJECTED = 8;
 
 std::string GetEsmeStatus(uint32_t);
 
-class SmppAddress {
+struct SmppAddress {
  public:
-  std::string value_;
-  uint8_t ton_;  // type-of-number
-  uint8_t npi_;  // numbering-plan-indicator
+  std::string value;
+  uint8_t ton;  // type-of-number
+  uint8_t npi;  // numbering-plan-indicator
 
-  SmppAddress(const std::string &value,
-              const uint8_t &ton = smpp::TON_UNKNOWN,
-              const uint8_t &npi = smpp::NPI_UNKNOWN) :
-    value_(value),
-    ton_(ton),
-    npi_(npi) {
+  SmppAddress(const std::string &val) :
+    value(val),
+    ton(smpp::TON_UNKNOWN),
+    npi(smpp::NPI_UNKNOWN) {
+  }
+
+  SmppAddress(const std::string &val,
+              const uint8_t type_of_number,
+              const uint8_t numbering_plan_indicator) :
+    value(val),
+    ton(type_of_number),
+    npi(numbering_plan_indicator) {
   }
 };
 }  // namespace smpp

@@ -183,9 +183,9 @@ PDU &PDU::operator<<(const std::basic_string<char> &s) {
 }
 
 PDU &PDU::operator <<(const smpp::SmppAddress s) {
-  (*this) << s.ton_;
-  (*this) << s.npi_;
-  (*this) << s.value_;
+  (*this) << s.ton;
+  (*this) << s.npi;
+  (*this) << s.value;
   return *this;
 }
 

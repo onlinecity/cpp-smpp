@@ -240,9 +240,9 @@ using asio::buffer;
   QuerySmResult SmppClient::QuerySm(std::string messageid, SmppAddress source) {
     PDU pdu = PDU(QUERY_SM, 0, NextSequenceNumber());
     pdu << messageid;
-    pdu << source.ton_;
-    pdu << source.npi_;
-    pdu << source.value_;
+    pdu << source.ton;
+    pdu << source.npi;
+    pdu << source.value;
     PDU reply = SendCommand(pdu);
     string msgid;
     string final_date;
