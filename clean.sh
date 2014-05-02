@@ -1,4 +1,27 @@
 #!/bin/sh
+
+function delete_dir {
+  if [ -d $1 ]; then
+    echo "Deleting dir $1"
+    rm -rf $1
+  fi;
+  echo ""
+}
+
+function delete_dir_recursive {
+  echo "Deleting dir recursive $1"
+  find . -type d -name $1 -exec rm -r {} \;
+  echo ""
+}
+
+
+function delete_file {
+  echo "Deleting file $1"
+  find . -type f -name $1
+  find . -type f -name $1 -delete
+  echo ""
+}
+
 if [ -f Makefile ]; then
 	echo "make clean"
 	make clean
@@ -6,39 +29,12 @@ if [ -f Makefile ]; then
 fi
 
 
-echo "Deleting Makefiles"
-find . -type f -name Makefile
-find . -type f -name Makefile -delete
-
-echo ""
-echo "Deleting Testing dirs"
-find . -type d -name Testing -exec rm -r {} \;
-
-echo ""
-echo "Deleting CMakeFiles dirs"
-#find . -type d -name CMakeFiles
-find . -type d -name CMakeFiles -exec rm -r {} \;
-
-echo ""
-echo "Deleting CMakeCache.txt"
-find . -type f -name CMakeCache.txt
-find . -type f -name CMakeCache.txt -delete
-
-echo ""
-echo "Deleting misc cmake files"
-find . -type f -name cmake_install.cmake
-find . -type f -name cmake_install.cmake -delete
-find . -type f -name CTestTestfile.cmake
-find . -type f -name CTestTestfile.cmake -delete
-
-if [ -d bin ]; then 
-	echo ""
-	echo "Deleting bin dir"
-	rm -rf bin
-fi	
-
-if [ -d lib ]; then 
-	echo ""
-	echo "Deleting lib dir"
-	rm -rf lib
-fi	
+delete_file Makefile
+delete_file CMakeCache.txt
+delete_file cmake_install.cmake
+delete_file CTestTestFile.cmake
+delete_dir_recursive CMakeFiles
+delete_dir_recursive Testing
+delete_dir bin
+delete_dir lib
+delete_dir ext
