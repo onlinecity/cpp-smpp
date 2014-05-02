@@ -7,5 +7,5 @@ flags.extend([
 '-I',
 'ext/src/googletest/include',
 '-I',
-'third_party/src/asio/include'
+'ext/src/asio/include'
 ])
