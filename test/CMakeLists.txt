@@ -1,5 +1,5 @@
-find_library(gtest_LIB gtest HINTS ${GTEST_LIB_DIR} DOC "GTest lib" REQUIRED)
-find_library(gtest_main_LIB gtest_main HINTS ${GTEST_LIB_DIR} DOC "GTest main() lib" REQUIRED)
+set(gtest_LIB ${GTEST_LIB_DIR}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a)
+set(gtest_main_LIB ${GTEST_LIB_DIR}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a)
 
 # Add a single gtest
 function(add_gtest name libs)
@@ -7,8 +7,9 @@ function(add_gtest name libs)
   add_executable(${test_bin} $<TARGET_OBJECTS:compiled> ${name}_test.cc ${ARGN})
   target_link_libraries(${test_bin} ${link_libs})
   foreach (lib "${libs}")
-    target_link_libraries(${test_bin} ${lib})
+    target_link_libraries(${test_bin} ${lib} )
   endforeach()
+  add_dependencies(${test_bin} googletest)
 endfunction()
 
 # Add a list of gtests, with global SetUp/TearDown
@@ -18,6 +19,7 @@ function(add_gtests)
   endforeach()
   add_executable(unittest $<TARGET_OBJECTS:compiled> ${testsrcs} main.cc)
   target_link_libraries(unittest ${link_libs} ${gtest_LIB})
+  add_dependencies(unittest googletest)
 endfunction()
 
 add_custom_target(test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest DEPENDS compiled)
