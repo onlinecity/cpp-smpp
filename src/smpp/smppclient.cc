@@ -21,7 +21,6 @@ using std::placeholders::_2;
 using std::shared_ptr;
 using asio::system_error;
 using asio::error_code;
-using boost::numeric_cast;
 using asio::ip::tcp;
 using asio::async_write;
 using asio::buffer;
@@ -156,7 +155,7 @@ pair<string, int> SmppClient::SendSms(
   if (csms_method_ == CSMS_8BIT_UDH) {
     // encode an udh with an 8bit csms reference
     uint8_t segment = 0;
-    uint8_t segments = numeric_cast<uint8_t>(parts.size());
+    uint8_t segments = static_cast<uint8_t>(parts.size());
     string sms_id;
     uint8_t csms_ref = static_cast<uint8_t>(msg_ref_callback_() & 0xff);
 
@@ -179,7 +178,6 @@ pair<string, int> SmppClient::SendSms(
     return std::make_pair(sms_id, segments);
   } else {  // csmsMethod == CSMS_16BIT_TAGS)
     tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msg_ref_callback_())));
-    //tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, boost::numeric_cast<uint8_t>(parts.size())));
     tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, static_cast<uint8_t>(parts.size())));
     int segment = 0;
     string sms_id;
@@ -351,7 +349,6 @@ string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiv
     pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, short_message);
   } else {
     pdu.set_null_terminate_octet_strings(null_terminate_octet_strings_);
-    //pdu << boost::numeric_cast<uint8_t>(short_message.length()) + (null_terminate_octet_strings_ ? 1 : 0);
     pdu << static_cast<uint8_t>(short_message.length()) + (null_terminate_octet_strings_ ? 1 : 0);
     pdu << short_message;
     pdu.set_null_terminate_octet_strings(true);
