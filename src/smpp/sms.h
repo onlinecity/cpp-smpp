@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <boost/numeric/conversion/cast.hpp>
-
 #include <chrono>
 #include <list>
 #include <string>

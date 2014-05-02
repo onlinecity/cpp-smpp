@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <boost/shared_array.hpp>
 #include <iomanip>
 #include <algorithm>
 #include <string>

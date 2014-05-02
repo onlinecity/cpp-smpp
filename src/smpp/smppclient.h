@@ -266,8 +266,6 @@ class SmppClient {
 
   // Handler for reading a PDU header.
   // If we read a valid PDU header on the socket, the readPduBodyHandler is invoked.
-  // @param error Boost error code
-  // @param read Bytes read
   void ReadPduHeaderHandler(const asio::error_code &error, size_t read,
                             const PduLengthHeader *pduLength);
 
@@ -277,9 +275,6 @@ class SmppClient {
 
   // Handler for reading a PDU body.
   // Reads a PDU body on the socket and pushes it onto the PDU queue.
-  //
-  // @param error Boost error code
-  // @param read Bytes read
   void ReadPduBodyHandler(const asio::error_code &error, size_t read,
                           const PduLengthHeader *pduLength,
                           const PduData *pduBuffer);

@@ -4,24 +4,10 @@
 
 #include "smpp/timeformat.h"
 #include <string>
+#include <complex>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/date_time/local_time/local_time.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-
-using std::setfill;
-using std::setw;
 using std::string;
 using std::stoi;
-using std::stringstream;
-
-using boost::local_time::local_date_time;
-using boost::local_time::posix_time_zone;
-using boost::local_time::time_zone_ptr;
-using boost::posix_time::from_iso_string;
-using boost::posix_time::ptime;
-using boost::posix_time::time_duration;
-using boost::posix_time::time_input_facet;
 
 using std::regex;
 using std::smatch;
@@ -97,9 +83,6 @@ ChronoDatePair ParseSmppTimestamp(const string &time) {
       // construct a relative timestamp based on the local clock and the absolute timestamp
       sc::time_point<sc::system_clock> now = sc::system_clock::now();
       auto td = sc::duration_cast<sc::seconds>(tp - now);
-      // beg, end
-    //  boost::local_time::local_time_period ltp(ldt, lt);
-    //  time_duration td = ltp.length();
       return ChronoDatePair(tp, td);
     }
   }
@@ -115,21 +98,11 @@ string ToSmppTimeString(const struct tm &tm) {
   int s = tm.tm_sec;
   string p = tm.tm_gmtoff < 0 ? "-" : "+";
   // nn is time difference in quarter hours and gmtoff is in seconds
-  int nn = tm.tm_gmtoff == 0 ? 0 : (abs(tm.tm_gmtoff) / 60)  / 15;
+  int nn = tm.tm_gmtoff == 0 ? 0 : (std::abs(tm.tm_gmtoff) / 60)  / 15;
   char buf[16];
   //            YY  MM  DD  hh   mm   ss  000R
   sprintf(buf, "%02i%02i%02i%02i%02i%02i0%02i%s", yy, mm, dd, h, m, s, nn, p.c_str());
   return string(buf);
-}
-
-string ToSmppTimeString(const std::chrono::time_point<std::chrono::system_clock> &tp) {
-  namespace sc = std::chrono;
-  auto t = sc::system_clock::to_time_t(tp);
-  using std::cout;
-  using std::endl;
-
-  cout << std::ctime(&t) << endl;
-  return "hello";
 }
 
 string ToSmppTimeString(const std::chrono::seconds &d) {
