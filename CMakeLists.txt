@@ -14,13 +14,14 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Debug' as none was specified.")
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 endif()
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Add src before libs to make use it don't use installed headers
 include_directories(src)
 
 # ASIO lib
-include(cmake/asio.cmake)
+find_package(Asio)
 include_directories(${ASIO_INCLUDE_DIR})
 
 # Find Boost library
@@ -48,11 +49,12 @@ set(link_libs
 
 add_subdirectory (src)
 
-option (ENABLE_TEST "Compile unit testing and CTest target" ON)
+option (ENABLE_TEST "Compile unit testing" ON)
 
 if (ENABLE_TEST)
-    enable_testing()
-    include(cmake/gtest.cmake)
-    include_directories(${GTEST_INCLUDE_DIR})
-	add_subdirectory (test)
+  #enable_testing()
+  find_package(gTest)
+  #include(cmake/gtest.cmake)
+  include_directories(${GTEST_INCLUDE_DIR})
+  add_subdirectory (test)
 endif (ENABLE_TEST)
