@@ -55,7 +55,7 @@ class PDU {
     return null_terminate_octet_strings_;
   }
 
-  void set_null_terminate_octet_strings(const bool null_terminate_octet_strings) {
+  inline void set_null_terminate_octet_strings(const bool null_terminate_octet_strings) {
     null_terminate_octet_strings_ = null_terminate_octet_strings;
   }
 

@@ -104,93 +104,93 @@ class SmppClient {
     return state_ != OPEN;
   }
 
-  void set_system_type(const std::string &system_type) {
+  inline void set_system_type(const std::string &system_type) {
     system_type_ = system_type;
   }
 
-  std::string system_type() const {
+  inline std::string system_type() const {
     return system_type_;
   }
 
-  void set_interface_version(const uint8_t interface_version) {
+  inline void set_interface_version(const uint8_t interface_version) {
     interface_version_ = interface_version;
   }
 
-  uint8_t interface_version() const {
+  inline uint8_t interface_version() const {
     return interface_version();
   }
 
-  void set_addr_ton(const uint8_t addr_ton) {
+  inline void set_addr_ton(const uint8_t addr_ton) {
     addr_ton_ = addr_ton;
   }
 
-  uint8_t addr_ton() const {
+  inline uint8_t addr_ton() const {
     return addr_ton_;
   }
 
-  void set_addr_npi(const uint8_t addr_npi) {
+  inline void set_addr_npi(const uint8_t addr_npi) {
     addr_npi_ = addr_npi;
   }
 
-  uint8_t addr_npi() const {
+  inline uint8_t addr_npi() const {
     return addr_npi_;
   }
 
-  void set_addr_range(const std::string &addr_range) {
+  inline void set_addr_range(const std::string &addr_range) {
     addr_range_ = addr_range;
   }
 
-  std::string addr_range() const {
+  inline std::string addr_range() const {
     return addr_range_;
   }
 
-  void set_null_terminate_octet_strings(const bool null_terminate_octet_strings) {
+  inline void set_null_terminate_octet_strings(const bool null_terminate_octet_strings) {
     null_terminate_octet_strings_ = null_terminate_octet_strings;
   }
 
-  bool null_terminate_octet_strings() const {
+  inline bool null_terminate_octet_strings() const {
     return null_terminate_octet_strings_;
   }
 
-  void set_csms_method(const int csms_method) {
+  inline void set_csms_method(const int csms_method) {
     csms_method_ = csms_method;
   }
 
-  int csms_method() const {
+  inline int csms_method() const {
     return csms_method_;
   }
 
   // Sets the socket read timeout in milliseconds. Default is 5000 milliseconds.
-  void set_socket_read_timeout(const int socket_read_timeout) {
+  inline void set_socket_read_timeout(const int socket_read_timeout) {
     socket_read_timeout_ = socket_read_timeout;
   }
 
   // Returns the socket read timeout.
-  int socket_read_timeout() const {
+  inline int socket_read_timeout() const {
     return socket_read_timeout_;
   }
 
   // Sets the socket write timeout in milliseconds. Default is 30000 milliseconds.
-  void set_socket_write_timeout(const int &socket_write_timeout) {
+  inline void set_socket_write_timeout(const int &socket_write_timeout) {
     socket_write_timeout_ = socket_write_timeout;
   }
 
   // Returns the socket write timeout in milliseconds.
-  int socket_write_timeout() const {
+  inline int socket_write_timeout() const {
     return socket_write_timeout_;
   }
 
-  void set_verbose(const bool verbose) {
+  inline void set_verbose(const bool verbose) {
     verbose_ = verbose;
   }
 
-  bool verbose() const {
+  inline bool verbose() const {
     return verbose_;
   }
 
   // Set callback method for generating message references.
   // The returned integer must be modulo 65535 (0xffff)
-  void set_msg_ref_callback(std::function<uint16_t()> msg_ref_callback) {
+  inline void set_msg_ref_callback(std::function<uint16_t()> msg_ref_callback) {
     msg_ref_callback_ = msg_ref_callback;
   }
 
@@ -322,7 +322,9 @@ class SmppClient {
   // Method to use when dealing with concatenated messages.
   int csms_method_;
 
+  //
   std::function<uint16_t()> msg_ref_callback_;
+  // Bind state
   int state_;
   std::shared_ptr<asio::ip::tcp::socket> socket_;
   uint32_t seq_no_;
