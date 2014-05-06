@@ -187,7 +187,6 @@ const uint8_t STATE_REJECTED = 8;
 std::string GetEsmeStatus(uint32_t);
 
 struct SmppAddress {
- public:
   std::string value;
   uint8_t ton;  // type-of-number
   uint8_t npi;  // numbering-plan-indicator
