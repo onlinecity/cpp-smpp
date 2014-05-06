@@ -295,6 +295,7 @@ uint32_t PDU::GetPduLength(const PduLengthHeader &pduHeader) {
 
 }  // namespace smpp
 
+
 std::ostream &smpp::operator<<(std::ostream &out, smpp::PDU &pdu) {
   if (pdu.null_) {
     out << "PDU IS NULL" << std::endl;

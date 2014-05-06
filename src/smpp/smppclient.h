@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <glog/logging.h>
 
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <list>
 #include <memory>
@@ -16,8 +15,8 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "asio.hpp"
 #include "smpp/exceptions.h"
@@ -25,8 +24,8 @@
 #include "smpp/smpp.h"
 #include "smpp/smpp_params.h"
 #include "smpp/sms.h"
-#include "smpp/timeformat.h"
 #include "smpp/time_traits.h"
+#include "smpp/timeformat.h"
 #include "smpp/tlv.h"
 
 namespace smpp {

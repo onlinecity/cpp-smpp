@@ -209,6 +209,13 @@ const uint8_t STATE_REJECTED = 8;
 
 std::string GetEsmeStatus(const ESME &);
 
+
+template<class Enum, class = typename std::enable_if<std::is_enum<Enum>::value>::type>
+std::ostream &operator<<(std::ostream &out, Enum &e) {
+  out << static_cast<typename std::underlying_type<Enum>::type >(e);
+  return out;
+}
+
 struct SmppAddress {
   std::string value;
   smpp::TON ton;  // type-of-number

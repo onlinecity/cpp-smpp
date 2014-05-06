@@ -17,15 +17,15 @@ namespace smpp {
 class SMS {
  public:
   std::string service_type;
-  int source_addr_ton;
-  int source_addr_npi;
+  TON source_addr_ton;
+  NPI source_addr_npi;
   std::string source_addr;
 
-  int dest_addr_ton;
-  int dest_addr_npi;
+  TON dest_addr_ton;
+  NPI dest_addr_npi;
   std::string dest_addr;
 
-  uint8_t esm_class;
+  ESM esm_class;
   int protocol_id;
   int priority_flag;
 

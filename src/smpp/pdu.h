@@ -115,5 +115,7 @@ class PDU {
   bool null_terminate_octet_strings_;
   bool null_;
 };
+
+
 std::ostream &operator<<(std::ostream &, smpp::PDU &);
 }  // namespace smpp

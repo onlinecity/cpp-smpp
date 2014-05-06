@@ -1,7 +1,8 @@
-/*
- * Copyright (C) 2014 OnlineCity
- * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
- */
+//
+// Copyright (C) 2014 OnlineCity
+// Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+//
+
 #include <glog/logging.h>
 #include <gflags/gflags.h>
 #include <algorithm>
@@ -11,9 +12,8 @@
 
 TEST(PduTest, readWrite) {
   uint32_t commandId = 1;
-  uint32_t commandStatus = 2;
   uint32_t sequence = 3;
-  smpp::PDU pdu(commandId, commandStatus, sequence);
+  smpp::PDU pdu(commandId, smpp::ESME::RINVCMDLEN, sequence);
   std::string str("test");
   uint32_t i32 = 0xdeadbeef;
   uint16_t i16 = 0x1337;

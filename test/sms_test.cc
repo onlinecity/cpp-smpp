@@ -83,12 +83,12 @@ TEST(SmsTest, dlr) {
   smpp::DeliveryReport dlr(sms);
   // Assertions for SMS
   EXPECT_EQ(sms.source_addr, string("4526159917"));
-  EXPECT_EQ(sms.source_addr_ton, 1);
-  EXPECT_EQ(sms.source_addr_npi, 1);
+  EXPECT_EQ(sms.source_addr_ton, smpp::TON::INTERNATIONAL);
+  EXPECT_EQ(sms.source_addr_npi, smpp::NPI::E164);
   EXPECT_EQ(sms.dest_addr, string("default"));
-  EXPECT_EQ(sms.dest_addr_ton, 5);
-  EXPECT_EQ(sms.dest_addr_npi, 0);
-  EXPECT_EQ(sms.esm_class, smpp::ESM_DELIVER_SMSC_RECEIPT);
+  EXPECT_EQ(sms.dest_addr_ton, smpp::TON::ALPHANUMERIC);
+  EXPECT_EQ(sms.dest_addr_npi, smpp::NPI::UNKNOWN);
+  EXPECT_EQ(sms.esm_class, smpp::ESM::DELIVER_SMSC_RECEIPT);
   EXPECT_TRUE(!sms.is_null);
   EXPECT_EQ(sms.data_coding, smpp::DATA_CODING_ISO8859_1);
   // Assertions for TLV fields
