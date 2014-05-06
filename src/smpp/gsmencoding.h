@@ -7,8 +7,8 @@
 #include <string>
 #include <unordered_map>
 
-namespace oc {
-namespace tools {
+namespace smpp {
+namespace encoding {
 // Class for encoding strings in GSM 0338.
 class GsmEncoder {
  public:
@@ -25,5 +25,5 @@ class GsmEncoder {
   static const std::unordered_map<std::string, std::string> gsm0338_map_;
   static const std::unordered_map<std::string, std::string> utf8_map_;
 };
-}  // namespace tools
+}  // namespace encoding
 }  // namespace oc

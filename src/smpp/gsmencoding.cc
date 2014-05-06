@@ -6,8 +6,8 @@
 #include <string>
 #include <unordered_map>
 
-namespace oc {
-namespace tools {
+namespace smpp {
+namespace encoding {
 using std::string;
 const std::unordered_map<std::string, std::string> GsmEncoder::gsm0338_map_ = {
   {"@", "\x00"},
@@ -201,5 +201,5 @@ string GsmEncoder::EncodeUtf8(const string &input) {
   }
   return out;
 }
-}  // namespace tools
-}  // namespace oc
+}  // namespace encdoing
+}  // namespace smpp

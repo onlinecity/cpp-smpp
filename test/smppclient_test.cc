@@ -14,7 +14,7 @@
 #include "smpp/smpp_params.h"
 #include "smppclient_test.h"
 
-using oc::tools::GsmEncoder;
+using smpp::encoding::GsmEncoder;
 using smpp::SmppAddress;
 using smpp::SmppClient;
 using smpp::TLV;
@@ -146,10 +146,6 @@ TEST_F(SmppClientTest, tlvExtended) {
 
 // Test sending all params to sendSms(). Also sets registered delivery
 TEST_F(SmppClientTest, submitExtended) {
-  using boost::posix_time::time_duration;
-  using boost::local_time::time_zone_ptr;
-  using boost::local_time::posix_time_zone;
-  using boost::local_time::local_date_time;
   socket->connect(endpoint);
   client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
