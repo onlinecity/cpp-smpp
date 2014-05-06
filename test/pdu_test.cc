@@ -61,3 +61,11 @@ TEST(PduTest, binary) {
   EXPECT_EQ(o16, uint16_t(0x1337));
   pdu >> o8;
 }
+
+TEST(PduTest, enumTest) {
+  smpp::PDU p;
+  p << smpp::TON::INTERNATIONAL;
+  smpp::TON t;
+  p >> t;
+  ASSERT_EQ(t, smpp::TON::INTERNATIONAL);
+}

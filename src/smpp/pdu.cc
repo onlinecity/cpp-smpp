@@ -22,7 +22,7 @@ PDU::PDU() :
   sb_(""),
   buf_(&sb_),
   command_id_(0),
-  command_status_(0),
+  command_status_(ESME::ROK),
   seq_no_(0),
   null_terminate_octet_strings_(true),
   null_(true) {
@@ -30,7 +30,7 @@ PDU::PDU() :
 
 PDU::PDU(
     const uint32_t &command_id,
-    const uint32_t &command_status,
+    const ESME &command_status,
     const uint32_t &seq_no) :
   sb_(""),
   buf_(&sb_),
@@ -51,7 +51,7 @@ PDU::PDU(
   sb_(""),
   buf_(&sb_),
   command_id_(0),
-  command_status_(0),
+  command_status_(ESME::ROK),
   seq_no_(0),
   null_terminate_octet_strings_(true),
   null_(false) {
@@ -197,6 +197,7 @@ PDU &PDU::operator <<(smpp::TLV tlv) {
   return *this;
 }
 
+// TODO(td): Upper case
 PDU &PDU::addOctets(const PduData &octets, const streamsize &len) {
   buf_.write(octets.c_str(), len);
 
@@ -303,7 +304,7 @@ std::ostream &smpp::operator<<(std::ostream &out, smpp::PDU &pdu) {
   int size = pdu.Size();
   out << "size      :" << pdu.Size() << endl << "sequence  :" << pdu.sequence_no() << endl <<
       "cmd id    :0x"
-      << hex << pdu.command_id() << dec << endl << "cmd status:0x" << hex << pdu.command_status() <<
+      << hex << pdu.command_id() << dec << endl << "cmd status:0x" << hex << static_cast<std::underlying_type<smpp::ESME>::type>(pdu.command_status()) <<
       dec << " : "
       << smpp::GetEsmeStatus(pdu.command_status()) << endl;
   out << oc::tools::hexdump(reinterpret_cast<const unsigned char*>(pdu.GetOctets().c_str()), static_cast<size_t>(size));

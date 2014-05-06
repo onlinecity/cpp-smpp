@@ -11,7 +11,7 @@ namespace smpp {
 // SMPP Command ID values (table 5-1, 5.1.2.1)
 const uint32_t GENERIC_NACK = 0x80000000;
 const uint32_t BIND_RECEIVER = 0x00000001;
-const uint32_t BIND_RECEIVER_RESP = 0x80000001;
+const uint32_t BIND_RECEIVER_RESP = BIND_RECEIVER | GENERIC_NACK;
 const uint32_t BIND_TRANSMITTER = 0x00000002;
 const uint32_t BIND_TRANSMITTER_RESP = 0x80000002;
 const uint32_t QUERY_SM = 0x00000003;
@@ -38,109 +38,132 @@ const uint32_t RESERVED = 0x80000102;
 const uint32_t DATA_SM = 0x00000103;
 const uint32_t DATA_SM_RESP = 0x80000103;
 
-const uint32_t ESME_ROK = 0x00000000;  // No Error
-const uint32_t ESME_RINVMSGLEN = 0x00000001;  // Message Length is invalid
-const uint32_t ESME_RINVCMDLEN = 0x00000002;  // Command Length is invalid
-const uint32_t ESME_RINVCMDID = 0x00000003;  // Invalid Command ID
-const uint32_t ESME_RINVBNDSTS = 0x00000004;  // Incorrect BIND Status for given command
-const uint32_t ESME_RALYBND = 0x00000005;  // ESME Already in Bound State
-const uint32_t ESME_RINVPRTFLG = 0x00000006;  // Invalid Priority Flag
-const uint32_t ESME_RINVREGDLVFLG = 0x00000007;  // Invalid Registered Delivery Flag
-const uint32_t ESME_RSYSERR = 0x00000008;  // System Error
-const uint32_t ESME_RINVSRCADR = 0x0000000A;  // Invalid Source Address
-const uint32_t ESME_RINVDSTADR = 0x0000000B;  // Invalid Dest Addr
-const uint32_t ESME_RINVMSGID = 0x0000000C;  // Message ID is invalid
-const uint32_t ESME_RBINDFAIL = 0x0000000D;  // Bind Failed
-const uint32_t ESME_RINVPASWD = 0x0000000E;  // Invalid Password
-const uint32_t ESME_RINVSYSID = 0x0000000F;  // Invalid System ID
-const uint32_t ESME_RCANCELFAIL = 0x00000011;  // Cancel SM Failed
-const uint32_t ESME_RREPLACEFAIL = 0x00000013;  // Replace SM Failed
-const uint32_t ESME_RMSGQFUL = 0x00000014;  // Message Queue Full
-const uint32_t ESME_RINVSERTYP = 0x00000015;  // Invalid Service Type
-const uint32_t ESME_RINVNUMDESTS = 0x00000033;  // Invalid number of destinations
-const uint32_t ESME_RINVDLNAME = 0x00000034;  // Invalid Distribution List name
-const uint32_t ESME_RINVDESTFLAG = 0x00000040;  // Destination flag (submit_multi)
-const uint32_t ESME_RINVSUBREP =
-  0x00000042;  // Invalid ‘submit with replace’ request (i.e. submit_sm with replace_if_present_flag set)
-const uint32_t ESME_RINVESMSUBMIT = 0x00000043;  // Invalid esm_SUBMIT field data
-const uint32_t ESME_RCNTSUBDL = 0x00000044;  // Cannot Submit to Distribution List
-const uint32_t ESME_RSUBMITFAIL = 0x00000045;  // submit_sm or submit_multi failed
-const uint32_t ESME_RINVSRCTON = 0x00000048;  // Invalid Source address TON
-const uint32_t ESME_RINVSRCNPI = 0x00000049;  // Invalid Source address NPI
-const uint32_t ESME_RINVDSTTON = 0x00000050;  // Invalid Destination address TON
-const uint32_t ESME_RINVDSTNPI = 0x00000051;  // Invalid Destination address NPI
-const uint32_t ESME_RINVSYSTYP = 0x00000053;  // Invalid system_type field
-const uint32_t ESME_RINVREPFLAG = 0x00000054;  // Invalid replace_if_present flag
-const uint32_t ESME_RINVNUMMSGS = 0x00000055;  // Invalid number of messages
-const uint32_t ESME_RTHROTTLED =
-  0x00000058;  // Throttling error (ESME has exceeded allowed message limits)
-const uint32_t ESME_RINVSCHED = 0x00000061;  // Invalid Scheduled Delivery Time
-const uint32_t ESME_RINVEXPIRY = 0x00000062;  // Invalid message (Expiry time)
-const uint32_t ESME_RINVDFTMSGID = 0x00000063;  // Predefined Message Invalid or Not Found
-const uint32_t ESME_RX_T_APPN = 0x00000064;  // ESME Receiver Temporary App Error Code
-const uint32_t ESME_RX_P_APPN = 0x00000065;  // ESME Receiver Permanent App Error Code
-const uint32_t ESME_RX_R_APPN = 0x00000066;  // ESME Receiver Reject Message Error Code
-const uint32_t ESME_RQUERYFAIL = 0x00000067;  // query_sm request failed
-const uint32_t ESME_RINVOPTPARSTREAM = 0x000000C0;  // Error in the optional part of the PDU Body.
-const uint32_t ESME_ROPTPARNOTALLWD = 0x000000C1;  // Optional Parameter not allowed
-const uint32_t ESME_RINVPARLEN = 0x000000C2;  // Invalid Parameter Length.
-const uint32_t ESME_RMISSINGOPTPARAM = 0x000000C3;  // Expected Optional Parameter missing
-const uint32_t ESME_RINVOPTPARAMVAL = 0x000000C4;  // Invalid Optional Parameter Value
-const uint32_t ESME_RDELIVERYFAILURE = 0x000000FE;  // Delivery Failure (data_sm_resp)
-const uint32_t ESME_RUNKNOWNERR = 0x000000FF;  // Unknown Error
+enum class ESME : uint32_t {
+  ROK = 0x00000000,  // No Error
+  RINVMSGLEN = 0x00000001,  // Message Length is invalid
+  RINVCMDLEN = 0x00000002,  // Command Length is invalid
+  RINVCMDID = 0x00000003,  // Invalid Command ID
+  RINVBNDSTS = 0x00000004,  // Incorrect BIND Status for given command
+  RALYBND = 0x00000005,  // ESME Already in Bound State
+  RINVPRTFLG = 0x00000006,  // Invalid Priority Flag
+  RINVREGDLVFLG = 0x00000007,  // Invalid Registered Delivery Flag
+  RSYSERR = 0x00000008,  // System Error
+  RINVSRCADR = 0x0000000A,  // Invalid Source Address
+  RINVDSTADR = 0x0000000B,  // Invalid Dest Addr
+  RINVMSGID = 0x0000000C,  // Message ID is invalid
+  RBINDFAIL = 0x0000000D,  // Bind Failed
+  RINVPASWD = 0x0000000E,  // Invalid Password
+  RINVSYSID = 0x0000000F,  // Invalid System ID
+  RCANCELFAIL = 0x00000011,  // Cancel SM Failed
+  RREPLACEFAIL = 0x00000013,  // Replace SM Failed
+  RMSGQFUL = 0x00000014,  // Message Queue Full
+  RINVSERTYP = 0x00000015,  // Invalid Service Type
+  RINVNUMDESTS = 0x00000033,  // Invalid number of destinations
+  RINVDLNAME = 0x00000034,  // Invalid Distribution List name
+  RINVDESTFLAG = 0x00000040,  // Destination flag (submit_multi)
+  RINVSUBREP =
+  0x00000042,  // Invalid ‘submit with replace’ request (i.e. submit_sm with replace_if_present_flag set)
+  RINVESMSUBMIT = 0x00000043,  // Invalid esm_SUBMIT field data
+  RCNTSUBDL = 0x00000044,  // Cannot Submit to Distribution List
+  RSUBMITFAIL = 0x00000045,  // submit_sm or submit_multi failed
+  RINVSRCTON = 0x00000048,  // Invalid Source address TON
+  RINVSRCNPI = 0x00000049,  // Invalid Source address NPI
+  RINVDSTTON = 0x00000050,  // Invalid Destination address TON
+  RINVDSTNPI = 0x00000051,  // Invalid Destination address NPI
+  RINVSYSTYP = 0x00000053,  // Invalid system_type field
+  RINVREPFLAG = 0x00000054,  // Invalid replace_if_present flag
+  RINVNUMMSGS = 0x00000055,  // Invalid number of messages
+  RTHROTTLED =
+  0x00000058,  // Throttling error (ESME has exceeded allowed message limits)
+  RINVSCHED = 0x00000061,  // Invalid Scheduled Delivery Time
+  RINVEXPIRY = 0x00000062,  // Invalid message (Expiry time)
+  RINVDFTMSGID = 0x00000063,  // Predefined Message Invalid or Not Found
+  RX_T_APPN = 0x00000064,  // ESME Receiver Temporary App Error Code
+  RX_P_APPN = 0x00000065,  // ESME Receiver Permanent App Error Code
+  RX_R_APPN = 0x00000066,  // ESME Receiver Reject Message Error Code
+  RQUERYFAIL = 0x00000067,  // query_sm request failed
+  RINVOPTPARSTREAM = 0x000000C0,  // Error in the optional part of the PDU Body.
+  ROPTPARNOTALLWD = 0x000000C1,  // Optional Parameter not allowed
+  RINVPARLEN = 0x000000C2,  // Invalid Parameter Length.
+  RMISSINGOPTPARAM = 0x000000C3,  // Expected Optional Parameter missing
+  RINVOPTPARAMVAL = 0x000000C4,  // Invalid Optional Parameter Value
+  RDELIVERYFAILURE = 0x000000FE,  // Delivery Failure (data_sm_resp)
+  RUNKNOWNERR = 0x000000FF  // Unknown Error
+};
 
 // SMPP v3.4 - 5.2.5 page 117
-const uint8_t TON_UNKNOWN = 0x00;
-const uint8_t TON_INTERNATIONAL = 0x01;
-const uint8_t TON_NATIONAL = 0x02;
-const uint8_t TON_NETWORKSPECIFIC = 0x03;
-const uint8_t TON_SUBSCRIBERNUMBER = 0x04;
-const uint8_t TON_ALPHANUMERIC = 0x05;
-const uint8_t TON_ABBREVIATED = 0x06;
+enum class TON : uint8_t {
+  UNKNOWN = 0x00,
+  INTERNATIONAL = 0x01,
+  NATIONAL = 0x02,
+  NETWORKSPECIFIC = 0x03,
+  SUBSCRIBERNUMBER = 0x04,
+  ALPHANUMERIC = 0x05,
+  ABBREVIATED = 0x06
+};
 
 // SMPP v3.4 - 5.2.6 page 118
-const uint8_t NPI_UNKNOWN = 0x00;
-const uint8_t NPI_E164 = 0x01;
-const uint8_t NPI_DATA = 0x03;
-const uint8_t NPI_TELEX = 0x04;
-const uint8_t NPI_E212 = 0x06;
-const uint8_t NPI_NATIONAL = 0x08;
-const uint8_t NPI_PRIVATE = 0x09;
-const uint8_t NPI_ERMES = 0x0a;
-const uint8_t NPI_INTERNET = 0x0e;
-const uint8_t NPI_WAPCLIENT = 0x12;
+enum class NPI : uint8_t {
+  UNKNOWN = 0x00,
+  E164 = 0x01,
+  DATA = 0x03,
+  TELEX = 0x04,
+  E212 = 0x06,
+  NATIONAL = 0x08,
+  PRIVATE = 0x09,
+  ERMES = 0x0a,
+  INTERNET = 0x0e,
+  WAPCLIENT = 0x12
+};
 
-// ESM bits 1-0 - SMPP v3.4 - 5.2.12 page 121-122
-const uint8_t ESM_SUBMIT_MODE_SMSC_DEFAULT = 0x00;
-const uint8_t ESM_SUBMIT_MODE_DATAGRAM = 0x01;
-const uint8_t ESM_SUBMIT_MODE_FORWARD = 0x02;
-const uint8_t ESM_SUBMIT_MODE_STOREANDFORWARD = 0x03;
-// ESM bits 5-2
-const uint8_t ESM_SUBMIT_BINARY = 0x04;
-const uint8_t ESM_SUBMIT_TYPE_ESME_D_ACK = 0x08;
-const uint8_t ESM_SUBMIT_TYPE_ESME_U_ACK = 0x10;
-const uint8_t ESM_DELIVER_SMSC_RECEIPT = 0x04;
-const uint8_t ESM_DELIVER_SME_ACK = 0x08;
-const uint8_t ESM_DELIVER_U_ACK = 0x10;
-const uint8_t ESM_DELIVER_CONV_ABORT = 0x18;
-const uint8_t ESM_DELIVER_IDN = 0x20;  // Intermediate delivery notification
-// ESM bits 7-6
-const uint8_t ESM_UHDI = 0x40;
-const uint8_t ESM_REPLYPATH = 0x80;
+enum class ESM : uint8_t {
+  // ESM bits 1-0 - SMPP v3.4 - 5.2.12 page 121-122
+  SUBMIT_MODE_SMSC_DEFAULT = 0x00,
+  SUBMIT_MODE_DATAGRAM = 0x01,
+  SUBMIT_MODE_FORWARD = 0x02,
+  SUBMIT_MODE_STOREANDFORWARD = 0x03,
+  // ESM bits 5-2
+  SUBMIT_BINARY = 0x04,
+  SUBMIT_TYPE_ESME_D_ACK = 0x08,
+  SUBMIT_TYPE_ESME_U_ACK = 0x10,
+  DELIVER_SMSC_RECEIPT = 0x04,
+  DELIVER_SME_ACK = 0x08,
+  DELIVER_U_ACK = 0x10,
+  DELIVER_CONV_ABORT = 0x18,
+  DELIVER_IDN = 0x20,  // Intermediate delivery notification
+  // ESM bits 7-6
+  UHDI = 0x40,
+  REPLYPATH = 0x80
+};
+
+// Allow combinations of ESM to be piped to PDU
+inline std::underlying_type<ESM>::type operator|(const ESM &a, const ESM &b) {
+  auto a_t = static_cast<std::underlying_type<ESM>::type>(a);
+  auto b_t = static_cast<std::underlying_type<ESM>::type>(b);
+  return a_t | b_t;
+}
 
 // SMPP v3.4 - 5.2.14 page 123 - priority_flag
-const uint8_t PRIORITY_GSM_NON_PRIORITY = 0x0;
-const uint8_t PRIORITY_GSM_PRIORITY = 0x1;
+namespace priority {
+enum class gsm : uint8_t {
+  GSM_NON_PRIORITY = 0x0,
+  GSM_PRIORITY = 0x1
+};
 
-const uint8_t PRIORITY_ANSI_136_BULK = 0x0;
-const uint8_t PRIORITY_ANSI_136_NORMAL = 0x1;
-const uint8_t PRIORITY_ANSI_136_URGENT = 0x2;
-const uint8_t PRIORITY_ANSI_136_VERY_URGENT = 0x3;
+enum class ansi : uint8_t {
+  ANSI_136_BULK = 0x0,
+  ANSI_136_NORMAL = 0x1,
+  ANSI_136_URGENT = 0x2,
+  ANSI_136_VERY_URGENT = 0x3
+};
 
-const uint8_t PRIORITY_IS_95_NORMAL = 0x0;
-const uint8_t PRIORITY_IS_95_INTERACTIVE = 0x1;
-const uint8_t PRIORITY_IS_95_URGENT = 0x2;
-const uint8_t PRIORITY_IS_95_EMERGENCY = 0x3;
+enum class IS95 : uint8_t {
+  IS_95_NORMAL = 0x0,
+  IS_95_INTERACTIVE = 0x1,
+  IS_95_URGENT = 0x2,
+  IS_95_EMERGENCY = 0x3
+};
+}  // namespace priority
 
 // SMPP v3.4 - 5.2.17 page 124
 const uint8_t REG_DELIVERY_NO = 0x00;
@@ -184,22 +207,22 @@ const uint8_t STATE_ACCEPTED = 6;
 const uint8_t STATE_UNKNOWN = 7;
 const uint8_t STATE_REJECTED = 8;
 
-std::string GetEsmeStatus(uint32_t);
+std::string GetEsmeStatus(const ESME &);
 
 struct SmppAddress {
   std::string value;
-  uint8_t ton;  // type-of-number
-  uint8_t npi;  // numbering-plan-indicator
+  smpp::TON ton;  // type-of-number
+  smpp::NPI npi;  // numbering-plan-indicator
 
   SmppAddress(const std::string &val) :
     value(val),
-    ton(smpp::TON_UNKNOWN),
-    npi(smpp::NPI_UNKNOWN) {
+    ton(smpp::TON::UNKNOWN),
+    npi(smpp::NPI::UNKNOWN) {
   }
 
   SmppAddress(const std::string &val,
-              const uint8_t type_of_number,
-              const uint8_t numbering_plan_indicator) :
+              const smpp::TON type_of_number,
+              const smpp::NPI numbering_plan_indicator) :
     value(val),
     ton(type_of_number),
     npi(numbering_plan_indicator) {

@@ -26,7 +26,7 @@ class PDU {
   PDU();
 
   // Construct a PDU from a command set, useful for sending PDUs
-  PDU(const uint32_t &_cmdId, const uint32_t &_cmdStatus, const uint32_t &_seqNo);
+  PDU(const uint32_t &_cmdId, const ESME &_cmdStatus, const uint32_t &_seqNo);
 
   // Construct a PDU from binary data, useful for receiving PDUs
   PDU(const PduLengthHeader &pduLength, const PduData &pduBuffer);
@@ -43,7 +43,7 @@ class PDU {
     return command_id_;
   }
 
-  uint32_t command_status() const {
+  ESME command_status() const {
     return command_status_;
   }
 
@@ -59,7 +59,7 @@ class PDU {
     null_terminate_octet_strings_ = null_terminate_octet_strings;
   }
 
-  bool null() const {
+  inline bool null() const {
     return null_;
   }
 
@@ -69,6 +69,12 @@ class PDU {
   PDU &operator<<(const uint16_t &i);
   PDU &operator<<(const uint32_t &i);
   PDU &operator<<(const std::basic_string<char> &s);
+
+  template <class Enum, class = typename std::enable_if<std::is_enum<Enum>::value >::type>
+  inline PDU &operator<<(const Enum &e) {
+    (*this) << static_cast< typename std::underlying_type<Enum>::type >( e );
+    return *this;
+  }
 
   PDU &operator<<(const smpp::SmppAddress);
   PDU &operator<<(const smpp::TLV);
@@ -86,6 +92,12 @@ class PDU {
   PDU &operator>>(uint32_t &i);
   PDU &operator>>(std::basic_string<char> &s);
 
+  template <class Enum, class = typename std::enable_if<std::is_enum<Enum>::value >::type>
+  inline PDU &operator>>(Enum &e) {
+    (*this) >> reinterpret_cast< typename std::underlying_type<Enum>::type &>( e );
+    return *this;
+  }
+
   // Copy n octet into an array.
   // @param array Target array.
   // @param n Octets to copy.
@@ -98,7 +110,7 @@ class PDU {
   std::stringbuf sb_;
   std::iostream buf_;
   uint32_t command_id_;
-  uint32_t command_status_;
+  ESME command_status_;
   uint32_t seq_no_;
   bool null_terminate_octet_strings_;
   bool null_;
