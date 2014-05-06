@@ -77,6 +77,7 @@ class SmppClient {
                                       const std::string &shortMessage,
                                       const SmppParams &params,
                                       std::list<TLV> tags);
+
   // Returns the first SMS in the PDU queue,
   // or does a blocking read on the socket until we receive an SMS from the SMSC.
   smpp::SMS ReadSms();
@@ -84,13 +85,10 @@ class SmppClient {
   // Query the SMSC about current state/status of a previous sent SMS.
   // You must specify the SMSC assigned message id and source of the sent SMS.
   // Returns an std::tuple with elements: message_id, final_date, message_state and error_code.
-  // message_state would be one of the SMPP::STATE_* constants. (SMPP v3.4 section 5.2.28)
+  // message_state would be one of the smpp::STATE_* constants. (SMPP v3.4 section 5.2.28)
   // error_code depends on the telco network, so could be anything.
   //
-  // @param messageid
-  // @param source
-  // @return QuerySmResult
-  QuerySmResult QuerySm(std::string messageid, SmppAddress source);
+  QuerySmResult QuerySm(std::string messageid, const SmppAddress &source);
 
   // Sends an enquire link command to SMSC and blocks until we a response.
   void EnquireLink();

@@ -236,7 +236,7 @@ SMS SmppClient::ReadSms() {
   return ParseSms();
 }
 
-QuerySmResult SmppClient::QuerySm(std::string messageid, SmppAddress source) {
+QuerySmResult SmppClient::QuerySm(std::string messageid, const SmppAddress &source) {
   PDU pdu = PDU(QUERY_SM, 0, NextSequenceNumber());
   pdu << messageid;
   pdu << source.ton;
