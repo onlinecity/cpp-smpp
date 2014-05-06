@@ -10,6 +10,7 @@ function(add_gtest name libs)
     target_link_libraries(${test_bin} ${lib} )
   endforeach()
   add_dependencies(${test_bin} googletest)
+  add_test(${name} ${CMAKE_BINARY_DIR}/bin/${test_bin})
 endfunction()
 
 # Add a list of gtests, with global SetUp/TearDown
@@ -20,6 +21,7 @@ function(add_gtests)
   add_executable(unittest $<TARGET_OBJECTS:compiled> ${testsrcs} main.cc)
   target_link_libraries(unittest ${link_libs} ${gtest_LIB})
   add_dependencies(unittest googletest)
+  add_test(unittest ${CMAKE_BINARY_DIR}/bin/unittest)
 endfunction()
 
 add_custom_target(test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest DEPENDS compiled)
