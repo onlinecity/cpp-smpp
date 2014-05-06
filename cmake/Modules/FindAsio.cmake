@@ -9,7 +9,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/ext)
 # Add gtest
 ExternalProject_Add(
     asio
-    URL http://sourceforge.net/projects/asio/files/asio/1.10.1%20%28Stable%29/asio-1.10.1.tar.bz2
+    URL http://sourceforge.net/projects/asio/files/asio/1.10.2%20%28Stable%29/asio-1.10.2.tar.bz2
     # TIMEOUT 10
     # # Force separate output paths for debug and release builds to allow easy
     # # identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
