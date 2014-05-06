@@ -34,7 +34,7 @@ su
 make install
 ```
 
-There is both an offline unit test (./bin/unittest) and an online unit test (./bin/smppclient_test). If you run ```make test``` you'll run them both via CTest. They can be run individually, which also allows you to view the results from CppUnit. The connection settings for the online test is found in [test/connectionsetting.h](https://github.com/onlinecity/cpp-smpp/blob/master/test/connectionsetting.h).
+There is both an offline unit test (./bin/unittest) and an online unit test (./bin/smppclient_test). If you run ```make test``` you'll run them both. They can be run individually, which also allows you to view the results from GTest. The connection settings for the online test is found in [test/connectionsetting.h](https://github.com/onlinecity/cpp-smpp/blob/master/test/connectionsetting.h).
 
 Sending a SMS:
 ----
@@ -121,14 +121,19 @@ F.A.Q.
 ----
 
 **How do I enable delivery reports?**
-You must set the registered delivery flag: ```client.setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);```
+You have to set the registered delivery flag when sending:
+``` c++
+smpp::SmppParams params;
+params.registered_delivery(smpp::REG_DELIVERY_SMSC_BOTH);
+client->SendSms(from, to, smpp::encoding::GsmEncoder::EncodeGsm0338(message), params);
+```
 
 **Why do I get 'Failed to read reply to command: 0x4', 'Message Length is invalid' or 'Error in optional part' errors?**
-Most likely your SMPP provider doesn't support NULL-terminating the message field. The specs aren't clear on this issue, so there is a toggle. Set ```client.setNullTerminateOctetStrings(false);``` and try again.
+Most likely your SMPP provider doesn't support NULL-terminating the message field. The specs aren't clear on this issue, so there is a toggle. Set ```client.set_null_terminate_octet_strings(false);``` and try again.
 
 **Can I test the client library without a SMPP server?**
 Many service providers can give you a demo account, but you can also use the [logica opensmpp simulator](http://opensmpp.logica.com/CommonPart/Introduction/Introduction.htm#simulator) (java) or [smsforum client test tool](http://www.smsforum.net/sctt_v1.0.Linux.tar.gz) (linux binary). In addition to a number of real-life SMPP servers this library is tested against these simulators.
 
 **How do I set socket timeouts?**
-You cannot modify the connect timeout since it uses the default boost::asio::ip::tcp socket. You can set the socket read/write timeouts by calling ```client.setSocketWriteTimeout(1000)``` and ```client.setSocketReadTimeout(1000)```. All timeouts are in milliseconds.
+You cannot modify the connect timeout since it uses the default asio::ip::tcp socket. You can set the socket read/write timeouts by calling ```client.set_socket_write_timeout(1000)``` and ```client.set_socket_read_timeout(1000)```. All timeouts are in milliseconds.
 
