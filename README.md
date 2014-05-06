@@ -8,15 +8,8 @@ Dependencies
 ----
 To build this library you need and a c++11 compatible compiler:
 
- - [Boost.Asio](http://www.boost.org/doc/libs/1_47_0/doc/html/boost_asio.html)
- - [Boost.Bimap](http://www.boost.org/doc/libs/1_47_0/libs/bimap/doc/html/index.html)
- - [Boost.Bind](http://www.boost.org/doc/libs/1_47_0/libs/bind/bind.html)
+ - [Asio C++ Library](http://think-async.com)
  - [Boost.Date_time](http://www.boost.org/doc/libs/1_47_0/doc/html/date_time.html)
- - [Boost.Function](http://www.boost.org/doc/libs/1_47_0/doc/html/function.html)
- - [Boost.NumericConversion](http://www.boost.org/doc/libs/1_47_0/libs/numeric/conversion/doc/html/index.html)
- - [Boost.Thread](http://www.boost.org/doc/libs/1_47_0/doc/html/thread.html)
- - [Boost.Tuple](http://www.boost.org/doc/libs/1_47_0/libs/tuple/doc/tuple_users_guide.html)
- - [Boost.System](http://www.boost.org/doc/libs/1_47_0/libs/system/doc/index.html)
  - [Google gflags] (https://code.google.com/p/gflags)
  - [Google gtest] (https://code.google.com/p/googletest)
  - [Google glog](https://code.google.com/p/google-glog)
@@ -28,7 +21,6 @@ The following ubuntu packages should suffice for the dependices: [libboost1.46-a
 If you dont wan't all the boost libs, try:
 
  - [libboost-system1.46-dev](http://packages.ubuntu.com/oneiric/libboost-system1.46-dev)
- - [libboost-filesystem1.46-dev](http://packages.ubuntu.com/oneiric/libboost-filesystem1.46-dev)
  - [libboost-date-time1.46-dev](http://packages.ubuntu.com/oneiric/libboost-date-time1.46-dev)
 
 Installation
@@ -42,51 +34,46 @@ su
 make install
 ```
 
-There is both an offline unit test (./test/unittest) and an online unit test (./test/livetest). If you run ```make test``` you'll run them both via CTest. They can be run individually, which also allows you to view the results from CppUnit. The connection settings for the online test is found in [test/connectionsetting.h](https://github.com/onlinecity/cpp-smpp/blob/master/test/connectionsetting.h).
+There is both an offline unit test (./bin/unittest) and an online unit test (./bin/smppclient_test). If you run ```make test``` you'll run them both via CTest. They can be run individually, which also allows you to view the results from CppUnit. The connection settings for the online test is found in [test/connectionsetting.h](https://github.com/onlinecity/cpp-smpp/blob/master/test/connectionsetting.h).
 
 Sending a SMS:
 ----
 
 ``` c++
-/*
- * transmit.cpp
- * Compile with (on Ubuntu):
- * g++ transmit.cpp -I/usr/local/include -lsmpp -lboost_system -lboost_regex -lboost_date_time
- */
+//
+// Transmitter example
+//
+// clang++ transmit.cc -I/usr/local/include -lsmpp -lboost_date_time
+//
 
-#include <smpp/smppclient.h>
-#include <smpp/gsmencoding.h>
-#include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <asio.hpp>
+#include <smpp/gsmencoding.h>
+#include <smpp/smpp.h>
+#include <smpp/smppclient.h>
 
-using namespace boost;
-using namespace boost::asio;
-using namespace boost::asio::ip;
-using namespace smpp;
-using namespace oc::tools;
-using namespace std;
+int main(int argc, char** argv) {
+  asio::io_service io_service;
+  std::shared_ptr<asio::ip::tcp::socket> socket(new asio::ip::tcp::socket(io_service));
 
-int main(int argc, char** argv)
-{
-	boost::asio::io_service io_service;
-	tcp::endpoint endpoint(ip::address_v4::from_string("127.0.0.1"), 2775);
-	shared_ptr<tcp::socket> socket(new tcp::socket(io_service));
-	socket->connect(endpoint);
+  asio::ip::tcp::endpoint endpoint(asio::ip::address_v4::from_string("127.0.0.1"), 2775);
+  socket->connect(endpoint);
 
-	SmppClient client(socket);
-	client.setVerbose(true);
-	client.bindTransmitter("username", "password");
+  smpp::SmppClient smpp_client(socket);
+  smpp_client.BindTransmitter("username", "password");
 
-	SmppAddress from("CPPSMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
-	SmppAddress to("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
-	string message = "message to send";
-	string smscId = client.sendSms(from, to, GsmEncoder::getGsm0338(message));
+  smpp::SmppAddress sender("CPP-SMPP", smpp::TON_ALPHANUMERIC, smpp::NPI_UNKNOWN);
+  smpp::SmppAddress receiver("4513371337", smpp::TON_INTERNATIONAL, smpp::NPI_E164);
 
-	cout << smscId << endl;
-	client.unbind();
+  std::string message = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sollicitudin.";
+  auto result = smpp_client.SendSms(sender, receiver, smpp::encoding::GsmEncoder::EncodeGsm0338(message));
+  std::cout << "smsc_id:" << result.first << " messages:" << result.second << std::endl;
 
-	return 0;
+  smpp_client.Unbind();
+  socket->close();
+  return 0;
 }
 ```
 
@@ -94,53 +81,40 @@ Receiving a SMS:
 ----
 
 ``` c++
-/*
- * receive.cpp
- * Compile with (on ubuntu):
- * g++ receive.cpp -I/usr/local/include -lsmpp -lboost_system -lboost_regex -lboost_date_time
- */
+//
+// Receiver example.
+//
+// clang++ recever.cc -std=c++11 -lsmpp -lboost_date_time
+//
 
-#include <smpp/smppclient.h>
-#include <smpp/sms.h>
-#include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <asio.hpp>
+#include <smpp/gsmencoding.h>
+#include <smpp/smpp.h>
+#include <smpp/smppclient.h>
 
-using namespace boost;
-using namespace boost::asio;
-using namespace boost::asio::ip;
-using namespace smpp;
-using namespace std;
+int main(int argc, char** argv) {
+  asio::io_service ios;
+  std::shared_ptr<asio::ip::tcp::socket> socket(new asio::ip::tcp::socket(ios));
 
-int main(int argc, char** argv)
-{
-	boost::asio::io_service io_service;
-	tcp::endpoint endpoint(ip::address_v4::from_string("127.0.0.1"), 2775);
-	shared_ptr<tcp::socket> socket(new tcp::socket(io_service));
-	socket->connect(endpoint);
+  asio::ip::tcp::endpoint endpoint(asio::ip::address_v4::from_string("127.0.0.1"), 2775);
+  socket->connect(endpoint);
 
-	SmppClient client(socket);
-	client.setVerbose(true);
-	client.bindReceiver("username", "password");
+  smpp::SmppClient client(socket);
+  client.set_verbose(true);
+  client.BindReceiver("username", "password");
 
-	SMS sms = client.readSms();
-	cout << "source addr: " << sms.source_addr << endl;
-	cout << "dest addr: " << sms.dest_addr << endl;
-	cout << "SM: " << sms.short_message << endl;
+  smpp::SMS sms = client.ReadSms();
+  std::cout << "source addr:" << sms.source_addr << std::endl;
+  std::cout << "dest addr:" << sms.dest_addr << std::endl;
+  std::cout << "message:" << sms.short_message << std::endl;
+  client.Unbind();
 
-	if ((sms.esm_class & smpp::ESM_DELIVER_SMSC_RECEIPT) != 0) {
-		DeliveryReport dlr(sms);
-		cout << "id: " << dlr.id << endl;
-		cout << "err: " << dlr.err << endl;
-		cout << "stat: " << dlr.stat << endl;
-		cout << "done date: " << dlr.doneDate << endl;
-		cout << "submit date: " << dlr.submitDate << endl;
-	}
-
-	client.unbind();
-
-	return 0;
+  return 0;
 }
+
 ```
 
 F.A.Q.
