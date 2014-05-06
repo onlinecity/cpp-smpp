@@ -53,7 +53,7 @@ option (ENABLE_TEST "Compile unit testing" ON)
 
 if (ENABLE_TEST)
   enable_testing()
-  find_package(gTest)
+  find_package(GTest)
   include_directories(${GTEST_INCLUDE_DIR})
   add_subdirectory (test)
 endif (ENABLE_TEST)

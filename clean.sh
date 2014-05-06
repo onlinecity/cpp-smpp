@@ -1,31 +1,27 @@
 #!/bin/sh
 
-function delete_dir {
+delete_dir() {
   if [ -d $1 ]; then
     echo "Deleting dir $1"
     rm -rf $1
   fi;
-  echo ""
 }
 
-function delete_dir_recursive {
+delete_dir_recursive() {
   echo "Deleting dir recursive $1"
   find . -type d -name $1 -exec rm -r {} \;
-  echo ""
 }
 
 
-function delete_file {
+delete_file() {
   echo "Deleting file $1"
-  find . -type f -name $1
+#  find . -type f -name $1
   find . -type f -name $1 -delete
-  echo ""
 }
 
 if [ -f Makefile ]; then
 	echo "make clean"
 	make clean
-    echo ""
 fi
 
 
