@@ -36,7 +36,7 @@ TEST(SmsTest, copy) {
   data.resize(53);
   std::copy(testdata, testdata + 53, data.begin());
   smpp::PDU pdu(head, data);
-  smpp::SMS sms(pdu);
+  smpp::SMS sms(&pdu);
   smpp::SMS sms2(sms);
   ASSERT_EQ(sms.is_null, sms2.is_null);
   ASSERT_TRUE(!sms2.is_null);
@@ -79,7 +79,7 @@ TEST(SmsTest, dlr) {
   data.resize(0xe0);
   std::copy(testdata, testdata + 0xe0, data.begin());
   smpp::PDU pdu(head, data);
-  smpp::SMS sms(pdu);
+  smpp::SMS sms(&pdu);
   smpp::DeliveryReport dlr(sms);
   // Assertions for SMS
   EXPECT_EQ(sms.source_addr, string("4526159917"));

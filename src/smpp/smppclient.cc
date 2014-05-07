@@ -274,7 +274,7 @@ SMS SmppClient::ParseSms() {
 
   while (it != pdu_queue_.end()) {
     if ((*it).command_id() == DELIVER_SM) {
-      SMS sms(*it);
+      SMS sms(&*it);
       // send response to smsc
       PDU resp = PDU(DELIVER_SM_RESP, ESME::ROK, (*it).sequence_no());
       resp << 0x0;

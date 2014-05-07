@@ -47,7 +47,7 @@ class SMS {
   SMS();
   virtual ~SMS() {
   }
-  explicit SMS(PDU &pdu);
+  explicit SMS(PDU *pdu);
   SMS(const SMS &sms);
 };
 std::ostream &operator<<(std::ostream &, smpp::SMS &);

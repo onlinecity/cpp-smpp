@@ -34,7 +34,7 @@ SMS::SMS() :
   is_null(true) {
 }
 
-SMS::SMS(PDU &pdu) :
+SMS::SMS(PDU *pdu) :
   service_type(""),
   source_addr_ton(TON::UNKNOWN),
   source_addr_npi(NPI::UNKNOWN),
@@ -55,35 +55,35 @@ SMS::SMS(PDU &pdu) :
   short_message(""),
   tlvs(),
   is_null(false) {
-  pdu >> service_type;
-  pdu >> source_addr_ton;
-  pdu >> source_addr_npi;
-  pdu >> source_addr;
-  pdu >> dest_addr_ton;
-  pdu >> dest_addr_npi;
-  pdu >> dest_addr;
-  pdu >> esm_class;
-  pdu >> protocol_id;
-  pdu >> priority_flag;
-  pdu >> schedule_delivery_time;
-  pdu >> validity_period;
-  pdu >> registered_delivery;
-  pdu >> replace_if_present_flag;
-  pdu >> data_coding;
-  pdu >> sm_default_msg_id;
-  pdu >> sm_length;
+  *pdu >> service_type;
+  *pdu >> source_addr_ton;
+  *pdu >> source_addr_npi;
+  *pdu >> source_addr;
+  *pdu >> dest_addr_ton;
+  *pdu >> dest_addr_npi;
+  *pdu >> dest_addr;
+  *pdu >> esm_class;
+  *pdu >> protocol_id;
+  *pdu >> priority_flag;
+  *pdu >> schedule_delivery_time;
+  *pdu >> validity_period;
+  *pdu >> registered_delivery;
+  *pdu >> replace_if_present_flag;
+  *pdu >> data_coding;
+  *pdu >> sm_default_msg_id;
+  *pdu >> sm_length;
   // read short_message with readOctets to ensure we get all chars including null bytes
   PduData msg;
   msg.resize(sm_length);
-  pdu.ReadOctets(&msg, sm_length);
+  pdu->ReadOctets(&msg, sm_length);
   short_message = msg;
   // fetch any optional tags
   uint16_t len = 0;
   uint16_t tag = 0;
 
-  while (pdu.HasMoreData()) {
-    pdu >> tag;
-    pdu >> len;
+  while (pdu->HasMoreData()) {
+    *pdu >> tag;
+    *pdu >> len;
 
     if (tag == 0) {
       break;
@@ -96,7 +96,7 @@ SMS::SMS(PDU &pdu) :
 
     PduData octets;
     octets.resize(len);
-    pdu.ReadOctets(&octets, len);
+    pdu->ReadOctets(&octets, len);
     tlvs.push_back(TLV(tag, octets));
   }
 }
