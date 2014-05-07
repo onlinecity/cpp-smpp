@@ -90,7 +90,7 @@ TEST(TimeTest, ParseDlrTimestamp) {
 
   auto exp_time1 = sc::system_clock::from_time_t(std::mktime(&tm));
   auto time1 = smpp::timeformat::ParseDlrTimestamp("1402031337");
-  ASSERT_EQ(time1, exp_time1);
+  EXPECT_EQ(exp_time1, time1);
 
   tm.tm_year = 2009 - 1900;
   tm.tm_mon = 5;
@@ -102,7 +102,7 @@ TEST(TimeTest, ParseDlrTimestamp) {
 
   auto exp_time2 = sc::system_clock::from_time_t(std::mktime(&tm));
   auto time2 = smpp::timeformat::ParseDlrTimestamp("0906051337");
-  ASSERT_EQ(time2, exp_time2);
+  EXPECT_EQ(exp_time2, time2);
 }
 
 TEST(TimeTest, FormatAbsolute) {

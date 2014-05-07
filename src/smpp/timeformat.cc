@@ -6,21 +6,29 @@
 #include <complex>
 #include <string>
 
-using std::string;
-using std::stoi;
-
-using std::regex;
-using std::smatch;
 
 namespace smpp {
 namespace timeformat {
+using std::string;
+using std::stoi;
+using std::regex;
+using std::smatch;
 
 std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::string &time) {
-  struct tm tm;
+  const char* ts = time.c_str();
+  std::tm tm;
+  tm.tm_year = (ts[0] - '0') * 10 + (ts[1] - '0');  // years since 1900
+  if (tm.tm_year < 70) {
+    tm.tm_year += 100;
+  }
+  tm.tm_mon = (ts[2] - '0') * 10 + (ts[3] - '0') - 1;  // months since january (0-11)
+  tm.tm_mday = (ts[4] - '0') * 10 + (ts[5] - '0');
+  tm.tm_hour = (ts[6] - '0') * 10 + (ts[7] - '0');
+  tm.tm_min = (ts[8] - '0') * 10 + (ts[9] - '0');
   tm.tm_isdst = -1;  // Set to avoid garbage.
   tm.tm_sec = 0;     // Set to avoid garbage.
-  strptime(time.c_str(), "%y%m%d%H%M", &tm);
-  return std::chrono::system_clock::from_time_t(mktime(&tm));
+  tm.tm_gmtoff = 0;
+  return std::chrono::system_clock::from_time_t(std::mktime(&tm));
 }
 
 std::chrono::seconds ParseRelativeTimestamp(const smatch &match) {

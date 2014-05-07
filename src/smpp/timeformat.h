@@ -17,7 +17,6 @@ namespace timeformat {
 typedef std::pair<std::chrono::time_point<std::chrono::system_clock>,
         std::chrono::seconds> ChronoDatePair;
 
-
 // Parses a relative timestamp and returns it as a chrono seconds duration.
 std::chrono::seconds ParseRelativeTimestamp(const std::smatch &match);
 
@@ -32,6 +31,7 @@ ChronoDatePair ParseSmppTimestamp(const std::string &time);
 
 // Parses a delivery receipt timestamp and returns it as time_point.
 std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const std::string &time);
+//std::chrono::time_point<std::chrono::system_clock> ParseDlrTimestamp(const char* ts);
 
 // Returns the struct tm as a string formatted as an absolute timestamp
 std::string ToSmppTimeString(const struct tm &tm);
