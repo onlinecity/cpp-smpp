@@ -14,16 +14,15 @@ namespace smpp {
 struct SmppParams {
   SmppParams() :
     service_type(""),
-    esm_class(smpp::ESM::SUBMIT_MODE_SMSC_DEFAULT),
+    esm_class(ESM::SUBMIT_MODE_SMSC_DEFAULT),
     protocol_id(0),
     priority_flag(0),
     schedule_delivery_time(""),
     validity_period(""),
     registered_delivery(RegisteredDelivery::DELIVERY_NO),
-    replace_if_present_flag(0),
-    data_coding(smpp::DATA_CODING_DEFAULT),
-    sm_default_msg_id(0)
-    {
+    replace_if_present_flag(ReplaceIfPresent::REPLACE_NO),
+    data_coding(DataCoding::DEFAULT),
+    sm_default_msg_id(0) {
   }
 
   // ESME transmitter options
@@ -34,9 +33,8 @@ struct SmppParams {
   std::string schedule_delivery_time;
   std::string validity_period;
   smpp::RegisteredDelivery registered_delivery;
-  uint8_t replace_if_present_flag;
-  uint8_t data_coding;
+  smpp::ReplaceIfPresent replace_if_present_flag;
+  smpp::DataCoding data_coding;
   uint8_t sm_default_msg_id;
-
 };
 }  // namespace smpp

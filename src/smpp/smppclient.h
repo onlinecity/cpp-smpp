@@ -47,10 +47,10 @@ class SmppClient {
   explicit SmppClient(std::shared_ptr<asio::ip::tcp::socket>);
   ~SmppClient();
 
-   // Binds the client in transmitter mode.
+  // Binds the client in transmitter mode.
   void BindTransmitter(const std::string &login, const std::string &password);
 
-   // Binds the client in receiver mode.
+  // Binds the client in receiver mode.
   void BindReceiver(const std::string &login, const std::string &password);
 
   // Unbinds the client.
@@ -332,6 +332,5 @@ class SmppClient {
   int socket_read_timeout_;
   // Verbose output
   bool verbose_;
-
 };
 }  // namespace smpp

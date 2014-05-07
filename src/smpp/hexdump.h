@@ -5,9 +5,9 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
+#include <string>
 
 namespace oc {
 namespace tools {

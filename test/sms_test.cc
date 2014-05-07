@@ -90,13 +90,13 @@ TEST(SmsTest, dlr) {
   EXPECT_EQ(sms.dest_addr_npi, smpp::NPI::UNKNOWN);
   EXPECT_EQ(sms.esm_class, smpp::ESM::DELIVER_SMSC_RECEIPT);
   EXPECT_TRUE(!sms.is_null);
-  EXPECT_EQ(sms.data_coding, smpp::DATA_CODING_ISO8859_1);
+  EXPECT_EQ(sms.data_coding, smpp::DataCoding::ISO8859_1);
   // Assertions for TLV fields
   EXPECT_EQ(static_cast<int>(sms.tlvs.size()), 2);
   list<smpp::TLV>::iterator it;
   it = sms.tlvs.begin();
   EXPECT_EQ(it->getTag(), smpp::tags::MESSAGE_STATE);
-  EXPECT_EQ(it->getOctets()[0], smpp::STATE_DELIVERED);
+  EXPECT_EQ(it->getOctets()[0], static_cast<typename std::underlying_type<smpp::State>::type>(smpp::State::DELIVERED));
   it++;
   EXPECT_EQ(it->getTag(), smpp::tags::RECEIPTED_MESSAGE_ID);
   EXPECT_EQ(it->getOctets(), string("dc0dc8ec67e16082483f9e8cd1b135dd", 33));

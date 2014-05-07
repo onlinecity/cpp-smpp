@@ -5,12 +5,12 @@
 #include "smpp/smpp.h"
 #include <string>
 
-using std::string;
 
 namespace smpp {
+using std::string;
 string GetEsmeStatus(const ESME &i) {
   switch (i) {
-    case ESME::ROK:
+  case ESME::ROK:
     return "No Error";
 
   case ESME::RINVMSGLEN:

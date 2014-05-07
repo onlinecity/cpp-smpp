@@ -178,40 +178,47 @@ enum class RegisteredDelivery : uint8_t {
 };
 
 // SMPP v3.4 - 5.2.18 page 125
-const uint8_t REPLACE_NO = 0x00;
-const uint8_t REPLACE_YES = 0x01;
+enum class ReplaceIfPresent : uint8_t {
+  REPLACE_NO = 0x00,
+  REPLACE_YES = 0x01
+};
 
 // SMPP v3.4 - 5.2.19 page 126
-const uint8_t DATA_CODING_DEFAULT = 0;
-const uint8_t DATA_CODING_IA5 = 1;  // IA5 (CCITT T.50)/ASCII (ANSI X3.4)
-const uint8_t DATA_CODING_BINARY_ALIAS = 2;
-const uint8_t DATA_CODING_ISO8859_1 = 3;  // Latin 1
-const uint8_t DATA_CODING_BINARY = 4;
-const uint8_t DATA_CODING_JIS = 5;
-const uint8_t DATA_CODING_ISO8859_5 = 6;  // Cyrllic
-const uint8_t DATA_CODING_ISO8859_8 = 7;  // Latin/Hebrew
-const uint8_t DATA_CODING_UCS2 = 8;  // UCS-2BE (Big Endian)
-const uint8_t DATA_CODING_PICTOGRAM = 9;
-const uint8_t DATA_CODING_ISO2022_JP = 10;  // Music codes
-const uint8_t DATA_CODING_KANJI = 13;  // Extended Kanji JIS
-const uint8_t DATA_CODING_KSC5601 = 14;
+enum class DataCoding : uint8_t {
+  DEFAULT = 0,
+  IA5 = 1,  // IA5 (CCITT T.50)/ASCII (ANSI X3.4)
+  BINARY_ALIAS = 2,
+  ISO8859_1 = 3,  // Latin 1
+  BINARY = 4,
+  JIS = 5,
+  ISO8859_5 = 6,  // Cyrllic
+  ISO8859_8 = 7,  // Latin/Hebrew
+  UCS2 = 8,  // UCS-2BE (Big Endian)
+  PICTOGRAM = 9,
+  ISO2022_JP = 10,  // Music codes
+  KANJI = 13,  // Extended Kanji JIS
+  KSC5601 = 14
+};
 
 // SMPP v3.4 - 5.2.25 page 129
-const uint8_t DEST_FLAG_SME = 1;
-const uint8_t DEST_FLAG_DISTLIST = 2;
+enum class DestFlag : uint8_t {
+  DEST_FLAG_SME = 1,
+  DEST_FLAG_DISTLIST = 2
+};
 
 // SMPP v3.4 - 5.2.28 page 130
-const uint8_t STATE_ENROUTE = 1;
-const uint8_t STATE_DELIVERED = 2;
-const uint8_t STATE_EXPIRED = 3;
-const uint8_t STATE_DELETED = 4;
-const uint8_t STATE_UNDELIVERABLE = 5;
-const uint8_t STATE_ACCEPTED = 6;
-const uint8_t STATE_UNKNOWN = 7;
-const uint8_t STATE_REJECTED = 8;
+enum class State : uint8_t {
+  ENROUTE = 1,
+  DELIVERED = 2,
+  EXPIRED = 3,
+  DELETED = 4,
+  UNDELIVERABLE = 5,
+  ACCEPTED = 6,
+  UNKNOWN = 7,
+  REJECTED = 8
+};
 
 std::string GetEsmeStatus(const ESME &);
-
 
 template<class Enum, class = typename std::enable_if<std::is_enum<Enum>::value>::type>
 std::ostream &operator<<(std::ostream &out, Enum &e) {
@@ -224,7 +231,7 @@ struct SmppAddress {
   smpp::TON ton;  // type-of-number
   smpp::NPI npi;  // numbering-plan-indicator
 
-  SmppAddress(const std::string &val) :
+  explicit SmppAddress(const std::string &val) :
     value(val),
     ton(smpp::TON::UNKNOWN),
     npi(smpp::NPI::UNKNOWN) {

@@ -8,10 +8,10 @@
 #include <list>
 #include <string>
 
-#include "smpp/smpp.h"
 #include "smpp/pdu.h"
-#include "smpp/tlv.h"
+#include "smpp/smpp.h"
 #include "smpp/timeformat.h"
+#include "smpp/tlv.h"
 
 namespace smpp {
 class SMS {
@@ -35,7 +35,7 @@ class SMS {
   int registered_delivery;
   int replace_if_present_flag;
 
-  uint8_t data_coding;
+  DataCoding data_coding;
   int sm_default_msg_id;
   int sm_length;
 

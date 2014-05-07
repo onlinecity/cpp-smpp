@@ -5,10 +5,11 @@
 
 #pragma once
 
-#include <memory>
 #include <asio.hpp>
-#include "gtest/gtest.h"
+#include <memory>
+
 #include "./connectionsetting.h"
+#include "gtest/gtest.h"
 #include "smpp/smppclient.h"
 
 class SmppClientTest: public testing::Test {

@@ -160,7 +160,7 @@ TEST_F(SmppClientTest, submitExtended) {
   struct tm *tm = localtime(&now);
   params.schedule_delivery_time = smpp::timeformat::ToSmppTimeString(*tm);
   params.validity_period = smpp::timeformat::ToSmppTimeString(std::chrono::hours(1));  // valid for one hour
-  params.data_coding = smpp::DATA_CODING_ISO8859_1;
+  params.data_coding = smpp::DataCoding::ISO8859_1;
 
   list<TLV> tags;
   tags.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT,

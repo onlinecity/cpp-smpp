@@ -26,4 +26,4 @@ class GsmEncoder {
   static const std::unordered_map<std::string, std::string> utf8_map_;
 };
 }  // namespace encoding
-}  // namespace oc
+}  // namespace smpp

@@ -5,9 +5,9 @@
 #pragma once
 
 #include <chrono>
-#include <utility>
 #include <regex>
 #include <string>
+#include <utility>
 
 #include "smpp/exceptions.h"
 

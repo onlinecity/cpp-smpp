@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <iomanip>
 #include <algorithm>
+#include <iomanip>
 #include <string>
 #include <type_traits>
 

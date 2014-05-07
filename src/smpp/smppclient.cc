@@ -4,12 +4,12 @@
 
 #include "smpp/smppclient.h"
 #include <algorithm>
-#include <list>
-#include <string>
-#include <vector>
-#include <utility>
 #include <cassert>
 #include <functional>
+#include <list>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace smpp {
 using std::string;
@@ -131,12 +131,11 @@ pair<string, int> SmppClient::SendSms(
   int csms_split = -1;  // where to split
 
   switch (params.data_coding) {
-    case smpp::DATA_CODING_UCS2:
+    case smpp::DataCoding::UCS2:
       single_sms_octet_limit = 140;
       csms_split = 132;
       break;
-
-    case smpp::DATA_CODING_DEFAULT:
+    case smpp::DataCoding::DEFAULT:
       single_sms_octet_limit = 160;
       csms_split = 152;
       break;

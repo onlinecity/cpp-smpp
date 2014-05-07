@@ -3,8 +3,8 @@
 // @author hd@onlinecity.dk & td@onlinecity.dk
 
 #include "smpp/timeformat.h"
-#include <string>
 #include <complex>
+#include <string>
 
 using std::string;
 using std::stoi;

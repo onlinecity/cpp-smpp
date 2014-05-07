@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <string>
-#include <sstream>
 #include <array>
+#include <sstream>
+#include <string>
 
+#include "smpp/exceptions.h"
 #include "smpp/smpp.h"
 #include "smpp/tlv.h"
-#include "smpp/exceptions.h"
 
 namespace smpp {
 
@@ -72,7 +72,7 @@ class PDU {
 
   template <class Enum, class = typename std::enable_if<std::is_enum<Enum>::value >::type>
   inline PDU &operator<<(const Enum &e) {
-    (*this) << static_cast< typename std::underlying_type<Enum>::type >( e );
+    (*this) << static_cast< typename std::underlying_type<Enum>::type >(e);
     return *this;
   }
 
@@ -94,7 +94,7 @@ class PDU {
 
   template <class Enum, class = typename std::enable_if<std::is_enum<Enum>::value >::type>
   inline PDU &operator>>(Enum &e) {
-    (*this) >> reinterpret_cast< typename std::underlying_type<Enum>::type &>( e );
+    (*this) >> reinterpret_cast< typename std::underlying_type<Enum>::type &>(e);
     return *this;
   }
 

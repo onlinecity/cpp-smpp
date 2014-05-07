@@ -6,12 +6,11 @@
 #include <regex>
 #include <string>
 
-using std::endl;
-using std::streamsize;
+namespace smpp {
 using std::stoi;
+using std::streamsize;
 using std::string;
 
-namespace smpp {
 SMS::SMS() :
   service_type(""),
   source_addr_ton(TON::UNKNOWN),
@@ -27,7 +26,7 @@ SMS::SMS() :
   validity_period(""),
   registered_delivery(0),
   replace_if_present_flag(0),
-  data_coding(0),
+  data_coding(DataCoding::DEFAULT),
   sm_default_msg_id(0),
   sm_length(0),
   short_message(""),
@@ -50,7 +49,7 @@ SMS::SMS(PDU &pdu) :
   validity_period(""),
   registered_delivery(0),
   replace_if_present_flag(0),
-  data_coding(0),
+  data_coding(DataCoding::DEFAULT),
   sm_default_msg_id(0),
   sm_length(0),
   short_message(""),
@@ -180,6 +179,7 @@ DeliveryReport::DeliveryReport(const DeliveryReport &rhs) :
 }  // namespace smpp
 
 std::ostream &smpp::operator<<(std::ostream &out, smpp::SMS &sms) {
+  using std::endl;
   if (sms.is_null) {
     out << "sms values: NULL" << endl;
     return out;
