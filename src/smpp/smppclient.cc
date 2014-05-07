@@ -37,7 +37,7 @@ using asio::buffer;
 SmppClient::SmppClient(shared_ptr<tcp::socket> socket) :
   csms_method_(SmppClient::CSMS_16BIT_TAGS),
   msg_ref_callback_(&SmppClient::DefaultMessageRef),
-  state_(OPEN),
+  state_(ClientState::OPEN),
   socket_(socket),
   seq_no_(0),
   pdu_queue_() {
@@ -45,7 +45,7 @@ SmppClient::SmppClient(shared_ptr<tcp::socket> socket) :
 
 SmppClient::~SmppClient() {
   try {
-    if (state_ != OPEN) {
+    if (state_ != ClientState::OPEN) {
       Unbind();
     }
   } catch (std::exception &e) {
@@ -62,15 +62,15 @@ void SmppClient::BindReceiver(const string &login, const string &pass) {
 
 void SmppClient::Bind(const CommandId &cmd, const string &login, const string &password) {
   CheckConnection();
-  CheckState(OPEN);
+  CheckState(ClientState::OPEN);
 
   PDU pdu = MakeBindPdu(cmd, login, password);
   SendCommand(&pdu);
 
   if (cmd == CommandId::BIND_RECEIVER) {
-    state_ = BOUND_RX;
+    state_ = ClientState::BOUND_RX;
   } else if (cmd == CommandId::BIND_TRANSMITTER) {
-    state_ = BOUND_TX;
+    state_ = ClientState::BOUND_TX;
   }
 }
 
@@ -95,7 +95,7 @@ void SmppClient::Unbind() {
   if (pduStatus != ESME::ROK) {
     throw SmppException(GetEsmeStatus(pduStatus));
   }
-  state_ = OPEN;
+  state_ = ClientState::OPEN;
 }
 
 pair<string, int> SmppClient::SendSms(
@@ -196,7 +196,7 @@ pair<string, int> SmppClient::SendSms(
 
 SMS SmppClient::ReadSms() {
   // see if we're bound correct.
-  CheckState(BOUND_RX);
+  CheckState(ClientState::BOUND_RX);
 
   // if  there are any messages in the queue pop the first usable one off and return it
   if (!pdu_queue_.empty()) {
@@ -321,7 +321,7 @@ vector<string> SmppClient::Split(const string &short_message, const int split) {
 }
 
 string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiver, const string &short_message, const struct SmppParams &params, list<TLV> tags) {
-  CheckState(BOUND_TX);
+  CheckState(ClientState::BOUND_TX);
   PDU pdu(CommandId::SUBMIT_SM, ESME::ROK, NextSequenceNumber());
   pdu << params.service_type;
   pdu << sender;
@@ -602,7 +602,7 @@ void SmppClient::CheckConnection() {
   }
 }
 
-void SmppClient::CheckState(int state) {
+void SmppClient::CheckState(const ClientState &state) {
   if (this->state_ != state) {
     throw SmppException("Client in wrong state");
   }

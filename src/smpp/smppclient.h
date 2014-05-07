@@ -48,6 +48,10 @@ typedef std::tuple<std::string, std::chrono::time_point<std::chrono::system_cloc
 // implemented.
 class SmppClient {
  public:
+  enum class ClientState {
+    OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
+  };
+
   // CSMS types
   enum {
     CSMS_PAYLOAD, CSMS_16BIT_TAGS, CSMS_8BIT_UDH
@@ -107,7 +111,7 @@ class SmppClient {
 
   // Returns true if the client is bound.
   inline bool IsBound() {
-    return state_ != OPEN;
+    return state_ != ClientState::OPEN;
   }
 
   inline void set_csms_method(const int csms_method) {
@@ -126,16 +130,9 @@ class SmppClient {
 
  private:
   // Binds the client to be in the mode specified in the mode parameter.
-  // @param mode Mode to bind client in.
-  // @param login SMSC login.
-  // @param password SMSC password.
   void Bind(const CommandId &bind_cmd, const std::string &login, const std::string &password);
 
   // Constructs a PDU for binding the client.
-  // @param mode Mode to bind client in.
-  // @param login SMSC login.
-  // @param password SMSC password.
-  // @return PDU for binding the client.
   smpp::PDU MakeBindPdu(const CommandId &cmd_id, const std::string &login, const std::string &password);
 
   // Runs through the PDU queue and returns the first sms it finds, and sends a reponse to the SMSC.
@@ -227,7 +224,7 @@ class SmppClient {
   // Checks if the client is in the desired state.
   // @param state Desired state.
   // @throw SmppException if the client is not in the desired state.
-  void CheckState(const int state);
+  void CheckState(const ClientState &state);
 
   // Default implementation for msgRefCallback.
   // Simple initializes a integer on the heap and increments it for each message reference.
@@ -235,17 +232,13 @@ class SmppClient {
   // @return
   static uint16_t DefaultMessageRef();
 
- private:
-  enum {
-    OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
-  };
 
   // Method to use when dealing with concatenated messages.
   int csms_method_;
 
   std::function<uint16_t()> msg_ref_callback_;
   // Bind state
-  int state_;
+  ClientState state_;
   std::shared_ptr<asio::ip::tcp::socket> socket_;
   uint32_t seq_no_;
   std::list<PDU> pdu_queue_;
