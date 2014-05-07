@@ -16,7 +16,7 @@ struct SmppParams {
     service_type(""),
     esm_class(ESM::SUBMIT_MODE_SMSC_DEFAULT),
     protocol_id(0),
-    priority_flag(0),
+    priority_flag(Priority::GSM_NON_PRIORITY),
     schedule_delivery_time(""),
     validity_period(""),
     registered_delivery(RegisteredDelivery::DELIVERY_NO),
@@ -29,7 +29,7 @@ struct SmppParams {
   std::string service_type;
   smpp::ESM esm_class;
   uint8_t protocol_id;
-  uint8_t priority_flag;
+  smpp::Priority priority_flag;
   std::string schedule_delivery_time;
   std::string validity_period;
   smpp::RegisteredDelivery registered_delivery;

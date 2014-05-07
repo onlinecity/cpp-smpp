@@ -153,7 +153,7 @@ TEST_F(SmppClientTest, submitExtended) {
   string message = "message to send";
 
   struct smpp::SmppParams params;
-  params.priority_flag = 0x01;
+  params.priority_flag = smpp::Priority::GSM_PRIORITY;
   params.registered_delivery = smpp::RegisteredDelivery::DELIVERY_SMSC_BOTH;
 
   time_t now = time(0);

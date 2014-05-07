@@ -154,29 +154,20 @@ inline std::underlying_type<ESM>::type operator|(const ESM &a, const ESM &b) {
 }
 
 // SMPP v3.4 - 5.2.14 page 123 - priority_flag
-namespace priority {
-enum class gsm : uint8_t {
-  GSM_NON_PRIORITY = 0x0,
-  GSM_PRIORITY = 0x1
+enum class Priority : uint8_t {
+  GSM_NON_PRIORITY      = 0x0,
+  GSM_PRIORITY          = 0x1,
+  ANSI_136_BULK         = 0x0,
+  ANSI_136_NORMAL       = 0x1,
+  ANSI_136_URGENT       = 0x2,
+  ANSI_136_VERY_URGENT  = 0x3,
+  IS_95_NORMAL          = 0x0,
+  IS_95_INTERACTIVE     = 0x1,
+  IS_95_URGENT          = 0x2,
+  IS_95_EMERGENCY       = 0x3
 };
-
-enum class ansi : uint8_t {
-  ANSI_136_BULK = 0x0,
-  ANSI_136_NORMAL = 0x1,
-  ANSI_136_URGENT = 0x2,
-  ANSI_136_VERY_URGENT = 0x3
-};
-
-enum class IS95 : uint8_t {
-  IS_95_NORMAL = 0x0,
-  IS_95_INTERACTIVE = 0x1,
-  IS_95_URGENT = 0x2,
-  IS_95_EMERGENCY = 0x3
-};
-}  // namespace priority
 
 // SMPP v3.4 - 5.2.17 page 124
-
 enum class RegisteredDelivery : uint8_t {
   DELIVERY_NO           = 0x00,
   DELIVERY_SMSC_BOTH    = 0x01,  // both success and failure

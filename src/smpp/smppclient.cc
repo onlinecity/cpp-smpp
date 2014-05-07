@@ -127,14 +127,17 @@ pair<string, int> SmppClient::SendSms(
   int csms_split = -1;  // where to split
 
   switch (params.data_coding) {
-    case smpp::DataCoding::UCS2:
+    case DataCoding::UCS2:
       single_sms_octet_limit = 140;
       csms_split = 132;
       break;
-    case smpp::DataCoding::DEFAULT:
+    case DataCoding::DEFAULT:
       single_sms_octet_limit = 160;
       csms_split = 152;
       break;
+    default:
+      single_sms_octet_limit = 160;
+      csms_split = 152;
   }
 
   // submit_sm if the short message could fit into one pdu.
@@ -400,6 +403,8 @@ PDU SmppClient::SendCommand(PDU *pdu) {
   PDU resp = ReadPduResponse(pdu->sequence_no(), pdu->command_id());
 
   switch (resp.command_status()) {
+    case ESME::ROK:  // Status OK break
+      break;
     case smpp::ESME::RINVPASWD:
       throw smpp::InvalidPasswordException(smpp::GetEsmeStatus(resp.command_status()));
       break;
@@ -412,12 +417,9 @@ PDU SmppClient::SendCommand(PDU *pdu) {
     case smpp::ESME::RINVDSTADR:
       throw smpp::InvalidDestinationAddressException(smpp::GetEsmeStatus(resp.command_status()));
       break;
+    default:
+      throw smpp::SmppException(smpp::GetEsmeStatus(resp.command_status()));
   }
-
-  if (resp.command_status() != smpp::ESME::ROK) {
-    throw smpp::SmppException(smpp::GetEsmeStatus(resp.command_status()));
-  }
-
   return resp;
 }
 
@@ -553,7 +555,6 @@ void SmppClient::ReadPduBodyHandler(const error_code &error, size_t len, const P
 
 // blocks until response is read
 PDU SmppClient::ReadPduResponse(const uint32_t &sequence, const CommandId &commandId) {
-  // TODO(td): Does this work?
   CommandId response = CommandId(CommandId::GENERIC_NACK | commandId);
   list<PDU>::iterator it = pdu_queue_.begin();
 
