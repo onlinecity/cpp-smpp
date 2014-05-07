@@ -29,9 +29,12 @@
 #include "smpp/timeformat.h"
 #include "smpp/tlv.h"
 
+DECLARE_string(system_type);
+DECLARE_string(addr_range);
 DECLARE_int32(socket_write_timeout);
 DECLARE_int32(socket_read_timeout);
 DECLARE_bool(null_terminate_octet_strings);
+
 
 namespace smpp {
 typedef asio::basic_deadline_timer<std::chrono::system_clock, smpp::CXX11Traits<std::chrono::system_clock>>
@@ -106,14 +109,6 @@ class SmppClient {
     return state_ != OPEN;
   }
 
-  inline void set_system_type(const std::string &system_type) {
-    system_type_ = system_type;
-  }
-
-  inline std::string system_type() const {
-    return system_type_;
-  }
-
   inline void set_interface_version(const uint8_t interface_version) {
     interface_version_ = interface_version;
   }
@@ -136,14 +131,6 @@ class SmppClient {
 
   inline uint8_t addr_npi() const {
     return addr_npi_;
-  }
-
-  inline void set_addr_range(const std::string &addr_range) {
-    addr_range_ = addr_range;
-  }
-
-  inline std::string addr_range() const {
-    return addr_range_;
   }
 
   inline void set_csms_method(const int csms_method) {
@@ -277,11 +264,9 @@ class SmppClient {
   };
 
   // SMPP bind parameters
-  std::string system_type_;
   uint8_t interface_version_;  // interfaceVersion = 0x34;
   uint8_t addr_ton_;  // addrTon = 0;
   uint8_t addr_npi_;  // addrNpi = 0;
-  std::string addr_range_;
 
   // Method to use when dealing with concatenated messages.
   int csms_method_;

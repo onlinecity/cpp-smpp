@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+DEFINE_string(system_type, "WWW", "SMPP System type parameter (SMPP specification chapter 5.2.3)");
+DEFINE_string(addr_range, "", "SMPP address range. (SMPP specification chapter 5.2.7)");
 DEFINE_int32(socket_write_timeout, 5000, "Socket write timeout in milliseconds.");
 DEFINE_int32(socket_read_timeout, 300000, "Socket read timeout in milliseconds.");
 DEFINE_bool(null_terminate_octet_strings, true, "Null termintate octet strings sent to the SMSC");
@@ -30,11 +32,9 @@ using asio::async_write;
 using asio::buffer;
 
 SmppClient::SmppClient(shared_ptr<tcp::socket> socket) :
-  system_type_("WWW"),
   interface_version_(0x34),
   addr_ton_(0),
   addr_npi_(0),
-  addr_range_(""),
   csms_method_(SmppClient::CSMS_16BIT_TAGS),
   msg_ref_callback_(&SmppClient::DefaultMessageRef),
   state_(OPEN),
@@ -78,11 +78,11 @@ PDU SmppClient::MakeBindPdu(const CommandId &cmd_id, const string &login, const 
   PDU pdu(cmd_id, ESME::ROK, NextSequenceNumber());
   pdu << login;
   pdu << password;
-  pdu << system_type_;
+  pdu << FLAGS_system_type;
   pdu << interface_version_;
   pdu << addr_ton_;
   pdu << addr_npi_;
-  pdu << addr_range_;
+  pdu << FLAGS_addr_range;
   return pdu;
 }
 
@@ -92,10 +92,9 @@ void SmppClient::Unbind() {
   PDU resp = SendCommand(&pdu);
   auto pduStatus = resp.command_status();
 
-  if (pduStatus != smpp::ESME::ROK) {
-    throw smpp::SmppException(smpp::GetEsmeStatus(pduStatus));
+  if (pduStatus != ESME::ROK) {
+    throw SmppException(GetEsmeStatus(pduStatus));
   }
-
   state_ = OPEN;
 }
 
@@ -175,13 +174,13 @@ pair<string, int> SmppClient::SendSms(
     }
     return std::make_pair(sms_id, segments);
   } else {  // csmsMethod == CSMS_16BIT_TAGS)
-    tags.push_back(TLV(smpp::tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msg_ref_callback_())));
-    tags.push_back(TLV(smpp::tags::SAR_TOTAL_SEGMENTS, static_cast<uint8_t>(parts.size())));
+    tags.push_back(TLV(tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msg_ref_callback_())));
+    tags.push_back(TLV(tags::SAR_TOTAL_SEGMENTS, static_cast<uint8_t>(parts.size())));
     int segment = 0;
     string sms_id;
 
     for (; itr < parts.end(); ++itr) {
-      tags.push_back(TLV(smpp::tags::SAR_SEGMENT_SEQNUM, ++segment));
+      tags.push_back(TLV(tags::SAR_SEGMENT_SEQNUM, ++segment));
       sms_id = SubmitSm(sender, receiver, (*itr), params, tags);
       // pop SAR_SEGMENT_SEQNUM tag
       tags.pop_back();
@@ -227,7 +226,7 @@ SMS SmppClient::ReadSms() {
       b = pdu.command_id() == CommandId::DELIVER_SM;
     }
   } catch (std::exception &e) {
-    throw smpp::TransportException(e.what());
+    throw TransportException(e.what());
   }
 
   return ParseSms();
@@ -251,7 +250,7 @@ QuerySmResult SmppClient::QuerySm(std::string messageid, const SmppAddress &sour
   std::chrono::time_point<std::chrono::system_clock> tp;
 
   if (final_date.length() > 1) {
-    smpp::timeformat::ChronoDatePair p = smpp::timeformat::ParseSmppTimestamp(final_date);
+    timeformat::ChronoDatePair p = timeformat::ParseSmppTimestamp(final_date);
     tp = p.first;
   }
 
@@ -343,7 +342,7 @@ string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiv
 
   if (csms_method_ == CSMS_PAYLOAD) {
     pdu << 0;  // sm_length = 0
-    pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, short_message);
+    pdu << TLV(tags::MESSAGE_PAYLOAD, short_message);
   } else {
     pdu.set_null_terminate_octet_strings(FLAGS_null_terminate_octet_strings);
     pdu << static_cast<uint8_t>(short_message.length()) + (FLAGS_null_terminate_octet_strings ? 1 : 0);
@@ -376,7 +375,7 @@ void SmppClient::SendPdu(PDU *pdu) {
 
   VLOG(1) << pdu;
 
-  smpp::ChronoDeadlineTimer timer(socket_->get_io_service());
+  ChronoDeadlineTimer timer(socket_->get_io_service());
   timer.expires_from_now(std::chrono::milliseconds(FLAGS_socket_write_timeout));
   timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
 
@@ -403,20 +402,20 @@ PDU SmppClient::SendCommand(PDU *pdu) {
   switch (resp.command_status()) {
     case ESME::ROK:  // Status OK break
       break;
-    case smpp::ESME::RINVPASWD:
-      throw smpp::InvalidPasswordException(smpp::GetEsmeStatus(resp.command_status()));
+    case ESME::RINVPASWD:
+      throw InvalidPasswordException(GetEsmeStatus(resp.command_status()));
       break;
-    case smpp::ESME::RINVSYSID:
-      throw smpp::InvalidSystemIdException(smpp::GetEsmeStatus(resp.command_status()));
+    case ESME::RINVSYSID:
+      throw InvalidSystemIdException(smpp::GetEsmeStatus(resp.command_status()));
       break;
-    case smpp::ESME::RINVSRCADR:
-      throw smpp::InvalidSourceAddressException(smpp::GetEsmeStatus(resp.command_status()));
+    case ESME::RINVSRCADR:
+      throw InvalidSourceAddressException(smpp::GetEsmeStatus(resp.command_status()));
       break;
-    case smpp::ESME::RINVDSTADR:
-      throw smpp::InvalidDestinationAddressException(smpp::GetEsmeStatus(resp.command_status()));
+    case ESME::RINVDSTADR:
+      throw InvalidDestinationAddressException(smpp::GetEsmeStatus(resp.command_status()));
       break;
     default:
-      throw smpp::SmppException(smpp::GetEsmeStatus(resp.command_status()));
+      throw SmppException(smpp::GetEsmeStatus(resp.command_status()));
   }
   return resp;
 }
@@ -445,7 +444,7 @@ bool SmppClient::SocketPeek() {
   // prepare our read
   PduLengthHeader pdu_header;
   async_read(*socket_, asio::buffer(pdu_header),
-      std::bind(&smpp::SmppClient::ReadPduHeaderHandler, this, _1, _2, &pdu_header));
+      std::bind(&SmppClient::ReadPduHeaderHandler, this, _1, _2, &pdu_header));
   size_t handlers_called = socket_->get_io_service().poll_one();
   socket_->get_io_service().reset();
   socket_->cancel();
@@ -466,7 +465,7 @@ void SmppClient::ReadPduBlocking() {
         _2,
         &pdu_header));
 
-  smpp::ChronoDeadlineTimer timer(socket_->get_io_service());
+  ChronoDeadlineTimer timer(socket_->get_io_service());
   timer.expires_from_now(std::chrono::milliseconds(FLAGS_socket_read_timeout));
   timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
   SocketExecute();
@@ -514,7 +513,7 @@ void SmppClient::ReadPduHeaderHandler(const error_code &error, size_t len, const
   // start reading after the size mark of the pdu
   async_read(*socket_,
       buffer(&*pdu_buffer.begin(), i - 4),
-      std::bind(&smpp::SmppClient::ReadPduBodyHandler, this, _1, _2, pduLength, &pdu_buffer));
+      std::bind(&SmppClient::ReadPduBodyHandler, this, _1, _2, pduLength, &pdu_buffer));
   SocketExecute();
 }
 
@@ -535,7 +534,7 @@ void SmppClient::ReadPduHeaderHandlerBlocking(bool *had_error, const error_code 
   pdu_buffer.resize(i - 4);
   // start reading after the size mark of the pdu
   async_read(*socket_, buffer(static_cast<char*>(&*pdu_buffer.begin()), i - 4),
-      std::bind(&smpp::SmppClient::ReadPduBodyHandler, this, _1, _2, pduLength, &pdu_buffer));
+      std::bind(&SmppClient::ReadPduBodyHandler, this, _1, _2, pduLength, &pdu_buffer));
   SocketExecute();
 }
 
@@ -577,7 +576,7 @@ PDU SmppClient::ReadPduResponse(const uint32_t &sequence, const CommandId &comma
   return pdu;
 }
 
-void smpp::SmppClient::EnquireLinkRespond() {
+void SmppClient::EnquireLinkRespond() {
   list<PDU>::iterator it = pdu_queue_.begin();
 
   while (it != pdu_queue_.end()) {
@@ -599,13 +598,13 @@ void smpp::SmppClient::EnquireLinkRespond() {
 
 void SmppClient::CheckConnection() {
   if (!socket_->is_open()) {
-    throw smpp::TransportException("Socket is closed");
+    throw TransportException("Socket is closed");
   }
 }
 
 void SmppClient::CheckState(int state) {
   if (this->state_ != state) {
-    throw smpp::SmppException("Client in wrong state");
+    throw SmppException("Client in wrong state");
   }
 }
 
