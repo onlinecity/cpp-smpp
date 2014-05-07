@@ -235,12 +235,12 @@ class SmppClient {
   uint32_t NextSequenceNumber();
 
   // Sends one PDU to the SMSC.
-  void SendPdu(PDU &pdu);
+  void SendPdu(PDU *pdu);
 
   // Sends one PDU to the SMSC and blocks until we a response to it.
   // @param pdu PDU to send.
   // @return PDU PDU response to the one we sent.
-  smpp::PDU SendCommand(PDU &pdu);
+  smpp::PDU SendCommand(PDU *pdu);
 
   // Returns one PDU from SMSC.
   PDU ReadPdu(const bool &);
