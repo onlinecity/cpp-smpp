@@ -154,7 +154,7 @@ TEST_F(SmppClientTest, submitExtended) {
 
   struct smpp::SmppParams params;
   params.priority_flag = 0x01;
-  params.registered_delivery = smpp::REG_DELIVERY_SMSC_BOTH;
+  params.registered_delivery = smpp::RegisteredDelivery::DELIVERY_SMSC_BOTH;
 
   time_t now = time(0);
   struct tm *tm = localtime(&now);

@@ -19,7 +19,7 @@ struct SmppParams {
     priority_flag(0),
     schedule_delivery_time(""),
     validity_period(""),
-    registered_delivery(0),
+    registered_delivery(RegisteredDelivery::DELIVERY_NO),
     replace_if_present_flag(0),
     data_coding(smpp::DATA_CODING_DEFAULT),
     sm_default_msg_id(0)
@@ -33,7 +33,7 @@ struct SmppParams {
   uint8_t priority_flag;
   std::string schedule_delivery_time;
   std::string validity_period;
-  uint8_t registered_delivery;
+  smpp::RegisteredDelivery registered_delivery;
   uint8_t replace_if_present_flag;
   uint8_t data_coding;
   uint8_t sm_default_msg_id;

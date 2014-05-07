@@ -166,13 +166,16 @@ enum class IS95 : uint8_t {
 }  // namespace priority
 
 // SMPP v3.4 - 5.2.17 page 124
-const uint8_t REG_DELIVERY_NO = 0x00;
-const uint8_t REG_DELIVERY_SMSC_BOTH = 0x01;  // both success and failure
-const uint8_t REG_DELIVERY_SMSC_FAILED = 0x02;
-const uint8_t REG_DELIVERY_SME_D_ACK = 0x04;
-const uint8_t REG_DELIVERY_SME_U_ACK = 0x08;
-const uint8_t REG_DELIVERY_SME_BOTH = 0x10;
-const uint8_t REG_DELIVERY_IDN = 0x16;  // Intermediate notification
+
+enum class RegisteredDelivery : uint8_t {
+  DELIVERY_NO = 0x00,
+  DELIVERY_SMSC_BOTH = 0x01,  // both success and failure
+  DELIVERY_SMSC_FAILED = 0x02,
+  DELIVERY_SME_D_ACK = 0x04,
+  DELIVERY_SME_U_ACK = 0x08,
+  DELIVERY_SME_BOTH = 0x10,
+  DELIVERY_IDN = 0x16  // Intermediate notification
+};
 
 // SMPP v3.4 - 5.2.18 page 125
 const uint8_t REPLACE_NO = 0x00;
