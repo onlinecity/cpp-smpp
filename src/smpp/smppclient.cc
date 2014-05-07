@@ -16,6 +16,9 @@ DEFINE_string(addr_range, "", "SMPP address range. (SMPP specification chapter 5
 DEFINE_int32(socket_write_timeout, 5000, "Socket write timeout in milliseconds.");
 DEFINE_int32(socket_read_timeout, 300000, "Socket read timeout in milliseconds.");
 DEFINE_bool(null_terminate_octet_strings, true, "Null termintate octet strings sent to the SMSC");
+DEFINE_int32(addr_npi, 0, "Default address npi.");
+DEFINE_int32(addr_ton, 0, "Default address ton.");
+DEFINE_int32(interface_version, 0x34, "SMPP protocol version.");
 
 namespace smpp {
 using std::string;
@@ -32,9 +35,6 @@ using asio::async_write;
 using asio::buffer;
 
 SmppClient::SmppClient(shared_ptr<tcp::socket> socket) :
-  interface_version_(0x34),
-  addr_ton_(0),
-  addr_npi_(0),
   csms_method_(SmppClient::CSMS_16BIT_TAGS),
   msg_ref_callback_(&SmppClient::DefaultMessageRef),
   state_(OPEN),
@@ -79,9 +79,9 @@ PDU SmppClient::MakeBindPdu(const CommandId &cmd_id, const string &login, const 
   pdu << login;
   pdu << password;
   pdu << FLAGS_system_type;
-  pdu << interface_version_;
-  pdu << addr_ton_;
-  pdu << addr_npi_;
+  pdu << InterfaceVersion(FLAGS_interface_version);
+  pdu << TON(FLAGS_addr_ton);
+  pdu << NPI(FLAGS_addr_npi);
   pdu << FLAGS_addr_range;
   return pdu;
 }

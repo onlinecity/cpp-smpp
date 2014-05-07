@@ -101,6 +101,10 @@ enum class ESME : uint32_t {
   RUNKNOWNERR       = 0x000000FF  // Unknown Error
 };
 
+enum class InterfaceVersion : uint8_t {
+  SMPP_3_4  = 0x34
+};
+
 // SMPP v3.4 - 5.2.5 page 117
 enum class TON : uint8_t {
   UNKNOWN           = 0x00,

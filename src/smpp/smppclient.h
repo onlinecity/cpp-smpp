@@ -34,7 +34,8 @@ DECLARE_string(addr_range);
 DECLARE_int32(socket_write_timeout);
 DECLARE_int32(socket_read_timeout);
 DECLARE_bool(null_terminate_octet_strings);
-
+DECLARE_int32(addr_npi);
+DECLARE_int32(interface_version);
 
 namespace smpp {
 typedef asio::basic_deadline_timer<std::chrono::system_clock, smpp::CXX11Traits<std::chrono::system_clock>>
@@ -105,32 +106,8 @@ class SmppClient {
   void EnquireLinkRespond();
 
   // Returns true if the client is bound.
-  bool IsBound() {
+  inline bool IsBound() {
     return state_ != OPEN;
-  }
-
-  inline void set_interface_version(const uint8_t interface_version) {
-    interface_version_ = interface_version;
-  }
-
-  inline uint8_t interface_version() const {
-    return interface_version();
-  }
-
-  inline void set_addr_ton(const uint8_t addr_ton) {
-    addr_ton_ = addr_ton;
-  }
-
-  inline uint8_t addr_ton() const {
-    return addr_ton_;
-  }
-
-  inline void set_addr_npi(const uint8_t addr_npi) {
-    addr_npi_ = addr_npi;
-  }
-
-  inline uint8_t addr_npi() const {
-    return addr_npi_;
   }
 
   inline void set_csms_method(const int csms_method) {
@@ -262,11 +239,6 @@ class SmppClient {
   enum {
     OPEN, BOUND_TX, BOUND_RX, BOUND_TRX
   };
-
-  // SMPP bind parameters
-  uint8_t interface_version_;  // interfaceVersion = 0x34;
-  uint8_t addr_ton_;  // addrTon = 0;
-  uint8_t addr_npi_;  // addrNpi = 0;
 
   // Method to use when dealing with concatenated messages.
   int csms_method_;

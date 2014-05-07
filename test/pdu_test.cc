@@ -67,4 +67,11 @@ TEST(PduTest, enumTest) {
   smpp::TON t;
   p >> t;
   ASSERT_EQ(t, smpp::TON::INTERNATIONAL);
+
+  smpp::PDU pdu;
+  pdu << smpp::NPI(0xff01);
+  smpp::NPI npi;
+  pdu >> npi;
+  ASSERT_EQ(npi, smpp::NPI::E164);
 }
+
