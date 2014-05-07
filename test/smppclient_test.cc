@@ -180,7 +180,7 @@ TEST_F(SmppClientTest, receive) {
 }
 
 TEST_F(SmppClientTest, logging) {
-  client->set_verbose(true);
+  FLAGS_v = 1;
   socket->connect(endpoint);
   client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
   client->Unbind();

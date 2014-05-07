@@ -11,6 +11,10 @@
 #include <utility>
 #include <vector>
 
+DEFINE_int32(socket_write_timeout, 5000, "Socket write timeout in milliseconds.");
+DEFINE_int32(socket_read_timeout, 300000, "Socket read timeout in milliseconds.");
+DEFINE_bool(null_terminate_octet_strings, true, "Null termintate octet strings sent to the SMSC");
+
 namespace smpp {
 using std::string;
 using std::vector;
@@ -31,16 +35,12 @@ SmppClient::SmppClient(shared_ptr<tcp::socket> socket) :
   addr_ton_(0),
   addr_npi_(0),
   addr_range_(""),
-  null_terminate_octet_strings_(true),
   csms_method_(SmppClient::CSMS_16BIT_TAGS),
   msg_ref_callback_(&SmppClient::DefaultMessageRef),
   state_(OPEN),
   socket_(socket),
   seq_no_(0),
-  pdu_queue_(),
-  socket_write_timeout_(5000),
-  socket_read_timeout_(30000),
-  verbose_(false) {
+  pdu_queue_() {
   }
 
 SmppClient::~SmppClient() {
@@ -345,8 +345,8 @@ string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiv
     pdu << 0;  // sm_length = 0
     pdu << TLV(smpp::tags::MESSAGE_PAYLOAD, short_message);
   } else {
-    pdu.set_null_terminate_octet_strings(null_terminate_octet_strings_);
-    pdu << static_cast<uint8_t>(short_message.length()) + (null_terminate_octet_strings_ ? 1 : 0);
+    pdu.set_null_terminate_octet_strings(FLAGS_null_terminate_octet_strings);
+    pdu << static_cast<uint8_t>(short_message.length()) + (FLAGS_null_terminate_octet_strings ? 1 : 0);
     pdu << short_message;
     pdu.set_null_terminate_octet_strings(true);
   }
@@ -374,12 +374,10 @@ void SmppClient::SendPdu(PDU *pdu) {
   bool io_result = false;
   bool timer_result = false;
 
-  if (verbose_) {
-    LOG(INFO) << pdu;
-  }
+  VLOG(1) << pdu;
 
   smpp::ChronoDeadlineTimer timer(socket_->get_io_service());
-  timer.expires_from_now(std::chrono::milliseconds(socket_write_timeout_));
+  timer.expires_from_now(std::chrono::milliseconds(FLAGS_socket_write_timeout));
   timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
 
   async_write(*socket_,
@@ -439,11 +437,7 @@ PDU SmppClient::ReadPdu(const bool &isBlocking) {
   // Return last the pdu inserted into the queue.
   PDU pdu = pdu_queue_.back();
   pdu_queue_.pop_back();
-
-  if (verbose_) {
-    LOG(INFO) << pdu;
-  }
-
+  VLOG(1) << pdu;
   return pdu;
 }
 
@@ -473,7 +467,7 @@ void SmppClient::ReadPduBlocking() {
         &pdu_header));
 
   smpp::ChronoDeadlineTimer timer(socket_->get_io_service());
-  timer.expires_from_now(std::chrono::milliseconds(socket_read_timeout_));
+  timer.expires_from_now(std::chrono::milliseconds(FLAGS_socket_read_timeout));
   timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
   SocketExecute();
 

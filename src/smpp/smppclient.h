@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 
 #include <chrono>
@@ -27,6 +28,10 @@
 #include "smpp/time_traits.h"
 #include "smpp/timeformat.h"
 #include "smpp/tlv.h"
+
+DECLARE_int32(socket_write_timeout);
+DECLARE_int32(socket_read_timeout);
+DECLARE_bool(null_terminate_octet_strings);
 
 namespace smpp {
 typedef asio::basic_deadline_timer<std::chrono::system_clock, smpp::CXX11Traits<std::chrono::system_clock>>
@@ -141,48 +146,12 @@ class SmppClient {
     return addr_range_;
   }
 
-  inline void set_null_terminate_octet_strings(const bool null_terminate_octet_strings) {
-    null_terminate_octet_strings_ = null_terminate_octet_strings;
-  }
-
-  inline bool null_terminate_octet_strings() const {
-    return null_terminate_octet_strings_;
-  }
-
   inline void set_csms_method(const int csms_method) {
     csms_method_ = csms_method;
   }
 
   inline int csms_method() const {
     return csms_method_;
-  }
-
-  // Sets the socket read timeout in milliseconds. Default is 5000 milliseconds.
-  inline void set_socket_read_timeout(const int socket_read_timeout) {
-    socket_read_timeout_ = socket_read_timeout;
-  }
-
-  // Returns the socket read timeout.
-  inline int socket_read_timeout() const {
-    return socket_read_timeout_;
-  }
-
-  // Sets the socket write timeout in milliseconds. Default is 30000 milliseconds.
-  inline void set_socket_write_timeout(const int &socket_write_timeout) {
-    socket_write_timeout_ = socket_write_timeout;
-  }
-
-  // Returns the socket write timeout in milliseconds.
-  inline int socket_write_timeout() const {
-    return socket_write_timeout_;
-  }
-
-  inline void set_verbose(const bool verbose) {
-    verbose_ = verbose;
-  }
-
-  inline bool verbose() const {
-    return verbose_;
   }
 
   // Set callback method for generating message references.
@@ -314,23 +283,14 @@ class SmppClient {
   uint8_t addr_npi_;  // addrNpi = 0;
   std::string addr_range_;
 
-  // Extra options;
-  bool null_terminate_octet_strings_;
   // Method to use when dealing with concatenated messages.
   int csms_method_;
 
-  //
   std::function<uint16_t()> msg_ref_callback_;
   // Bind state
   int state_;
   std::shared_ptr<asio::ip::tcp::socket> socket_;
   uint32_t seq_no_;
   std::list<PDU> pdu_queue_;
-  // Socket write timeout in milliseconds. Default is 5000 milliseconds.
-  int socket_write_timeout_;
-  // Socket read timeout in milliseconds. Default is 30000 milliseconds.
-  int socket_read_timeout_;
-  // Verbose output
-  bool verbose_;
 };
 }  // namespace smpp
