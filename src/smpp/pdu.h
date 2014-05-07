@@ -26,7 +26,7 @@ class PDU {
   PDU();
 
   // Construct a PDU from a command set, useful for sending PDUs
-  PDU(const uint32_t &_cmdId, const ESME &_cmdStatus, const uint32_t &_seqNo);
+  PDU(const CommandId  &cmd_id, const ESME &cmd_status, const uint32_t &seq_no);
 
   // Construct a PDU from binary data, useful for receiving PDUs
   PDU(const PduLengthHeader &pduLength, const PduData &pduBuffer);
@@ -39,7 +39,7 @@ class PDU {
   // @return PDU size in octets.
   int Size();
 
-  uint32_t command_id() const {
+  CommandId command_id() const {
     return command_id_;
   }
 
@@ -109,7 +109,7 @@ class PDU {
 
   std::stringbuf sb_;
   std::iostream buf_;
-  uint32_t command_id_;
+  CommandId command_id_;
   ESME command_status_;
   uint32_t seq_no_;
   bool null_terminate_octet_strings_;

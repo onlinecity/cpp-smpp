@@ -196,14 +196,14 @@ class SmppClient {
   // @param mode Mode to bind client in.
   // @param login SMSC login.
   // @param password SMSC password.
-  void Bind(uint32_t mode, const std::string &login, const std::string &password);
+  void Bind(const CommandId &bind_cmd, const std::string &login, const std::string &password);
 
   // Constructs a PDU for binding the client.
   // @param mode Mode to bind client in.
   // @param login SMSC login.
   // @param password SMSC password.
   // @return PDU for binding the client.
-  smpp::PDU SetupBindPdu(uint32_t mode, const std::string &login, const std::string &password);
+  smpp::PDU MakeBindPdu(const CommandId &cmd_id, const std::string &login, const std::string &password);
 
   // Runs through the PDU queue and returns the first sms it finds, and sends a reponse to the SMSC.
   // While running through the PDU queuy, Alert notification and DataSm PDU are handled as well.
@@ -285,7 +285,7 @@ class SmppClient {
   // @param sequence Sequence number to look for.
   // @param commandId Command id to look for.
   // @return PDU response to PDU with the given sequence number and command id.
-  PDU ReadPduResponse(const uint32_t &sequence, const uint32_t &commandId);
+  PDU ReadPduResponse(const uint32_t &sequence, const CommandId &commandId);
 
   // Checks the connection.
   // @throw TransportException if there was an problem with the connection.

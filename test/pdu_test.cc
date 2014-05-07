@@ -11,9 +11,8 @@
 #include "smpp/pdu.h"
 
 TEST(PduTest, readWrite) {
-  uint32_t commandId = 1;
   uint32_t sequence = 3;
-  smpp::PDU pdu(commandId, smpp::ESME::RINVCMDLEN, sequence);
+  smpp::PDU pdu(smpp::CommandId::NOT_DEFINED, smpp::ESME::RINVCMDLEN, sequence);
   std::string str("test");
   uint32_t i32 = 0xdeadbeef;
   uint16_t i16 = 0x1337;

@@ -53,33 +53,29 @@ SmppClient::~SmppClient() {
 }
 
 void SmppClient::BindTransmitter(const string &login, const string &pass) {
-  Bind(smpp::BIND_TRANSMITTER, login, pass);
+  Bind(CommandId::BIND_TRANSMITTER, login, pass);
 }
 
 void SmppClient::BindReceiver(const string &login, const string &pass) {
-  Bind(smpp::BIND_RECEIVER, login, pass);
+  Bind(CommandId::BIND_RECEIVER, login, pass);
 }
 
-void SmppClient::Bind(uint32_t mode, const string &login, const string &password) {
+void SmppClient::Bind(const CommandId &cmd, const string &login, const string &password) {
   CheckConnection();
   CheckState(OPEN);
 
-  PDU pdu = SetupBindPdu(mode, login, password);
+  PDU pdu = MakeBindPdu(cmd, login, password);
   SendCommand(&pdu);
 
-  switch (mode) {
-    case smpp::BIND_RECEIVER:
-      state_ = BOUND_RX;
-      break;
-
-    case smpp::BIND_TRANSMITTER:
-      state_ = BOUND_TX;
-      break;
+  if (cmd == CommandId::BIND_RECEIVER) {
+    state_ = BOUND_RX;
+  } else if (cmd == CommandId::BIND_TRANSMITTER) {
+    state_ = BOUND_TX;
   }
 }
 
-PDU SmppClient::SetupBindPdu(uint32_t mode, const string &login, const string &password) {
-  PDU pdu(mode, ESME::ROK, NextSequenceNumber());
+PDU SmppClient::MakeBindPdu(const CommandId &cmd_id, const string &login, const string &password) {
+  PDU pdu(cmd_id, ESME::ROK, NextSequenceNumber());
   pdu << login;
   pdu << password;
   pdu << system_type_;
@@ -92,7 +88,7 @@ PDU SmppClient::SetupBindPdu(uint32_t mode, const string &login, const string &p
 
 void SmppClient::Unbind() {
   CheckConnection();
-  PDU pdu(smpp::UNBIND, ESME::ROK, NextSequenceNumber());
+  PDU pdu(CommandId::UNBIND, ESME::ROK, NextSequenceNumber());
   PDU resp = SendCommand(&pdu);
   auto pduStatus = resp.command_status();
 
@@ -212,8 +208,8 @@ SMS SmppClient::ReadSms() {
     while (!b) {
       PDU pdu = ReadPdu(true);
 
-      if (pdu.command_id() == ENQUIRE_LINK) {
-        PDU resp = PDU(ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
+      if (pdu.command_id() == CommandId::ENQUIRE_LINK) {
+        PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
         SendPdu(&resp);
         continue;
       }
@@ -225,8 +221,7 @@ SMS SmppClient::ReadSms() {
       if (!pdu.null()) {
         pdu_queue_.push_back(pdu);    // save pdu for reading later
       }
-
-      b = pdu.command_id() == DELIVER_SM;
+      b = pdu.command_id() == CommandId::DELIVER_SM;
     }
   } catch (std::exception &e) {
     throw smpp::TransportException(e.what());
@@ -236,7 +231,7 @@ SMS SmppClient::ReadSms() {
 }
 
 QuerySmResult SmppClient::QuerySm(std::string messageid, const SmppAddress &source) {
-  PDU pdu = PDU(QUERY_SM, ESME::ROK, NextSequenceNumber());
+  PDU pdu = PDU(CommandId::QUERY_SM, ESME::ROK, NextSequenceNumber());
   pdu << messageid;
   pdu << source.ton;
   pdu << source.npi;
@@ -261,7 +256,7 @@ QuerySmResult SmppClient::QuerySm(std::string messageid, const SmppAddress &sour
 }
 
 void SmppClient::EnquireLink() {
-  PDU pdu = PDU(ENQUIRE_LINK, ESME::ROK, NextSequenceNumber());
+  PDU pdu = PDU(CommandId::ENQUIRE_LINK, ESME::ROK, NextSequenceNumber());
   SendCommand(&pdu);
 }
 
@@ -273,10 +268,10 @@ SMS SmppClient::ParseSms() {
   list<PDU>::iterator it = pdu_queue_.begin();
 
   while (it != pdu_queue_.end()) {
-    if ((*it).command_id() == DELIVER_SM) {
+    if ((*it).command_id() == CommandId::DELIVER_SM) {
       SMS sms(&*it);
       // send response to smsc
-      PDU resp = PDU(DELIVER_SM_RESP, ESME::ROK, (*it).sequence_no());
+      PDU resp = PDU(CommandId::DELIVER_SM_RESP, ESME::ROK, (*it).sequence_no());
       resp << 0x0;
       SendPdu(&resp);
       // remove sms from queue
@@ -284,13 +279,13 @@ SMS SmppClient::ParseSms() {
       return sms;
     }
 
-    if ((*it).command_id() == ALERT_NOTIFICATION) {
+    if ((*it).command_id() == CommandId::ALERT_NOTIFICATION) {
       it = pdu_queue_.erase(it);
       continue;
     }
 
-    if ((*it).command_id() == DATA_SM) {
-      PDU resp = PDU(DATA_SM_RESP, ESME::ROK, (*it).sequence_no());
+    if ((*it).command_id() == CommandId::DATA_SM) {
+      PDU resp = PDU(CommandId::DATA_SM_RESP, ESME::ROK, (*it).sequence_no());
       resp << 0x0;
       SendPdu(&resp);
       it = pdu_queue_.erase(it);
@@ -325,7 +320,7 @@ vector<string> SmppClient::Split(const string &short_message, const int split) {
 
 string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiver, const string &short_message, const struct SmppParams &params, list<TLV> tags) {
   CheckState(BOUND_TX);
-  PDU pdu(smpp::SUBMIT_SM, ESME::ROK, NextSequenceNumber());
+  PDU pdu(CommandId::SUBMIT_SM, ESME::ROK, NextSequenceNumber());
   pdu << params.service_type;
   pdu << sender;
   pdu << receiver;
@@ -557,8 +552,9 @@ void SmppClient::ReadPduBodyHandler(const error_code &error, size_t len, const P
 }
 
 // blocks until response is read
-PDU SmppClient::ReadPduResponse(const uint32_t &sequence, const uint32_t &commandId) {
-  uint32_t response = GENERIC_NACK | commandId;
+PDU SmppClient::ReadPduResponse(const uint32_t &sequence, const CommandId &commandId) {
+  // TODO(td): Does this work?
+  CommandId response = CommandId(CommandId::GENERIC_NACK | commandId);
   list<PDU>::iterator it = pdu_queue_.begin();
 
   while (it != pdu_queue_.end()) {
@@ -575,8 +571,8 @@ PDU SmppClient::ReadPduResponse(const uint32_t &sequence, const uint32_t &comman
     PDU pdu = ReadPdu(true);
     if (!pdu.null()) {
       if ((pdu.sequence_no() == sequence && (pdu.command_id() == response
-              || pdu.command_id() == GENERIC_NACK))
-          || (pdu.sequence_no() == 0 && pdu.command_id() == GENERIC_NACK)) {
+              || pdu.command_id() == CommandId::GENERIC_NACK))
+          || (pdu.sequence_no() == 0 && pdu.command_id() == CommandId::GENERIC_NACK)) {
         return pdu;
       }
     }
@@ -591,8 +587,8 @@ void smpp::SmppClient::EnquireLinkRespond() {
 
   while (it != pdu_queue_.end()) {
     PDU pdu = (*it);
-    if (pdu.command_id() == ENQUIRE_LINK) {
-      PDU resp = PDU(ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
+    if (pdu.command_id() == CommandId::ENQUIRE_LINK) {
+      PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
       SendCommand(&resp);
     }
     it++;
@@ -600,8 +596,8 @@ void smpp::SmppClient::EnquireLinkRespond() {
 
   PDU pdu = ReadPdu(false);
 
-  if (!pdu.null() && pdu.command_id() == ENQUIRE_LINK) {
-    PDU resp = PDU(ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
+  if (!pdu.null() && pdu.command_id() == CommandId::ENQUIRE_LINK) {
+    PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
     SendPdu(&resp);
   }
 }
