@@ -201,5 +201,5 @@ string GsmEncoder::EncodeUtf8(const string &input) {
   }
   return out;
 }
-}  // namespace encdoing
+}  // namespace encoding
 }  // namespace smpp

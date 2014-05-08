@@ -4,8 +4,8 @@
 
 #include "smpp/timeformat.h"
 #include <complex>
+#include <cstdio>
 #include <string>
-
 
 namespace smpp {
 namespace timeformat {
@@ -39,8 +39,8 @@ std::chrono::seconds ParseRelativeTimestamp(const smatch &match) {
   int min = stoi(match[5]);
   int sec = stoi(match[6]);
   int total_hours = (yy * 365 * 24) + (mon * 30 * 24) + (dd * 24) + hh;
-  long total_minutes = (total_hours * 60) + min;
-  long total_seconds = (total_minutes * 60) + sec;
+  int64_t total_minutes = (total_hours * 60) + min;
+  int64_t total_seconds = (total_minutes * 60) + sec;
   return std::chrono::seconds(total_seconds);
 }
 
@@ -107,9 +107,9 @@ string ToSmppTimeString(const struct tm &tm) {
   string p = tm.tm_gmtoff < 0 ? "-" : "+";
   // nn is time difference in quarter hours and gmtoff is in seconds
   int nn = tm.tm_gmtoff == 0 ? 0 : (std::abs(tm.tm_gmtoff) / 60)  / 15;
-  char buf[16];
-  //            YY  MM  DD  hh   mm   ss  000R
-  sprintf(buf, "%02i%02i%02i%02i%02i%02i0%02i%s", yy, mm, dd, h, m, s, nn, p.c_str());
+  char buf[17];
+  //                               YY  MM  DD  hh   mm   ss  000R
+  std::snprintf(buf, sizeof(buf), "%02i%02i%02i%02i%02i%02i0%02i%s", yy, mm, dd, h, m, s, nn, p.c_str());
   return string(buf);
 }
 
@@ -131,9 +131,9 @@ string ToSmppTimeString(const std::chrono::seconds &d) {
     throw SmppException("Time duration overflows");
   }
 
-  char buf[16];
+  char buf[17];
   //            YY  MM  DD  hh   mm   ss  000R
-  sprintf(buf, "%02i%02i%02i%02li%02li%02lli000R", yy, mon, dd, h, m, s);
+  std::snprintf(buf, sizeof(buf), "%02i%02i%02i%02li%02li%02lli000R", yy, mon, dd, h, m, s);
   return string(buf);
 }
 

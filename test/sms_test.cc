@@ -9,10 +9,10 @@
 #include <list>
 #include <string>
 
-#include "smpp/timeformat.h"
 #include "gtest/gtest.h"
-#include "smpp/sms.h"
 #include "smpp/smpp.h"
+#include "smpp/sms.h"
+#include "smpp/timeformat.h"
 #include "smpp/tlv.h"
 
 using std::list;

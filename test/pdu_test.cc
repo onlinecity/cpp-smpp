@@ -3,10 +3,12 @@
 // Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
 //
 
-#include <glog/logging.h>
 #include <gflags/gflags.h>
+#include <glog/logging.h>
+
 #include <algorithm>
 #include <string>
+
 #include "gtest/gtest.h"
 #include "smpp/pdu.h"
 

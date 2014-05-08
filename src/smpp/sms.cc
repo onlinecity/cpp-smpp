@@ -150,7 +150,8 @@ DeliveryReport::DeliveryReport(const SMS &sms) :
   err(""),
   text("") {
   std::regex expression(
-    "^id:([^ ]+)\\s+sub:(\\d{1,3})\\s+dlvrd:(\\d{1,3})\\s+submit\\s+date:(\\d{1,10})\\s+done\\s+date:(\\d{1,10})\\s+stat:([A-Z]{7})\\s+err:(\\d{1,3})\\s+text:(.*)$");
+    "^id:([^ ]+)\\s+sub:(\\d{1,3})\\s+dlvrd:(\\d{1,3})\\s+submit\\s+date:(\\d{1,10})"
+    "\\s+done\\s+date:(\\d{1,10})\\s+stat:([A-Z]{7})\\s+err:(\\d{1,3})\\s+text:(.*)$");
   std::smatch what;
 
   if (std::regex_match(short_message, what, expression)) {

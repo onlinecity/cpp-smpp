@@ -4,15 +4,18 @@
  */
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+
+#include <ctime>
 #include <list>
 #include <string>
 #include <tuple>
+
+#include "./smppclient_test.h"
 #include "asio.hpp"
 #include "gtest/gtest.h"
 #include "smpp/gsmencoding.h"
-#include "smpp/timeformat.h"
 #include "smpp/smpp_params.h"
-#include "smppclient_test.h"
+#include "smpp/timeformat.h"
 
 using smpp::encoding::GsmEncoder;
 using smpp::SmppAddress;
@@ -120,8 +123,9 @@ TEST_F(SmppClientTest, submitExtended) {
   params.registered_delivery = smpp::RegisteredDelivery::DELIVERY_SMSC_BOTH;
 
   time_t now = time(0);
-  struct tm *tm = localtime(&now);
-  params.schedule_delivery_time = smpp::timeformat::ToSmppTimeString(*tm);
+  struct tm tm;
+  localtime_r(&now, &tm);
+  params.schedule_delivery_time = smpp::timeformat::ToSmppTimeString(tm);
   params.validity_period = smpp::timeformat::ToSmppTimeString(std::chrono::hours(1));  // valid for one hour
   params.data_coding = smpp::DataCoding::ISO8859_1;
 

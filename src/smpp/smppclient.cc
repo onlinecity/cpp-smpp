@@ -119,8 +119,7 @@ pair<string, int> SmppClient::SendSms(
     const SmppAddress &receiver,
     const string &short_message,
     const struct SmppParams &params,
-    list<TLV> tags)
-{
+    list<TLV> tags) {
   int message_len = short_message.length();
   int single_sms_octet_limit = 254;  // Default SMPP standard
   int csms_split = -1;  // where to split
@@ -321,7 +320,11 @@ vector<string> SmppClient::Split(const string &short_message, const int split) {
   return parts;
 }
 
-string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiver, const string &short_message, const struct SmppParams &params, list<TLV> tags) {
+string SmppClient::SubmitSm(const SmppAddress &sender,
+    const SmppAddress &receiver,
+    const string &short_message,
+    const struct SmppParams &params,
+    list<TLV> tags) {
   CheckState(ClientState::BOUND_TX);
   PDU pdu(CommandId::SUBMIT_SM, ESME::ROK, NextSequenceNumber());
   pdu << params.service_type;
@@ -539,7 +542,11 @@ void SmppClient::ReadPduHeaderHandlerBlocking(bool *had_error, const error_code 
   SocketExecute();
 }
 
-void SmppClient::ReadPduBodyHandler(const error_code &error, size_t len, const PduLengthHeader *pduLength, const PduData *pdu_buffer) {
+void SmppClient::ReadPduBodyHandler(
+    const error_code &error,
+    size_t len,
+    const PduLengthHeader *pduLength,
+    const PduData *pdu_buffer) {
   if (error) {
     throw TransportException(system_error(error).what());
   }

@@ -15,13 +15,14 @@ using smpp::timeformat::ParseSmppTimestamp;
 namespace sc = std::chrono;
 
 void print(const std::string &tp_id, const sc::time_point<sc::system_clock> &tp) {
+  struct tm tm;
   auto t = sc::system_clock::to_time_t(tp);
   std::cout << tp_id << ":"
-  << std::put_time(std::gmtime(&t), "%C %F %T %Z %z")
+  << std::put_time(gmtime_r(&t, &tm), "%C %F %T %Z %z")
   << std::endl;
 }
 
-sc::time_point<sc::system_clock> MakeTimePoint(int yy, int mon, int mday, int hour, int min, int sec, long gmtoff) {
+sc::time_point<sc::system_clock> MakeTimePoint(int yy, int mon, int mday, int hour, int min, int sec, int64_t gmtoff) {
   struct tm tm;
   tm.tm_year = yy - 1900;
   tm.tm_mon = mon - 1;
@@ -34,7 +35,7 @@ sc::time_point<sc::system_clock> MakeTimePoint(int yy, int mon, int mday, int ho
   return sc::system_clock::from_time_t(std::mktime(&tm));
 }
 
-struct tm MakeTm(int yy, int mon, int mday, int hour, int min, int sec, long gmtoff) {
+struct tm MakeTm(int yy, int mon, int mday, int hour, int min, int sec, int64_t gmtoff) {
   struct tm tm;
   tm.tm_year = yy - 1900;
   tm.tm_mon = mon - 1;

@@ -7,6 +7,7 @@
 
 #include <asio.hpp>
 #include <memory>
+#include <string>
 
 #include "./connectionsetting.h"
 #include "gtest/gtest.h"
@@ -99,5 +100,4 @@ class SmppClientCsmsTest : public testing::Test {
 
     socket_->close();
   }
-
 };

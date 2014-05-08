@@ -3,10 +3,10 @@
 // @author hd@onlinecity.dk & td@onlinecity.dk
 
 #include "smpp/pdu.h"
-#include <iostream>
 #include <netinet/in.h>
+#include <iostream>
 #include <string>
-#include "hexdump.h"
+#include "smpp/hexdump.h"
 
 namespace smpp {
 using std::ios;

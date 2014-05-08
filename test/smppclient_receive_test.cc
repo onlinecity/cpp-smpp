@@ -4,20 +4,22 @@
  */
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+
 #include <list>
 #include <string>
 #include <tuple>
-#include "asio.hpp"
+
+#include "./asio.hpp"
+#include "./smppclient_test.h"
 #include "gtest/gtest.h"
 #include "smpp/gsmencoding.h"
-#include "smpp/timeformat.h"
 #include "smpp/smpp_params.h"
-#include "smppclient_test.h"
+#include "smpp/timeformat.h"
 
-using smpp::encoding::GsmEncoder;
 using smpp::SmppAddress;
 using smpp::SmppClient;
 using smpp::TLV;
+using smpp::encoding::GsmEncoder;
 using std::list;
 using std::string;
 
