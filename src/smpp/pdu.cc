@@ -4,7 +4,7 @@
 
 #include "smpp/pdu.h"
 #include <netinet/in.h>
-#include <iostream>
+#include <iostream>  //NOLINT
 #include <string>
 #include "smpp/hexdump.h"
 
@@ -290,9 +290,7 @@ uint32_t PDU::GetPduLength(const PduLengthHeader &pduHeader) {
   auto i = reinterpret_cast<const uint32_t*>(pduHeader.data());
   return ntohl(*i);
 }
-
 }  // namespace smpp
-
 
 std::ostream &smpp::operator<<(std::ostream &out, smpp::PDU &pdu) {
   if (pdu.null_) {
