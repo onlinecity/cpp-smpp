@@ -78,14 +78,14 @@ SMS::SMS(PDU *pdu) :
   pdu->ReadOctets(&msg, sm_length);
   short_message = msg;
   // fetch any optional tags
+  Tag tag(Tag::NA);
   uint16_t len = 0;
-  uint16_t tag = 0;
 
   while (pdu->HasMoreData()) {
     *pdu >> tag;
     *pdu >> len;
 
-    if (tag == 0) {
+    if (tag == Tag::NA) {
       break;
     }
 

@@ -111,9 +111,9 @@ TEST_F(SmppClientTest, tlv) {
   string message = "message to send";
   struct smpp::SmppParams params;
   list<TLV> taglist;
-  taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT,
+  taglist.push_back(TLV(smpp::Tag::DEST_ADDR_SUBUNIT,
                         static_cast<uint8_t>(0x01)));  // "flash sms" use-case
-  taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
+  taglist.push_back(TLV(smpp::Tag::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
   client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), params, taglist);
   client->Unbind();
   socket->close();
@@ -134,8 +134,8 @@ TEST_F(SmppClientTest, tlvExtended) {
 
   struct smpp::SmppParams params;
   list<TLV> taglist;
-  taglist.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT, static_cast<uint8_t>(0x01)));
-  taglist.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
+  taglist.push_back(TLV(smpp::Tag::DEST_ADDR_SUBUNIT, static_cast<uint8_t>(0x01)));
+  taglist.push_back(TLV(smpp::Tag::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
   int csms_method = client->csms_method();
   client->set_csms_method(SmppClient::CSMS_16BIT_TAGS);
   client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), params, taglist);
@@ -163,9 +163,9 @@ TEST_F(SmppClientTest, submitExtended) {
   params.data_coding = smpp::DataCoding::ISO8859_1;
 
   list<TLV> tags;
-  tags.push_back(TLV(smpp::tags::DEST_ADDR_SUBUNIT,
+  tags.push_back(TLV(smpp::Tag::DEST_ADDR_SUBUNIT,
                         static_cast<uint8_t>(0x01)));  // "flash sms" use-case
-  tags.push_back(TLV(smpp::tags::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
+  tags.push_back(TLV(smpp::Tag::USER_MESSAGE_REFERENCE, static_cast<uint16_t>(0x1337)));
 
   client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message), params, tags);
   client->Unbind();

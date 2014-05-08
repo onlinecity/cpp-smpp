@@ -174,13 +174,13 @@ pair<string, int> SmppClient::SendSms(
     }
     return std::make_pair(sms_id, segments);
   } else {  // csmsMethod == CSMS_16BIT_TAGS)
-    tags.push_back(TLV(tags::SAR_MSG_REF_NUM, static_cast<uint16_t>(msg_ref_callback_())));
-    tags.push_back(TLV(tags::SAR_TOTAL_SEGMENTS, static_cast<uint8_t>(parts.size())));
+    tags.push_back(TLV(Tag::SAR_MSG_REF_NUM, static_cast<uint16_t>(msg_ref_callback_())));
+    tags.push_back(TLV(Tag::SAR_TOTAL_SEGMENTS, static_cast<uint8_t>(parts.size())));
     int segment = 0;
     string sms_id;
 
     for (; itr < parts.end(); ++itr) {
-      tags.push_back(TLV(tags::SAR_SEGMENT_SEQNUM, ++segment));
+      tags.push_back(TLV(Tag::SAR_SEGMENT_SEQNUM, ++segment));
       sms_id = SubmitSm(sender, receiver, (*itr), params, tags);
       // pop SAR_SEGMENT_SEQNUM tag
       tags.pop_back();
@@ -342,7 +342,7 @@ string SmppClient::SubmitSm(const SmppAddress &sender, const SmppAddress &receiv
 
   if (csms_method_ == CSMS_PAYLOAD) {
     pdu << 0;  // sm_length = 0
-    pdu << TLV(tags::MESSAGE_PAYLOAD, short_message);
+    pdu << TLV(Tag::MESSAGE_PAYLOAD, short_message);
   } else {
     pdu.set_null_terminate_octet_strings(FLAGS_null_terminate_octet_strings);
     pdu << static_cast<uint8_t>(short_message.length()) + (FLAGS_null_terminate_octet_strings ? 1 : 0);

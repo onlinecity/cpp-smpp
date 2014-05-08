@@ -78,7 +78,7 @@ class PDU {
 
   PDU &operator<<(const smpp::SmppAddress);
   PDU &operator<<(const smpp::TLV);
-  PDU &addOctets(const PduData &octets, const std::streamsize &len);
+  PDU &AddOctets(const PduData &octets, const std::streamsize &len);
 
   // Skips n octets.
   void Skip(int n);

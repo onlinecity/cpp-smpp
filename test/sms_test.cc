@@ -48,9 +48,9 @@ TEST(SmsTest, copy) {
   it2 = sms2.tlvs.begin();
 
   while (it != sms.tlvs.end()) {
-    ASSERT_EQ((*it).getTag(), (*it2).getTag());
-    ASSERT_EQ((*it).getLen(), (*it2).getLen());
-    ASSERT_EQ((*it).getOctets(), (*it2).getOctets());
+    ASSERT_EQ((*it).tag(), (*it2).tag());
+    ASSERT_EQ((*it).len(), (*it2).len());
+    ASSERT_EQ((*it).octets(), (*it2).octets());
     it++;
     it2++;
   }
@@ -95,11 +95,11 @@ TEST(SmsTest, dlr) {
   EXPECT_EQ(static_cast<int>(sms.tlvs.size()), 2);
   list<smpp::TLV>::iterator it;
   it = sms.tlvs.begin();
-  EXPECT_EQ(it->getTag(), smpp::tags::MESSAGE_STATE);
-  EXPECT_EQ(it->getOctets()[0], static_cast<typename std::underlying_type<smpp::State>::type>(smpp::State::DELIVERED));
+  EXPECT_EQ(it->tag(), smpp::Tag::MESSAGE_STATE);
+  EXPECT_EQ(it->octets()[0], static_cast<typename std::underlying_type<smpp::State>::type>(smpp::State::DELIVERED));
   it++;
-  EXPECT_EQ(it->getTag(), smpp::tags::RECEIPTED_MESSAGE_ID);
-  EXPECT_EQ(it->getOctets(), string("dc0dc8ec67e16082483f9e8cd1b135dd", 33));
+  EXPECT_EQ(it->tag(), smpp::Tag::RECEIPTED_MESSAGE_ID);
+  EXPECT_EQ(it->octets(), string("dc0dc8ec67e16082483f9e8cd1b135dd", 33));
   // Assertions for DLR part of SMS
   EXPECT_EQ(dlr.id, string("dc0dc8ec67e16082483f9e8cd1b135dd"));
   EXPECT_EQ(dlr.sub, uint32_t(1));

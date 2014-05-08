@@ -186,18 +186,17 @@ PDU &PDU::operator <<(const smpp::SmppAddress s) {
 }
 
 PDU &PDU::operator <<(smpp::TLV tlv) {
-  (*this) << tlv.getTag();
-  (*this) << tlv.getLen();
+  (*this) << tlv.tag();
+  (*this) << tlv.len();
 
-  if (tlv.getLen() != 0) {
-    (*this).addOctets(tlv.getOctets(), (uint32_t) tlv.getLen());
+  if (tlv.len() != 0) {
+    (*this).AddOctets(tlv.octets(), (uint32_t) tlv.len());
   }
 
   return *this;
 }
 
-// TODO(td): Upper case
-PDU &PDU::addOctets(const PduData &octets, const streamsize &len) {
+PDU &PDU::AddOctets(const PduData &octets, const streamsize &len) {
   buf_.write(octets.c_str(), len);
 
   if (buf_.fail()) {
