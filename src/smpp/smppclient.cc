@@ -141,8 +141,9 @@ pair<string, int> SmppClient::SendSms(
 
   // submit_sm if the short message could fit into one pdu.
   if (message_len <= single_sms_octet_limit || csms_method_ == CSMS_PAYLOAD) {
+    auto num_messages = ceil(static_cast<double>(message_len) / static_cast<double>(single_sms_octet_limit));
     string smsc_id = SubmitSm(sender, receiver, short_message, params, tags);
-    return std::make_pair(smsc_id, 1);
+    return std::make_pair(smsc_id, num_messages);
   }
 
   // CSMS -> split message

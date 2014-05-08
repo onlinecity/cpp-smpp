@@ -21,16 +21,7 @@ using smpp::TLV;
 using std::list;
 using std::string;
 
-//  Test login of either transmitter or receiver
-TEST_F(SmppClientTest, BindReceiver) {
-  socket->connect(endpoint);
-  ASSERT_TRUE(socket->is_open());
-  client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
-  ASSERT_TRUE(client->IsBound());
-  client->Unbind();
-  socket->close();
-}
-
+//  Test login
 TEST_F(SmppClientTest, BindTransmitter) {
   socket->connect(endpoint);
   ASSERT_TRUE(socket->is_open());
@@ -51,8 +42,6 @@ TEST_F(SmppClientTest, LoginError) {
 TEST_F(SmppClientTest, submit) {
   socket->connect(endpoint);
   client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
-  //      client->setNullTerminateOctetStrings(false);
-  //      client->setRegisteredDelivery(smpp::REG_DELIVERY_SMSC_BOTH);
   SmppAddress from("CPPSMPP", smpp::TON::ALPHANUMERIC, smpp::NPI::UNKNOWN);
   SmppAddress to("4513371337", smpp::TON::INTERNATIONAL, smpp::NPI::E164);
   string message = "message to send";
@@ -72,32 +61,6 @@ TEST_F(SmppClientTest, querySm) {
   string smscId = smscResult.first;
   smpp::QuerySmResult result = client->QuerySm(smscId, from);
   ASSERT_EQ(std::get<0>(result), smscId);
-  client->Unbind();
-  socket->close();
-}
-
-// Test concatenated SMS using either split or payload method.
-TEST_F(SmppClientTest, csms) {
-  socket->connect(endpoint);
-  client->BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
-  SmppAddress from("CPPSMPP", smpp::TON::ALPHANUMERIC, smpp::NPI::UNKNOWN);
-  SmppAddress to("4513371337", smpp::TON::INTERNATIONAL, smpp::NPI::E164);
-  // Construct 168 char message
-  string message;
-  message.reserve(170);
-
-  for (int i = 0; i < 14; i++) {
-    message += "lorem ipsum ";
-  }
-
-  int csmsMethod = client->csms_method();
-  client->set_csms_method(SmppClient::CSMS_PAYLOAD);
-  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
-  client->set_csms_method(SmppClient::CSMS_16BIT_TAGS);
-  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
-  client->set_csms_method(SmppClient::CSMS_8BIT_UDH);
-  client->SendSms(from, to, GsmEncoder::EncodeGsm0338(message));
-  client->set_csms_method(csmsMethod);
   client->Unbind();
   socket->close();
 }
@@ -172,13 +135,6 @@ TEST_F(SmppClientTest, submitExtended) {
   socket->close();
 }
 
-TEST_F(SmppClientTest, receive) {
-  socket->connect(endpoint);
-  client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
-  LOG(INFO) << "Waiting for smpp connection to send message";
-  smpp::SMS sms = client->ReadSms();
-}
-
 TEST_F(SmppClientTest, logging) {
   FLAGS_v = 1;
   socket->connect(endpoint);
@@ -187,9 +143,86 @@ TEST_F(SmppClientTest, logging) {
   socket->close();
 }
 
-int main(int argc, char **argv) {
-  google::ParseCommandLineFlags(&argc, &argv, true);
-  google::InitGoogleLogging(argv[0]);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+TEST_F(SmppClientCsmsTest, CsmsPayload) {
+  client_.set_csms_method(SmppClient::CSMS_PAYLOAD);
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_170_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_256_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_300_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_400_));
+    EXPECT_EQ(3, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_500_));
+    EXPECT_EQ(4, r.second);
+  }
+}
+
+TEST_F(SmppClientCsmsTest, Csms16BitTags) {
+  client_.set_csms_method(SmppClient::CSMS_16BIT_TAGS);
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_170_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_256_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_300_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_400_));
+    EXPECT_EQ(3, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_500_));
+    EXPECT_EQ(4, r.second);
+  }
+}
+
+TEST_F(SmppClientCsmsTest, Csms8BitUdh) {
+  client_.set_csms_method(SmppClient::CSMS_8BIT_UDH);
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_170_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_256_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_300_));
+    EXPECT_EQ(2, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_400_));
+    EXPECT_EQ(3, r.second);
+  }
+
+  {
+    auto r = client_.SendSms(sender_, receiver_, GsmEncoder::EncodeGsm0338(message_500_));
+    EXPECT_EQ(4, r.second);
+  }
 }
