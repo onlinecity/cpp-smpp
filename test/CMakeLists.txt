@@ -4,7 +4,7 @@ set(gtest_main_LIB ${GTEST_LIB_DIR}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a)
 # Add a single gtest
 function(add_gtest name libs)
   set (test_bin ${name}_test)
-  add_executable(${test_bin} $<TARGET_OBJECTS:compiled> ${name}_test.cc ${ARGN})
+  add_executable(${test_bin} $<TARGET_OBJECTS:compiled> ${name}_test.cc ${ARGN} main.cc)
   target_link_libraries(${test_bin} ${link_libs})
   foreach (lib "${libs}")
     target_link_libraries(${test_bin} ${lib} )
@@ -39,3 +39,4 @@ add_gtests(
   )
 
 add_gtest(smppclient ${gtest_LIB})
+add_gtest(smppclient_receive ${gtest_LIB})
