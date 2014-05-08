@@ -36,6 +36,7 @@ add_gtests(
   time
   encoder
   pdu
+  smpp
   )
 
 add_gtest(smppclient ${gtest_LIB})

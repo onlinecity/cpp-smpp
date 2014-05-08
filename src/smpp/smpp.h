@@ -157,6 +157,12 @@ inline std::underlying_type<ESM>::type operator|(const ESM &a, const ESM &b) {
   return a_t | b_t;
 }
 
+inline std::underlying_type<ESM>::type operator&(const ESM &a, const ESM &b) {
+  auto a_t = static_cast<std::underlying_type<ESM>::type>(a);
+  auto b_t = static_cast<std::underlying_type<ESM>::type>(b);
+  return a_t & b_t;
+}
+
 // SMPP v3.4 - 5.2.14 page 123 - priority_flag
 enum class Priority : uint8_t {
   GSM_NON_PRIORITY      = 0x0,
