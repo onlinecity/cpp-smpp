@@ -14,7 +14,7 @@
 DEFINE_string(system_type, "WWW", "SMPP System type parameter (SMPP specification chapter 5.2.3)");
 DEFINE_string(addr_range, "", "SMPP address range. (SMPP specification chapter 5.2.7)");
 DEFINE_int32(socket_write_timeout, 5000, "Socket write timeout in milliseconds.");
-DEFINE_int32(socket_read_timeout, 300000, "Socket read timeout in milliseconds.");
+DEFINE_int32(socket_read_timeout, 30000, "Socket read timeout in milliseconds.");
 DEFINE_bool(null_terminate_octet_strings, true, "Null termintate octet strings sent to the SMSC");
 DEFINE_int32(addr_npi, 0, "Default address npi.");
 DEFINE_int32(addr_ton, 0, "Default address ton.");
