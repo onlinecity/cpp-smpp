@@ -7,4 +7,3 @@ echo "Cleaning test/"
 cd test
 make clean
 cd ..
-
