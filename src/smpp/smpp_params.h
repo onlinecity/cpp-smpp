@@ -19,7 +19,7 @@ struct SmppParams {
     priority_flag(Priority::GSM_NON_PRIORITY),
     schedule_delivery_time(""),
     validity_period(""),
-    registered_delivery(RegisteredDelivery::DELIVERY_NO),
+    registered_delivery(RegisteredDelivery::DELIVERY_SMSC_BOTH),
     replace_if_present_flag(ReplaceIfPresent::REPLACE_NO),
     data_coding(DataCoding::DEFAULT),
     sm_default_msg_id(0) {
