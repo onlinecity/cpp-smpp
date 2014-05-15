@@ -156,6 +156,9 @@ pair<string, int> SmppClient::SendSms(
     string sms_id;
     uint8_t csms_ref = static_cast<uint8_t>(msg_ref_callback_() & 0xff);
 
+    SmppParams p(params);
+    p.esm_class = ESM(p.esm_class | ESM::UHDI);
+
     for (; itr < parts.end(); itr++) {
       // encode udh
       int part_size = (*itr).size();
@@ -170,7 +173,7 @@ pair<string, int> SmppClient::SendSms(
       // concatenate with message part
       copy((*itr).begin(), (*itr).end(), &udh[6]);
       string message(reinterpret_cast<char*>(udh.get()), size);
-      sms_id = SubmitSm(sender, receiver, message, params, tags);
+      sms_id = SubmitSm(sender, receiver, message, p, tags);
     }
     return std::make_pair(sms_id, segments);
   } else {  // csmsMethod == CSMS_16BIT_TAGS)
@@ -330,11 +333,7 @@ string SmppClient::SubmitSm(const SmppAddress &sender,
   pdu << params.service_type;
   pdu << sender;
   pdu << receiver;
-  if (csms_method_ == CSMS_8BIT_UDH) {
-    pdu << (params.esm_class | ESM::UHDI);  // Set UHDI bit
-  } else {
-    pdu << params.esm_class;
-  }
+  pdu << params.esm_class;
   pdu << params.protocol_id;
   pdu << params.priority_flag;
   pdu << params.schedule_delivery_time;

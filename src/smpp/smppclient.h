@@ -158,7 +158,8 @@ class SmppClient {
       const SmppAddress &receiver,
       const std::string &short_message,
       const struct SmppParams &params,
-      std::list<TLV> tags);
+      std::list<TLV> tags
+      );
 
   // @return Returns the next sequence number.
   // @throw SmppException Throws an SmppException if we run out of sequence numbers.
