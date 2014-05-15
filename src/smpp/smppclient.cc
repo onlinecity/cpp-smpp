@@ -377,7 +377,7 @@ void SmppClient::SendPdu(PDU *pdu) {
   bool io_result = false;
   bool timer_result = false;
 
-  VLOG(1) << pdu;
+  VLOG(1) << *pdu;
 
   ChronoDeadlineTimer timer(socket_->get_io_service());
   timer.expires_from_now(std::chrono::milliseconds(FLAGS_socket_write_timeout));
