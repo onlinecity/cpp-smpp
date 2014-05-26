@@ -232,11 +232,10 @@ SMS SmppClient::ReadSms() {
   } catch (std::exception &e) {
     throw TransportException(e.what());
   }
-
   return ParseSms();
 }
 
-void SmppClient::CancelReadSms() {
+void SmppClient::CancelBlocking() {
   timer_->cancel();
   socket_->cancel();
   SocketExecute();
@@ -268,6 +267,9 @@ QuerySmResult SmppClient::QuerySm(std::string messageid, const SmppAddress &sour
 }
 
 void SmppClient::EnquireLink() {
+  if (state_ == ClientState::OPEN) {
+    return;
+  }
   PDU pdu = PDU(CommandId::ENQUIRE_LINK, ESME::ROK, NextSequenceNumber());
   SendCommand(&pdu);
 }
@@ -385,10 +387,8 @@ void SmppClient::SendPdu(PDU *pdu) {
 
   VLOG(1) << *pdu;
 
-  ChronoDeadlineTimer timer(socket_->get_io_service());
-  timer.expires_from_now(std::chrono::milliseconds(FLAGS_socket_write_timeout));
-  timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
-
+  timer_->expires_from_now(std::chrono::milliseconds(FLAGS_socket_write_timeout));
+  timer_->async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
   async_write(*socket_,
       buffer(static_cast<const void*>(pdu->GetOctets().c_str()),
       pdu->Size()),
@@ -397,7 +397,7 @@ void SmppClient::SendPdu(PDU *pdu) {
   SocketExecute();
 
   if (io_result) {
-    timer.cancel();
+    timer_->cancel();
   } else if (timer_result) {
     socket_->cancel();
   }
@@ -534,7 +534,6 @@ void SmppClient::ReadPduHeaderHandlerBlocking(bool *callback_result, const error
       // Not treated as an error
       return;
     }
-
     throw TransportException(system_error(error).what());
   }
 

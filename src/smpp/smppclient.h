@@ -94,8 +94,8 @@ class SmppClient {
   // or does a blocking read on the socket until we receive an SMS from the SMSC.
   smpp::SMS ReadSms();
 
-  // Cancels read sms
-  void CancelReadSms();
+  // Cancels a blocking call.
+  void CancelBlocking();
 
   // Query the SMSC about current state/status of a previous sent SMS.
   // You must specify the SMSC assigned message id and source of the sent SMS.
