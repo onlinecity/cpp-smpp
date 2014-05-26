@@ -94,6 +94,9 @@ class SmppClient {
   // or does a blocking read on the socket until we receive an SMS from the SMSC.
   smpp::SMS ReadSms();
 
+  // Cancels read sms
+  void CancelReadSms();
+
   // Query the SMSC about current state/status of a previous sent SMS.
   // You must specify the SMSC assigned message id and source of the sent SMS.
   // Returns an std::tuple with elements: message_id, final_date, message_state and error_code.
@@ -178,12 +181,12 @@ class SmppClient {
 
   void ReadPduBlocking();
 
-  void HandleTimeout(bool *had_error, const asio::error_code &error);
+  void HandleTimeout(bool *callback_result, const asio::error_code &error);
 
   // Async write handler.
   // @param
   // @throw TransportException if an error occurred.
-  void WriteHandler(bool *had_error, const asio::error_code &error);
+  void WriteHandler(bool *callback_result, const asio::error_code &error);
 
   // Peeks at the socket and returns true if there is data to be read.
   // @return True if there is data to be read.
@@ -197,7 +200,7 @@ class SmppClient {
   void ReadPduHeaderHandler(const asio::error_code &error, size_t read,
                             const PduLengthHeader *pduLength);
 
-  void ReadPduHeaderHandlerBlocking(bool *had_error,
+  void ReadPduHeaderHandlerBlocking(bool *callback_result,
                                     const asio::error_code &error, size_t read,
                                     const PduLengthHeader *pduLength);
 
@@ -241,6 +244,7 @@ class SmppClient {
   // Bind state
   ClientState state_;
   std::shared_ptr<asio::ip::tcp::socket> socket_;
+  std::shared_ptr<smpp::ChronoDeadlineTimer> timer_;
   uint32_t seq_no_;
   std::list<PDU> pdu_queue_;
 };

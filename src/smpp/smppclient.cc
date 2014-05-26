@@ -39,6 +39,7 @@ SmppClient::SmppClient(shared_ptr<tcp::socket> socket) :
   msg_ref_callback_(&SmppClient::DefaultMessageRef),
   state_(ClientState::OPEN),
   socket_(socket),
+  timer_(std::make_shared<smpp::ChronoDeadlineTimer>(socket_->get_io_service())),
   seq_no_(0),
   pdu_queue_() {
   }
@@ -233,6 +234,12 @@ SMS SmppClient::ReadSms() {
   }
 
   return ParseSms();
+}
+
+void SmppClient::CancelReadSms() {
+  timer_->cancel();
+  socket_->cancel();
+  SocketExecute();
 }
 
 QuerySmResult SmppClient::QuerySm(std::string messageid, const SmppAddress &source) {
@@ -468,26 +475,26 @@ void SmppClient::ReadPduBlocking() {
         _2,
         &pdu_header));
 
-  ChronoDeadlineTimer timer(socket_->get_io_service());
-  timer.expires_from_now(std::chrono::milliseconds(FLAGS_socket_read_timeout));
-  timer.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
+  timer_->expires_from_now(std::chrono::milliseconds(FLAGS_socket_read_timeout));
+  timer_->async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
   SocketExecute();
 
   if (io_result) {
-    timer.cancel();
-  } else if (timer_result) {
+    timer_->cancel();
+  }
+  else if (timer_result) {
     socket_->cancel();
   }
 
   SocketExecute();
 }
 
-void SmppClient::HandleTimeout(bool *had_error, const error_code &error) {
-  *had_error = true;
+void SmppClient::HandleTimeout(bool *callback_result, const error_code &error) {
+  *callback_result = true;
 }
 
-void SmppClient::WriteHandler(bool *had_error, const error_code &error) {
-  *had_error = true;
+void SmppClient::WriteHandler(bool *callback_result, const error_code &error) {
+  *callback_result = true;
   if (error) {
     throw TransportException(system_error(error).what());
   }
@@ -520,7 +527,7 @@ void SmppClient::ReadPduHeaderHandler(const error_code &error, size_t len, const
   SocketExecute();
 }
 
-void SmppClient::ReadPduHeaderHandlerBlocking(bool *had_error, const error_code &error, size_t read,
+void SmppClient::ReadPduHeaderHandlerBlocking(bool *callback_result, const error_code &error, size_t read,
     const PduLengthHeader *pduLength) {
   if (error) {
     if (error == asio::error::operation_aborted) {
@@ -531,7 +538,7 @@ void SmppClient::ReadPduHeaderHandlerBlocking(bool *had_error, const error_code 
     throw TransportException(system_error(error).what());
   }
 
-  *had_error = true;
+  *callback_result = true;
   uint32_t i = PDU::GetPduLength(*pduLength);
   PduData pdu_buffer;
   pdu_buffer.resize(i - 4);
