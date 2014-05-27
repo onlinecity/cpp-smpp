@@ -110,7 +110,7 @@ class SmppClient {
 
   // Checks if the SMSC has sent us a enquire link command.
   // If they have, a response is sent.
-  void EnquireLinkRespond();
+  bool EnquireLinkRespond();
 
   // Returns true if the client is bound.
   inline bool IsBound() {

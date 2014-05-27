@@ -209,11 +209,10 @@ SMS SmppClient::ReadSms() {
 
   // fill queue until we get a DELIVER_SM command
   try {
-    bool b = false;
+    bool got_deliver_sm = false;
 
-    while (!b) {
+    while (!got_deliver_sm) {
       PDU pdu = ReadPdu(true);
-
       if (pdu.command_id() == CommandId::ENQUIRE_LINK) {
         PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
         SendPdu(&resp);
@@ -227,7 +226,7 @@ SMS SmppClient::ReadSms() {
       if (!pdu.null()) {
         pdu_queue_.push_back(pdu);    // save pdu for reading later
       }
-      b = pdu.command_id() == CommandId::DELIVER_SM;
+      got_deliver_sm = pdu.command_id() == CommandId::DELIVER_SM;
     }
   } catch (std::exception &e) {
     throw TransportException(e.what());
@@ -385,7 +384,7 @@ void SmppClient::SendPdu(PDU *pdu) {
   bool io_result = false;
   bool timer_result = false;
 
-  VLOG(1) << *pdu;
+  VLOG(1) << "\n>>> Sent:" << *pdu;
 
   timer_->expires_from_now(std::chrono::milliseconds(FLAGS_socket_write_timeout));
   timer_->async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
@@ -430,10 +429,18 @@ PDU SmppClient::SendCommand(PDU *pdu) {
   return resp;
 }
 
-PDU SmppClient::ReadPdu(const bool &isBlocking) {
+PDU SmppClient::ReadPdu(const bool &is_blocking) {
   // return NULL pdu if there is nothing on the wire for us.
-  if (!isBlocking && !SocketPeek()) {
+  if (!is_blocking && !SocketPeek()) {
     return PDU();
+  }
+
+  // SocketPeek left something in the queue
+  if (!pdu_queue_.empty()) {
+    PDU pdu = pdu_queue_.back();
+    pdu_queue_.pop_back();
+    VLOG(1) << "\n<<< Received:" << pdu;
+    return pdu;
   }
 
   ReadPduBlocking();
@@ -446,7 +453,7 @@ PDU SmppClient::ReadPdu(const bool &isBlocking) {
   // Return last the pdu inserted into the queue.
   PDU pdu = pdu_queue_.back();
   pdu_queue_.pop_back();
-  VLOG(1) << pdu;
+  VLOG(1) << "\n<<< Received:" << pdu;
   return pdu;
 }
 
@@ -459,6 +466,7 @@ bool SmppClient::SocketPeek() {
   socket_->get_io_service().reset();
   socket_->cancel();
   SocketExecute();
+
   return handlers_called != 0;
 }
 
@@ -563,14 +571,12 @@ void SmppClient::ReadPduBodyHandler(
 PDU SmppClient::ReadPduResponse(const uint32_t &sequence, const CommandId &commandId) {
   CommandId response = CommandId(CommandId::GENERIC_NACK | commandId);
   list<PDU>::iterator it = pdu_queue_.begin();
-
   while (it != pdu_queue_.end()) {
     PDU pdu = (*it);
     if (pdu.sequence_no() == sequence && pdu.command_id() == response) {
       it = pdu_queue_.erase(it);
       return pdu;
     }
-
     it++;
   }
 
@@ -589,24 +595,34 @@ PDU SmppClient::ReadPduResponse(const uint32_t &sequence, const CommandId &comma
   return pdu;
 }
 
-void SmppClient::EnquireLinkRespond() {
+bool SmppClient::EnquireLinkRespond() {
   list<PDU>::iterator it = pdu_queue_.begin();
-
   while (it != pdu_queue_.end()) {
     PDU pdu = (*it);
     if (pdu.command_id() == CommandId::ENQUIRE_LINK) {
       PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
-      SendCommand(&resp);
+      SendPdu(&resp);
+      // Remove pdu
+      it = pdu_queue_.erase(it);
+    } else {
+      it++;
     }
-    it++;
   }
 
   PDU pdu = ReadPdu(false);
-
-  if (!pdu.null() && pdu.command_id() == CommandId::ENQUIRE_LINK) {
-    PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
-    SendPdu(&resp);
+  if (pdu.null()) {
+    return false;
   }
+
+  if (pdu.command_id() != CommandId::ENQUIRE_LINK) {
+    // Not enquire link pdu, put it back in the queue.
+    pdu_queue_.emplace_back(pdu);
+    return false;
+  }
+
+  PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
+  SendPdu(&resp);
+  return true;
 }
 
 void SmppClient::CheckConnection() {
