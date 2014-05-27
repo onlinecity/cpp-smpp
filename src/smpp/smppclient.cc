@@ -489,11 +489,9 @@ void SmppClient::ReadPduBlocking() {
 
   if (io_result) {
     timer_->cancel();
-  }
-  else if (timer_result) {
+  } else if (timer_result) {
     socket_->cancel();
   }
-
   SocketExecute();
 }
 
