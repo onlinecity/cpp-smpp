@@ -299,11 +299,12 @@ std::ostream &smpp::operator<<(std::ostream &out, smpp::PDU &pdu) {
   }
 
   int size = pdu.Size();
-  out << "size      :" << pdu.Size() << endl
-    << "sequence  :" << pdu.sequence_no() << endl
-    << "cmd id    :0x" << hex
-    << static_cast< std::underlying_type<CommandId>::type >(pdu.command_id()) << dec << endl
-    << "cmd status:0x" << hex
+
+  out << "PDU size:" << size
+    << " | seq:" << pdu.sequence_no()
+    << " | cmd id:0x" << hex
+    << static_cast< std::underlying_type<CommandId>::type >(pdu.command_id()) << dec
+    << " | cmd status:0x" << hex
     << static_cast<std::underlying_type<smpp::ESME>::type>(pdu.command_status()) << dec
     << " : " << smpp::GetEsmeStatus(pdu.command_status()) << endl;
 
