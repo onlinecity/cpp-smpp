@@ -51,9 +51,7 @@ TEST_F(SmppClientTest, ReceiveSmsTimeout) {
     end = std::chrono::high_resolution_clock::now();
   } while (!sms.is_null);
 
-  std::chrono::duration<double> s = end - start;
-  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(s);
-
+  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   EXPECT_GE(ms.count(), timeout);
   EXPECT_LT(ms.count(), timeout + 100);  // Timeout + 100 ms
   FLAGS_socket_read_timeout = socket_read_timeout;  // Restore defaults
