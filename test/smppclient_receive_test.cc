@@ -39,3 +39,16 @@ TEST_F(SmppClientTest, ReceiveSms) {
   LOG(INFO) << "Waiting for smpp connection to send message";
   smpp::SMS sms = client->ReadSms();
 }
+
+TEST_F(SmppClientTest, ReceiveSmsTimeout) {
+  FLAGS_socket_read_timeout = 500;
+  socket->connect(endpoint);
+  client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
+  LOG(INFO) << "Retrieve all messages and wait for timeout";
+  smpp::SMS sms;
+
+  do {
+    sms = client->ReadSms();
+  } while (!sms.is_null);
+  client->ReadSms();
+}
