@@ -188,7 +188,10 @@ class SmppClient {
   void WriteHandler(bool *callback_result, const asio::error_code &error);
 
   // Peeks at the socket and returns true if there is data to be read.
-  // @return True if there is data to be read.
+  //
+  // Because ASIO doesn't allow peeking. SocketPeek accutally reads the
+  // data on the socket and if it is a valid PDU, it is put in the pdu
+  // queue.
   bool SocketPeek();
 
   // Executes any pending async operations on the socket.
@@ -197,17 +200,17 @@ class SmppClient {
   // Handler for reading a PDU header.
   // If we read a valid PDU header on the socket, the readPduBodyHandler is invoked.
   void ReadPduHeaderHandler(const asio::error_code &error, size_t read,
-                            const PduLengthHeader *pduLength);
+                            const PduLengthHeader *pdu_length);
 
   void ReadPduHeaderHandlerBlocking(bool *callback_result,
                                     const asio::error_code &error, size_t read,
-                                    const PduLengthHeader *pduLength);
+                                    const PduLengthHeader *pdu_length);
 
   // Handler for reading a PDU body.
   // Reads a PDU body on the socket and pushes it onto the PDU queue.
   void ReadPduBodyHandler(const asio::error_code &error, size_t read,
-                          const PduLengthHeader *pduLength,
-                          const PduData *pduBuffer);
+                          const PduLengthHeader *pdu_length,
+                          const PduData *pdu_buffer);
 
   // Returns a response for a PDU we have sent,
   // specified by its sequence number and its command id.
@@ -218,7 +221,7 @@ class SmppClient {
   // @param sequence Sequence number to look for.
   // @param commandId Command id to look for.
   // @return PDU response to PDU with the given sequence number and command id.
-  PDU ReadPduResponse(const uint32_t &sequence, const CommandId &commandId);
+  PDU ReadPduResponse(const uint32_t &sequence, const CommandId &command_id);
 
   // Checks the connection.
   // @throw TransportException if there was an problem with the connection.
@@ -235,13 +238,9 @@ class SmppClient {
   // @return
   static uint16_t DefaultMessageRef();
 
-
-  // Method to use when dealing with concatenated messages.
-  int csms_method_;
-
+  int csms_method_;  // Method to use when dealing with concatenated messages.
   std::function<uint16_t()> msg_ref_callback_;
-  // Bind state
-  ClientState state_;
+  ClientState state_;  // Bind state
   std::shared_ptr<asio::ip::tcp::socket> socket_;
   std::shared_ptr<smpp::ChronoDeadlineTimer> timer_;
   uint32_t seq_no_;

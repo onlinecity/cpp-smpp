@@ -603,24 +603,25 @@ bool SmppClient::EnquireLinkRespond() {
       // Remove pdu
       it = pdu_queue_.erase(it);
     } else {
-      it++;
+      ++it;
     }
   }
 
   PDU pdu = ReadPdu(false);
+
   if (pdu.null()) {
     return false;
   }
 
-  if (pdu.command_id() != CommandId::ENQUIRE_LINK) {
-    // Not enquire link pdu, put it back in the queue.
-    pdu_queue_.emplace_back(pdu);
-    return false;
+  if (pdu.command_id() == CommandId::ENQUIRE_LINK) {
+    PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
+    SendPdu(&resp);
+    return true;
   }
 
-  PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
-  SendPdu(&resp);
-  return true;
+  // Not enquire link pdu, put it back in the queue.
+  pdu_queue_.emplace_back(pdu);
+  return false;
 }
 
 void SmppClient::CheckConnection() {
