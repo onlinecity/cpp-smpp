@@ -242,7 +242,7 @@ class SmppClient {
   std::function<uint16_t()> msg_ref_callback_;
   ClientState state_;  // Bind state
   std::shared_ptr<asio::ip::tcp::socket> socket_;
-  std::shared_ptr<smpp::ChronoDeadlineTimer> timer_;
+  smpp::ChronoDeadlineTimer timer_;
   uint32_t seq_no_;
   std::list<PDU> pdu_queue_;
 };

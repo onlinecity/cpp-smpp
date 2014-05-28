@@ -39,7 +39,7 @@ SmppClient::SmppClient(shared_ptr<tcp::socket> socket) :
   msg_ref_callback_(&SmppClient::DefaultMessageRef),
   state_(ClientState::OPEN),
   socket_(socket),
-  timer_(std::make_shared<smpp::ChronoDeadlineTimer>(socket_->get_io_service())),
+  timer_(socket_->get_io_service()),
   seq_no_(0),
   pdu_queue_() {
   }
@@ -235,7 +235,7 @@ SMS SmppClient::ReadSms() {
 }
 
 void SmppClient::CancelBlocking() {
-  timer_->cancel();
+  timer_.cancel();
   socket_->cancel();
   SocketExecute();
 }
@@ -386,8 +386,8 @@ void SmppClient::SendPdu(PDU *pdu) {
 
   VLOG(1) << "\n>>> Sent:" << *pdu;
 
-  timer_->expires_from_now(std::chrono::milliseconds(FLAGS_socket_write_timeout));
-  timer_->async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
+  timer_.expires_from_now(std::chrono::milliseconds(FLAGS_socket_write_timeout));
+  timer_.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
   async_write(*socket_,
       buffer(static_cast<const void*>(pdu->GetOctets().c_str()),
       pdu->Size()),
@@ -396,7 +396,7 @@ void SmppClient::SendPdu(PDU *pdu) {
   SocketExecute();
 
   if (io_result) {
-    timer_->cancel();
+    timer_.cancel();
   } else if (timer_result) {
     socket_->cancel();
   }
@@ -483,12 +483,12 @@ void SmppClient::ReadPduBlocking() {
         _2,
         &pdu_header));
 
-  timer_->expires_from_now(std::chrono::milliseconds(FLAGS_socket_read_timeout));
-  timer_->async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
+  timer_.expires_from_now(std::chrono::milliseconds(FLAGS_socket_read_timeout));
+  timer_.async_wait(std::bind(&SmppClient::HandleTimeout, this, &timer_result, _1));
   SocketExecute();
 
   if (io_result) {
-    timer_->cancel();
+    timer_.cancel();
   } else if (timer_result) {
     socket_->cancel();
   }
