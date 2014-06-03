@@ -1,7 +1,8 @@
-/*
- * Copyright (C) 2014 OnlineCity
- * Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
- */
+//
+// Copyright (C) 2014 OnlineCity
+// Licensed under the MIT license, which can be read at: http://www.opensource.org/licenses/mit-license.php
+//
+
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
@@ -114,8 +115,8 @@ TEST_F(SmppClientTest, tlvExtended) {
 TEST_F(SmppClientTest, submitExtended) {
   socket_->connect(endpoint_);
   client_->BindTransmitter(FLAGS_username, FLAGS_password);
-  SmppAddress from("CPPSMPP", smpp::TON::ALPHANUMERIC, smpp::NPI::UNKNOWN);
-  SmppAddress to("4513371337", smpp::TON::INTERNATIONAL, smpp::NPI::E164);
+  SmppAddress from(FLAGS_sender, smpp::TON::ALPHANUMERIC, smpp::NPI::UNKNOWN);
+  SmppAddress to(FLAGS_receiver, smpp::TON::INTERNATIONAL, smpp::NPI::E164);
   string message = "message to send";
 
   struct smpp::SmppParams params;

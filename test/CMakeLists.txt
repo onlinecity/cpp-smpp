@@ -42,3 +42,4 @@ add_gtests(
 
 add_gtest(smppclient ${gtest_LIB})
 add_gtest(smppclient_receive ${gtest_LIB})
+add_gtest(smppclient_send ${gtest_LIB})
