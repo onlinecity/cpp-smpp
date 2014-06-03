@@ -9,22 +9,22 @@
 #include <memory>
 #include <string>
 
-#include "./connectionsetting.h"
 #include "gtest/gtest.h"
 #include "smpp/smppclient.h"
+#include "test_flags.h"
 
 class SmppClientTest: public testing::Test {
  public:
-  asio::ip::tcp::endpoint endpoint;
-  asio::io_service ios;
-  std::shared_ptr<asio::ip::tcp::socket> socket;
-  std::shared_ptr<smpp::SmppClient> client;
+  asio::ip::tcp::endpoint endpoint_;
+  asio::io_service ios_;
+  std::shared_ptr<asio::ip::tcp::socket> socket_;
+  std::shared_ptr<smpp::SmppClient> client_;
 
   SmppClientTest() :
-    endpoint(asio::ip::address_v4::from_string(SMPP_HOST), SMPP_PORT),
-    ios(),
-    socket(std::shared_ptr<asio::ip::tcp::socket>(new asio::ip::tcp::socket(ios))),
-    client(std::shared_ptr<smpp::SmppClient>(new smpp::SmppClient(socket))) {
+    endpoint_(asio::ip::address_v4::from_string(FLAGS_host), FLAGS_port),
+    ios_(),
+    socket_(std::shared_ptr<asio::ip::tcp::socket>(new asio::ip::tcp::socket(ios_))),
+    client_(std::shared_ptr<smpp::SmppClient>(new smpp::SmppClient(socket_))) {
   }
 
   virtual void SetUp() {
@@ -32,11 +32,11 @@ class SmppClientTest: public testing::Test {
   }
 
   virtual void TearDown() {
-    if (client->IsBound()) {
-      client->Unbind();
+    if (client_->IsBound()) {
+      client_->Unbind();
     }
 
-    socket->close();
+    socket_->close();
   }
 };
 
@@ -55,12 +55,12 @@ class SmppClientCsmsTest : public testing::Test {
   std::string message_500_;
 
   SmppClientCsmsTest() :
-    endpoint_(asio::ip::address_v4::from_string(SMPP_HOST), SMPP_PORT),
+    endpoint_(asio::ip::address_v4::from_string(FLAGS_host), FLAGS_port),
     ios_(),
     socket_(std::shared_ptr<asio::ip::tcp::socket>(new asio::ip::tcp::socket(ios_))),
     client_(socket_),
-    sender_("CPPSMPP", smpp::TON::ALPHANUMERIC, smpp::NPI::UNKNOWN),
-    receiver_("4513371337", smpp::TON::INTERNATIONAL, smpp::NPI::E164),
+    sender_(FLAGS_sender, smpp::TON::ALPHANUMERIC, smpp::NPI::UNKNOWN),
+    receiver_(FLAGS_receiver, smpp::TON::INTERNATIONAL, smpp::NPI::E164),
     message_170_("Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
         "Ut blandit sagittis erat, id tempus enim dapibus vitae. Duis "
         "posuere nunc a augue tincidunt laoreet. Ut volutpat."),
@@ -90,7 +90,7 @@ class SmppClientCsmsTest : public testing::Test {
 
   virtual void SetUp() {
     socket_->connect(endpoint_);
-    client_.BindTransmitter(SMPP_USERNAME, SMPP_PASSWORD);
+    client_.BindTransmitter(FLAGS_username, FLAGS_password);
   }
 
   virtual void TearDown() {

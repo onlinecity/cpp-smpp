@@ -26,20 +26,20 @@ using std::string;
 
 //  Test login of either transmitter or receiver
 TEST_F(SmppClientTest, BindReceiver) {
-  socket->connect(endpoint);
-  ASSERT_TRUE(socket->is_open());
-  client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
-  ASSERT_TRUE(client->IsBound());
-  client->Unbind();
-  socket->close();
+  socket_->connect(endpoint_);
+  ASSERT_TRUE(socket_->is_open());
+  client_->BindReceiver(FLAGS_username, FLAGS_password);
+  ASSERT_TRUE(client_->IsBound());
+  client_->Unbind();
+  socket_->close();
 }
 
 TEST_F(SmppClientTest, ReceiveSmsTimeout) {
   int socket_read_timeout = FLAGS_socket_read_timeout;  // Save defaults
   int timeout = 500;  // timeout 500 ms
   FLAGS_socket_read_timeout = timeout;  // Set timeout
-  socket->connect(endpoint);
-  client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
+  socket_->connect(endpoint_);
+  client_->BindReceiver(FLAGS_username, FLAGS_password);
   // Retrieve all messages and wait for timeout
   smpp::SMS sms;
 
@@ -47,7 +47,7 @@ TEST_F(SmppClientTest, ReceiveSmsTimeout) {
 
   do {
     start = std::chrono::high_resolution_clock::now();
-    sms = client->ReadSms();
+    sms = client_->ReadSms();
     end = std::chrono::high_resolution_clock::now();
   } while (!sms.is_null);
 
@@ -58,9 +58,9 @@ TEST_F(SmppClientTest, ReceiveSmsTimeout) {
 }
 
 TEST_F(SmppClientTest, ReceiveSms) {
-  socket->connect(endpoint);
-  client->BindReceiver(SMPP_USERNAME, SMPP_PASSWORD);
+  socket_->connect(endpoint_);
+  client_->BindReceiver(FLAGS_username, FLAGS_password);
   LOG(INFO) << "Waiting for smpp connection to send message";
-  smpp::SMS sms = client->ReadSms();
+  smpp::SMS sms = client_->ReadSms();
 }
 
