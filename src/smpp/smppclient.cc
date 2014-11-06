@@ -202,7 +202,7 @@ SMS SmppClient::ReadSms() {
   // see if we're bound correct.
   CheckState(ClientState::BOUND_RX);
 
-  // if  there are any messages in the queue pop the first usable one off and return it
+  // if there are any messages in the queue pop the first usable one off and return it
   if (!pdu_queue_.empty()) {
     return ParseSms();
   }
@@ -216,7 +216,7 @@ SMS SmppClient::ReadSms() {
       if (pdu.command_id() == CommandId::ENQUIRE_LINK) {
         PDU resp = PDU(CommandId::ENQUIRE_LINK_RESP, ESME::ROK, pdu.sequence_no());
         SendPdu(&resp);
-        continue;
+        return ParseSms();
       }
 
       if (pdu.null()) {
